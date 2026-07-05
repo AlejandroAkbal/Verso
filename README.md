@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://github.com/AlejandroAkbal/Verso/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/license-MIT-000000?style=for-the-badge" alt="License: MIT" />
+    <img src="https://img.shields.io/badge/license-AGPL--3.0-000000?style=for-the-badge" alt="License: AGPL-3.0" />
   </a>
   <a href="https://docs.expo.dev/versions/v57.0.0/">
     <img src="https://img.shields.io/badge/Expo-SDK%2057-4630EB?style=for-the-badge&logo=expo&logoColor=white" alt="Expo SDK 57" />
@@ -213,7 +213,7 @@ Please keep PRs focused and match the existing TypeScript strictness — no `any
 
 ## License
 
-[MIT](./LICENSE) © [Alejandro Akbal](https://github.com/AlejandroAkbal)
+[AGPL-3.0](./LICENSE) © [Alejandro Akbal](https://github.com/AlejandroAkbal)
 
 ---
 

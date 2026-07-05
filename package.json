@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "description": "Premium local-first OPDS e-book reader built with Expo SDK 57",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "author": "Alejandro Akbal (https://github.com/AlejandroAkbal)",
   "repository": {
     "type": "git",
