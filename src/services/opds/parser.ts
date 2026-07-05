@@ -1,8 +1,9 @@
+import { authToHeaders } from './credentials';
 import { XMLParser } from 'fast-xml-parser';
 import * as Crypto from 'expo-crypto';
 
 import type { BookRow } from '@/db/schema';
-import type { OPDSEntry, OPDSFeed } from './types';
+import type { OPDSEntry, OPDSFeed, OPDSNavigationEntry, OpdsAuth } from './types';
 
 type XmlPrimitive = string | number | boolean;
 interface XmlNode {
@@ -45,6 +46,24 @@ function extractLinks(entry: XmlNode): XmlNode[] {
   return asArray(entry.link as XmlNode | XmlNode[]);
 }
 
+function extractCategories(entry: XmlNode): string[] {
+  const categories = asArray(entry.category as XmlNode | XmlNode[]);
+  const labels = categories
+    .map((category) => asString(category['@_label']) || asString(category['@_term']))
+    .filter(Boolean);
+  return [...new Set(labels)];
+}
+
+function isAcquisitionLink(link: XmlNode): boolean {
+  const rel = asString(link['@_rel']);
+  return rel.includes('acquisition') || rel.includes('http://opds-spec.org/acquisition');
+}
+
+function isNavigationLink(link: XmlNode): boolean {
+  const rel = asString(link['@_rel']);
+  return rel === 'subsection' || rel.includes('subsection');
+}
+
 function extractCoverUrl(links: XmlNode[]): string {
   const imageLink = links.find((link) => {
     const rel = asString(link['@_rel']);
@@ -65,10 +84,18 @@ function extractCoverUrl(links: XmlNode[]): string {
 }
 
 function extractDownloadLink(links: XmlNode[]): { url: string; mime: string } {
-  const acquisition = links.find((link) => {
-    const rel = asString(link['@_rel']);
-    return rel.includes('acquisition') || rel.includes('http://opds-spec.org/acquisition');
+  const acquisitions = links.filter(isAcquisitionLink);
+
+  const preferred = acquisitions.find((link) => {
+    const href = asString(link['@_href']);
+    const type = asString(link['@_type']);
+    return (
+      (type.includes('epub') || href.endsWith('.epub')) &&
+      !href.includes('kepub')
+    );
   });
+
+  const acquisition = preferred ?? acquisitions[0];
 
   if (acquisition) {
     return {
@@ -97,9 +124,29 @@ function extractDownloadLink(links: XmlNode[]): { url: string; mime: string } {
   return { url: '', mime: '' };
 }
 
-function resolveHref(href: string, baseUrl?: string): string {
+function extractNavigationHref(links: XmlNode[]): string {
+  const navLink = links.find(isNavigationLink);
+  if (navLink) {
+    return asString(navLink['@_href']);
+  }
+
+  const catalogLink = links.find((link) => {
+    const type = asString(link['@_type']);
+    return type.includes('opds-catalog') && !isAcquisitionLink(link);
+  });
+
+  return catalogLink ? asString(catalogLink['@_href']) : '';
+}
+
+export function resolveHref(href: string, baseUrl?: string): string {
   if (!href) return '';
-  if (href.startsWith('http://') || href.startsWith('https://')) return href;
+  if (
+    href.startsWith('http://') ||
+    href.startsWith('https://') ||
+    href.startsWith('data:')
+  ) {
+    return href;
+  }
   if (baseUrl) {
     try {
       return new URL(href, baseUrl).href;
@@ -110,12 +157,87 @@ function resolveHref(href: string, baseUrl?: string): string {
   return href;
 }
 
-function parseEntry(entry: XmlNode, baseUrl: string): OPDSEntry | null {
+export function isOpdsCatalogReference(url: string, mime: string): boolean {
+  if (!url) return false;
+  if (mime.includes('opds-catalog')) return true;
+  return /\.opds(\?|$)/i.test(url);
+}
+
+function isCatalogBookEntry(entry: XmlNode, links: XmlNode[]): boolean {
+  if (!links.some(isNavigationLink)) return false;
+
+  const title = asString(entry.title);
+  if (!title) return false;
+
+  const id = asString(entry.id);
+  if (id.endsWith('.opds')) return true;
+  if (extractAuthors(entry)) return true;
+
+  return false;
+}
+
+function parseCatalogBookEntry(entry: XmlNode, baseUrl: string): OPDSEntry | null {
+  const title = asString(entry.title);
+  const links = extractLinks(entry);
+  if (!isCatalogBookEntry(entry, links)) return null;
+
+  const subsection = links.find(isNavigationLink);
+  if (!subsection) return null;
+
+  const detailUrl = resolveHref(asString(subsection['@_href']), baseUrl);
+  if (!detailUrl) return null;
+
+  const coverRaw = extractCoverUrl(links);
+  const id =
+    asString(entry.id) ||
+    detailUrl ||
+    `${title}-${asString(entry.updated)}`;
+
+  return {
+    id,
+    title,
+    author: extractAuthors(entry),
+    summary: asString(entry.summary) || asString(entry.content),
+    coverUrl: resolveHref(coverRaw, baseUrl),
+    downloadUrl: detailUrl,
+    mime: 'application/atom+xml;profile=opds-catalog',
+    updated: asString(entry.updated),
+    categories: extractCategories(entry),
+  };
+}
+
+export async function resolveAcquisitionFromDetail(
+  detailUrl: string,
+  auth: OpdsAuth | null = null,
+): Promise<{ url: string; mime: string }> {
+  const feed = await fetchOPDSFeed(detailUrl, auth);
+
+  const epubs = feed.entries.filter(
+    (entry) =>
+      entry.downloadUrl &&
+      (entry.mime.includes('epub') || entry.downloadUrl.endsWith('.epub')) &&
+      !entry.downloadUrl.includes('kepub'),
+  );
+  if (epubs.length > 0) {
+    return { url: epubs[0].downloadUrl, mime: epubs[0].mime };
+  }
+
+  const acquisition = feed.entries.find((entry) => entry.downloadUrl);
+  if (acquisition) {
+    return { url: acquisition.downloadUrl, mime: acquisition.mime };
+  }
+
+  throw new Error('No download link found in OPDS detail feed');
+}
+
+function parseAcquisitionEntry(entry: XmlNode, baseUrl: string): OPDSEntry | null {
   const title = asString(entry.title);
   if (!title) return null;
 
   const links = extractLinks(entry);
   const { url: downloadUrl, mime } = extractDownloadLink(links);
+  if (!downloadUrl) return null;
+
   const coverRaw = extractCoverUrl(links);
 
   const id =
@@ -133,16 +255,59 @@ function parseEntry(entry: XmlNode, baseUrl: string): OPDSEntry | null {
     downloadUrl: resolveHref(downloadUrl, baseUrl),
     mime,
     updated: asString(entry.updated),
+    categories: extractCategories(entry),
   };
+}
+
+function parseNavigationEntry(entry: XmlNode, baseUrl: string): OPDSNavigationEntry | null {
+  const title = asString(entry.title);
+  const links = extractLinks(entry);
+  const href = resolveHref(extractNavigationHref(links), baseUrl);
+  if (!title || !href) return null;
+  return { title, href };
+}
+
+function extractSearchUrl(links: XmlNode[], baseUrl: string): string | null {
+  const searchLink = links.find((link) => {
+    const rel = asString(link['@_rel']);
+    const type = asString(link['@_type']);
+    return rel === 'search' && type.includes('atom+xml');
+  });
+
+  if (!searchLink) return null;
+
+  const href = asString(searchLink['@_href']);
+  if (!href) return null;
+
+  return resolveHref(href, baseUrl);
 }
 
 export function parseOPDSFeed(xml: string, feedUrl: string): OPDSFeed {
   const parsed = parser.parse(xml) as XmlNode;
   const feed = (parsed.feed ?? parsed['catalog'] ?? parsed) as XmlNode;
 
-  const entries = asArray(feed.entry as XmlNode | XmlNode[])
-    .map((entry) => parseEntry(entry, feedUrl))
-    .filter((entry): entry is OPDSEntry => entry !== null);
+  const rawEntries = asArray(feed.entry as XmlNode | XmlNode[]);
+  const entries: OPDSEntry[] = [];
+  const navigationEntries: OPDSNavigationEntry[] = [];
+
+  for (const entry of rawEntries) {
+    const book = parseAcquisitionEntry(entry, feedUrl);
+    if (book) {
+      entries.push(book);
+      continue;
+    }
+
+    const catalogBook = parseCatalogBookEntry(entry, feedUrl);
+    if (catalogBook) {
+      entries.push(catalogBook);
+      continue;
+    }
+
+    const nav = parseNavigationEntry(entry, feedUrl);
+    if (nav) {
+      navigationEntries.push(nav);
+    }
+  }
 
   const links = asArray(feed.link as XmlNode | XmlNode[]);
   const nextLink = links.find((link) => {
@@ -153,15 +318,19 @@ export function parseOPDSFeed(xml: string, feedUrl: string): OPDSFeed {
   return {
     title: asString(feed.title) || 'Catalog',
     entries,
+    navigationEntries,
     nextUrl: nextLink ? resolveHref(asString(nextLink['@_href']), feedUrl) : null,
+    searchUrl: extractSearchUrl(links, feedUrl),
   };
 }
 
-export async function fetchOPDSFeed(url: string): Promise<OPDSFeed> {
+export async function fetchOPDSFeed(url: string, auth: OpdsAuth | null = null): Promise<OPDSFeed> {
   const response = await fetch(url, {
     headers: {
       Accept: 'application/atom+xml, application/xml, text/xml, */*',
+      ...authToHeaders(auth),
     },
+    redirect: 'follow',
   });
 
   if (!response.ok) {
@@ -169,30 +338,64 @@ export async function fetchOPDSFeed(url: string): Promise<OPDSFeed> {
   }
 
   const xml = await response.text();
-  return parseOPDSFeed(xml, url);
+  const trimmed = xml.trimStart();
+
+  if (!trimmed.startsWith('<?xml') && !trimmed.startsWith('<feed')) {
+    throw new Error('OPDS fetch returned non-XML response');
+  }
+
+  const feedUrl = response.url || url;
+  return parseOPDSFeed(xml, feedUrl);
 }
 
 export async function fetchAllOPDSEntries(
   startUrl: string,
-  maxPages = 3,
-): Promise<OPDSEntry[]> {
+  maxPages = 50,
+  auth: OpdsAuth | null = null,
+): Promise<{ entries: OPDSEntry[]; searchUrl: string | null }> {
   const allEntries: OPDSEntry[] = [];
+  let searchUrl: string | null = null;
   let currentUrl: string | null = startUrl;
   let page = 0;
 
   while (currentUrl && page < maxPages) {
-    const feed = await fetchOPDSFeed(currentUrl);
+    const feed = await fetchOPDSFeed(currentUrl, auth);
+    if (!searchUrl && feed.searchUrl) {
+      searchUrl = feed.searchUrl;
+    }
     allEntries.push(...feed.entries);
     currentUrl = feed.nextUrl;
     page += 1;
   }
 
   const seen = new Set<string>();
-  return allEntries.filter((entry) => {
+  const entries = allEntries.filter((entry) => {
     if (seen.has(entry.id)) return false;
     seen.add(entry.id);
     return true;
   });
+
+  return { entries, searchUrl };
+}
+
+export async function searchOPDSEntries(
+  searchUrlTemplate: string,
+  query: string,
+  baseUrl: string,
+  auth: OpdsAuth | null = null,
+  maxPages = 5,
+): Promise<OPDSEntry[]> {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+
+  const encoded = encodeURIComponent(trimmed);
+  const searchUrl = searchUrlTemplate.includes('{searchTerms}')
+    ? searchUrlTemplate.replace('{searchTerms}', encoded)
+    : `${searchUrlTemplate}${searchUrlTemplate.includes('?') ? '&' : '?'}query=${encoded}`;
+
+  const absoluteUrl = resolveHref(searchUrl, baseUrl);
+  const { entries } = await fetchAllOPDSEntries(absoluteUrl, maxPages, auth);
+  return entries;
 }
 
 export async function createBookId(serverId: string, opdsId: string): Promise<string> {
@@ -225,6 +428,7 @@ export async function entriesToBookRows(
       mime: entry.mime,
       updated_at: entry.updated,
       cached_at: now,
+      categories: JSON.stringify(entry.categories),
     });
   }
 

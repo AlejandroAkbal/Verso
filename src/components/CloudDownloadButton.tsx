@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { SymbolView } from 'expo-symbols';
 
-import { useTheme } from '@/theme/ThemeProvider';
 import { useBackgroundDownload } from '@/hooks/useBackgroundDownload';
+import { useTheme } from '@/theme/ThemeProvider';
 import { ProgressRing } from './ProgressRing';
 
 type CloudDownloadButtonProps = {
@@ -15,16 +15,10 @@ export function CloudDownloadButton({ bookId, size = 28 }: CloudDownloadButtonPr
   const { isDownloading, isCompleted, progress, startDownload } =
     useBackgroundDownload(bookId);
 
+  // Downloaded books show no chrome on the cover — absence of the cloud is the signal
+  // (Apple Books / Infuse pattern). Progress bar + detail screen carry read state.
   if (isCompleted) {
-    return (
-      <View style={[styles.button, { width: size, height: size }]}>
-        <SymbolView
-          name="checkmark.circle.fill"
-          size={size - 4}
-          tintColor={theme.colors.success}
-        />
-      </View>
-    );
+    return null;
   }
 
   if (isDownloading) {

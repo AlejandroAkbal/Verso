@@ -1,5 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import { SymbolView } from 'expo-symbols';
+import { useTranslation } from 'react-i18next';
 
 import { useTheme } from '@/theme/ThemeProvider';
 import { ThemedText } from './ThemedText';
@@ -10,6 +11,7 @@ type OfflineBannerProps = {
 
 export function OfflineBanner({ visible }: OfflineBannerProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   if (!visible) return null;
 
@@ -17,7 +19,7 @@ export function OfflineBanner({ visible }: OfflineBannerProps) {
     <View style={[styles.banner, { backgroundColor: theme.colors.surfaceElevated }]}>
       <SymbolView name="wifi.slash" size={14} tintColor={theme.colors.warning} />
       <ThemedText variant="caption" color={theme.colors.textSecondary}>
-        Offline Mode — showing cached catalog
+        {t('library.offlineBanner')}
       </ThemedText>
     </View>
   );

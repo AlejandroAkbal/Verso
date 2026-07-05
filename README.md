@@ -125,33 +125,47 @@ flowchart TB
 - [Node.js](https://nodejs.org/) 22+
 - [pnpm](https://pnpm.io/) 9+
 - [Expo CLI](https://docs.expo.dev/more/expo-cli/) (via `pnpm expo`)
-- **Development build required** — FlashList v2, native color extraction, and background tasks are not fully supported in Expo Go
+- **Development build required** — Expo Go is not supported (SDK 57 + native modules). Use `pnpm run:ios` or EAS.
 
-### Install & run
+### Install & run (iOS simulator)
 
 ```bash
 git clone https://github.com/AlejandroAkbal/Verso.git
 cd Verso
 pnpm install
+pnpm run:ios          # builds dev client + opens iPhone simulator
+```
+
+Metro-only (if you already built the native app):
+
+```bash
+pnpm start            # dev client connects to Metro
+```
+
+### Physical device
+
+Expo Go is **not supported**. Build a dev client:
+
+```bash
+eas build --profile development --platform ios
 pnpm start
 ```
 
-### Development build (recommended)
+Scan the QR code with the **Verso dev app**, not Expo Go.
+
+### CocoaPods troubleshooting
+
+If `pod install` fails with `cdn.cocoapods.org` SSL errors:
 
 ```bash
-pnpm expo install expo-dev-client
-eas build --profile development --platform ios   # or android
-pnpm start --dev-client
+pnpm pod-install
 ```
 
-### Default OPDS servers
+### First launch
 
-Verso seeds two public catalogs on first launch:
+Verso opens a short onboarding flow — welcome screen, then connect your OPDS catalog (Calibre-Web, etc.). Credentials are stored on-device only (`expo-secure-store` for passwords).
 
-| Server | URL |
-|---|---|
-| Project Gutenberg | `https://m.gutenberg.org/ebooks.opds/` |
-| Standard Ebooks | `https://standardebooks.org/feeds/opds` |
+For local dev prefills, copy `src/config/dev-secrets.example.ts` → `src/config/dev-secrets.ts` (gitignored).
 
 Add, edit, or remove servers anytime from **Settings**.
 
@@ -162,7 +176,7 @@ Add, edit, or remove servers anytime from **Settings**.
 ```text
 src/
 ├── app/                  # Expo Router screens
-│   ├── (tabs)/           # Catalog & Downloads tabs
+│   ├── (tabs)/           # Library home screen
 │   ├── book/[id].tsx     # Detail view (dynamic blur)
 │   ├── reader/[id].tsx   # EPUB / text reader
 │   └── settings.tsx      # OPDS server management

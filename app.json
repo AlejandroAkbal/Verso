@@ -13,7 +13,10 @@
       "supportsTablet": true,
       "bundleIdentifier": "dev.akbal.verso",
       "infoPlist": {
-        "UIBackgroundModes": ["fetch", "processing"]
+        "UIBackgroundModes": [
+          "fetch",
+          "processing"
+        ]
       }
     },
     "android": {
@@ -26,15 +29,12 @@
       "package": "dev.akbal.verso",
       "predictiveBackGestureEnabled": false
     },
-    "web": {
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
     "plugins": [
       "expo-router",
       "expo-sqlite",
       "expo-background-task",
       "expo-task-manager",
+      "expo-localization",
       [
         "expo-splash-screen",
         {
@@ -42,10 +42,10 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
-      "typedRoutes": true,
       "reactCompiler": true
     }
   }

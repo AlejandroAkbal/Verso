@@ -1,0 +1,141 @@
+{
+  "common": {
+    "back": "Atrás",
+    "done": "Listo",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "search": "Buscar",
+    "catalog": "Catálogo",
+    "goBack": "Volver"
+  },
+  "loading": {
+    "openingLibrary": "Abriendo biblioteca…"
+  },
+  "library": {
+    "title": "Biblioteca",
+    "searchPlaceholder": "Buscar en tu biblioteca",
+    "filterAll": "Todos",
+    "filterDownloaded": "Descargados",
+    "filterAllGenres": "Todos los géneros",
+    "noLibrary": "Sin biblioteca conectada",
+    "noLibraryHint": "Añade un catálogo OPDS en Ajustes para explorar tus libros.",
+    "connectServer": "Conectar servidor OPDS",
+    "emptyDownloaded": "Nada descargado aún — toca el icono de nube en un libro.",
+    "emptySearch": "Ningún libro coincide con tu búsqueda.",
+    "emptyCatalog": "No se encontraron libros en este catálogo",
+    "offlineBanner": "Sin conexión — los libros en el dispositivo se ven normales; el resto aparece atenuado",
+    "footer": {
+      "books_one": "{{count}} libro",
+      "books_other": "{{count}} libros",
+      "filtered": "{{visible}} de {{total}} libros",
+      "downloaded_one": "{{count}} descargado",
+      "downloaded_other": "{{count}} descargados",
+      "inProgress_one": "{{count}} en curso",
+      "inProgress_other": "{{count}} en curso",
+      "finished_one": "{{count}} terminado",
+      "finished_other": "{{count}} terminados"
+    }
+  },
+  "progress": {
+    "finished": "Terminado",
+    "percent": "{{percent}}%"
+  },
+  "book": {
+    "read": "Leer",
+    "download": "Descargar",
+    "new": "Nuevo",
+    "downloadToRead": "Descarga para leer",
+    "onDevice": "En el dispositivo",
+    "onThisDevice": "En este dispositivo",
+    "about": "Acerca de",
+    "showMore": "Ver más",
+    "showLess": "Ver menos",
+    "showMoreCategories": "Ver {{count}} más",
+    "continueReading": "Continuar · {{percent}}%",
+    "downloading": "Descargando… {{percent}}%",
+    "downloadFailed": "Error al descargar — Toca para reintentar",
+    "shareFile": "Compartir archivo",
+    "shareFileError": "No se pudo compartir el archivo",
+    "fileDetails": "{{format}} · {{size}}"
+  },
+  "downloads": {
+    "remove": "Eliminar descarga",
+    "removeTitle": "¿Eliminar descarga?",
+    "removeMessage": "«{{title}}» se eliminará de este dispositivo. Se conserva el progreso de lectura.",
+    "removeAll": "Eliminar todas las descargas",
+    "removeAllTitle": "¿Eliminar todas las descargas?",
+    "removeAllMessage": "{{count}} libros ({{size}}) se eliminarán de este dispositivo.",
+    "storageHeader": "Almacenamiento en el dispositivo",
+    "storageSummary": "{{count}} libros · {{size}}",
+    "storageEmpty": "Aún no hay libros descargados",
+    "storageFooter": "Eliminar descargas libera espacio en este dispositivo. Los libros siguen en tu catálogo OPDS."
+  },
+  "reader": {
+    "bookNotDownloaded": "Libro no descargado",
+    "loadFailed": "No se pudo cargar el libro"
+  },
+  "settings": {
+    "title": "Servidores OPDS",
+    "addServer": "Añadir servidor OPDS",
+    "editServer": "Editar servidor OPDS",
+    "configuredServers": "Bibliotecas",
+    "auth": "Auth: {{username}}",
+    "deleteTitle": "Eliminar servidor",
+    "deleteMessage": "¿Eliminar \"{{name}}\"?",
+    "cancelEdit": "Cancelar edición",
+    "addButton": "Añadir servidor",
+    "updateButton": "Actualizar servidor",
+    "deleteServer": "Eliminar servidor",
+    "listFooter": "Toca una biblioteca para abrirla en tu catálogo. Usa la flecha para editar la URL o las credenciales.",
+    "emptyServers": "Aún no hay bibliotecas conectadas. Añade un servidor OPDS para empezar.",
+    "serverFooter": "Las credenciales se guardan de forma segura solo en este dispositivo.",
+    "advancedHeader": "Avanzado",
+    "showIntroAgain": "Ver introducción de nuevo",
+    "showIntroAgainFooter": "Vuelve a ver las pantallas de bienvenida. Tu biblioteca y descargas se mantienen.",
+    "resetAllData": "Restablecer todos los datos",
+    "resetAllTitle": "¿Restablecer todos los datos?",
+    "resetAllMessage": "Esto elimina servidores, libros, descargas, progreso de lectura y contraseñas guardadas. Empezarás de cero como si acabaras de instalar Verso.",
+    "resetAllConfirm": "Restablecer"
+  },
+  "serverForm": {
+    "helper": "Pega la URL de tu feed OPDS — en Calibre-Web, activa OPDS en ajustes de admin y usa {{url}}. Usuario y contraseña solo para servidores privados.",
+    "helperUrl": "https://tu-servidor/opds",
+    "urlLabel": "URL OPDS",
+    "urlPlaceholder": "https://calibre.ejemplo.com/opds",
+    "authLabel": "Autenticación (si es necesaria)",
+    "usernamePlaceholder": "Usuario",
+    "passwordPlaceholder": "Contraseña",
+    "loadingPassword": "Cargando contraseña guardada…",
+    "testConnection": "Probar conexión",
+    "connect": "Conectar",
+    "saveAndOpen": "Guardar y abrir biblioteca",
+    "errorUrlRequired": "Introduce la URL OPDS.",
+    "errorUrlFirst": "Introduce primero la URL OPDS.",
+    "errorSaveFailed": "No se pudo guardar el servidor",
+    "errorConnectionFailed": "Conexión fallida",
+    "statusConnected": "Conectado — {{countLabel}} (\"{{title}}\")",
+    "statusBooksFound": "{{count}}+ libros encontrados",
+    "statusCatalogReachable": "catálogo accesible"
+  },
+  "onboarding": {
+    "tagline": "Tus libros. Tu servidor. Sin conexión.",
+    "description": "Verso es un lector premium para tu biblioteca OPDS autoalojada. Conecta Calibre-Web u otro catálogo OPDS, descarga libros y lee sin distracciones.",
+    "point1Title": "Conecta tu catálogo",
+    "point1Body": "Apunta Verso a tu feed OPDS — sin repositorios públicos, solo tu colección.",
+    "point2Title": "Descarga una vez, lee en cualquier lugar",
+    "point2Body": "Encola descargas y mantén tu biblioteca en el dispositivo para leer sin conexión.",
+    "point3Title": "Privado por defecto",
+    "point3Body": "Las credenciales permanecen en tu dispositivo. Tu biblioteca nunca pasa por nuestros servidores.",
+    "connectButton": "Conectar mi biblioteca",
+    "connectTitle": "Conectar OPDS",
+    "connectStep": "Paso 2 de 2 — vincula tu servidor Calibre-Web u OPDS.",
+    "backToLibrary": "Volver a la biblioteca"
+  },
+  "errors": {
+    "authFailed": "Autenticación fallida. Comprueba usuario y contraseña.",
+    "noBooksFound": "Conectado pero sin libros. Comprueba que OPDS esté activado en el servidor.",
+    "connectionFailed": "Conexión fallida",
+    "catalogConnectionFailed": "No se pudo conectar al catálogo"
+  }
+}

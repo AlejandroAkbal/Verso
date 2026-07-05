@@ -18,7 +18,9 @@ export function useBooksCache(serverId?: string) {
   }, [db, serverId]);
 
   useEffect(() => {
-    void refresh();
+    queueMicrotask(() => {
+      void refresh();
+    });
   }, [refresh]);
 
   return { books, loading, refresh };

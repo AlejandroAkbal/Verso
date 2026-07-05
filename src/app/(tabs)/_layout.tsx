@@ -1,41 +1,16 @@
-import { Tabs } from 'expo-router';
-import { SymbolView } from 'expo-symbols';
+import { Stack } from 'expo-router';
 
 import { theme } from '@/theme/theme';
 
-export default function TabLayout() {
+export default function LibraryLayout() {
   return (
-    <Tabs
+    <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: theme.colors.background },
-        headerTintColor: theme.colors.text,
-        headerShadowVisible: false,
-        tabBarStyle: {
-          backgroundColor: theme.colors.background,
-          borderTopColor: theme.colors.border,
-        },
-        tabBarActiveTintColor: theme.colors.text,
-        tabBarInactiveTintColor: theme.colors.textMuted,
+        headerShown: false,
+        contentStyle: { backgroundColor: theme.colors.background },
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Catalog',
-          tabBarIcon: ({ color }) => (
-            <SymbolView name="books.vertical" size={22} tintColor={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="downloads"
-        options={{
-          title: 'Downloads',
-          tabBarIcon: ({ color }) => (
-            <SymbolView name="arrow.down.circle" size={22} tintColor={color} />
-          ),
-        }}
-      />
-    </Tabs>
+      <Stack.Screen name="index" />
+    </Stack>
   );
 }

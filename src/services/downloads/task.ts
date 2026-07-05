@@ -1,5 +1,7 @@
 import * as BackgroundTask from 'expo-background-task';
+import * as Device from 'expo-device';
 import * as TaskManager from 'expo-task-manager';
+import type { SQLiteDatabase } from 'expo-sqlite';
 import { openDatabaseSync } from 'expo-sqlite';
 
 import { processDownloadQueue } from './queue';
@@ -17,6 +19,10 @@ TaskManager.defineTask(BACKGROUND_DOWNLOAD_TASK, async () => {
 });
 
 export async function registerBackgroundDownloadTask(): Promise<void> {
+  if (!Device.isDevice) {
+    return;
+  }
+
   const isRegistered = await TaskManager.isTaskRegisteredAsync(
     BACKGROUND_DOWNLOAD_TASK,
   );
@@ -28,7 +34,6 @@ export async function registerBackgroundDownloadTask(): Promise<void> {
   }
 }
 
-export async function triggerDownloadProcessing(): Promise<void> {
-  const db = openDatabaseSync('verso.db');
+export async function triggerDownloadProcessing(db: SQLiteDatabase): Promise<void> {
   await processDownloadQueue(db);
 }

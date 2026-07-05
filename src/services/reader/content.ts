@@ -13,6 +13,38 @@ export type ReaderContent = {
   plainText: string;
 };
 
+function parseOpfAttributes(tag: string): Record<string, string> {
+  const attrs: Record<string, string> = {};
+  for (const match of tag.matchAll(/([\w:-]+)="([^"]*)"/g)) {
+    attrs[match[1]] = match[2];
+  }
+  return attrs;
+}
+
+function parseOpfManifest(opfXml: string, opfDir: string): Map<string, string> {
+  const manifest = new Map<string, string>();
+  for (const match of opfXml.matchAll(/<item\b[^>]*\/?>/gi)) {
+    const attrs = parseOpfAttributes(match[0]);
+    const id = attrs.id;
+    const href = attrs.href;
+    if (id && href) {
+      manifest.set(id, opfDir + href);
+    }
+  }
+  return manifest;
+}
+
+function parseOpfSpine(opfXml: string): string[] {
+  const idrefs: string[] = [];
+  for (const match of opfXml.matchAll(/<itemref\b[^>]*\/?>/gi)) {
+    const idref = parseOpfAttributes(match[0]).idref;
+    if (idref) {
+      idrefs.push(idref);
+    }
+  }
+  return idrefs;
+}
+
 function stripHtml(html: string): string {
   return html
     .replace(/<script[\s\S]*?<\/script>/gi, '')
@@ -59,30 +91,32 @@ async function loadEpubContent(localUri: string): Promise<ReaderContent> {
   const titleMatch = opfXml.match(/<dc:title[^>]*>([\s\S]*?)<\/dc:title>/i);
   const title = titleMatch ? stripHtml(titleMatch[1]) : 'Untitled';
 
-  const manifestItems = [...opfXml.matchAll(/<item[^>]+id="([^"]+)"[^>]+href="([^"]+)"[^>]*\/?>/gi)];
-  const manifest = new Map<string, string>();
-  for (const match of manifestItems) {
-    manifest.set(match[1], opfDir + match[2]);
-  }
-
-  const spineItems = [...opfXml.matchAll(/<itemref[^>]+idref="([^"]+)"[^>]*\/?>/gi)];
+  const manifest = parseOpfManifest(opfXml, opfDir);
+  const spineIdrefs = parseOpfSpine(opfXml);
   const chapters: ReaderChapter[] = [];
 
-  for (const [index, match] of spineItems.entries()) {
-    const href = manifest.get(match[1]);
+  for (const [index, idref] of spineIdrefs.entries()) {
+    const href = manifest.get(idref);
     if (!href) continue;
 
     const html = await zip.file(href)?.async('string');
     if (!html) continue;
 
     chapters.push({
-      id: match[1],
+      id: idref,
       title: `Chapter ${index + 1}`,
       html,
     });
   }
 
   const plainText = chapters.map((c) => stripHtml(c.html)).join('\n\n');
+
+  if (chapters.length === 0) {
+    throw new Error('Invalid EPUB: no readable chapters in spine');
+  }
+  if (!plainText.trim()) {
+    throw new Error('Invalid EPUB: no text content');
+  }
 
   return { title, chapters, plainText };
 }

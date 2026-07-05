@@ -4,19 +4,24 @@ import { Image } from 'expo-image';
 
 type BlurBackdropProps = {
   imageUrl: string;
+  imageHeaders?: Record<string, string>;
   dominantColor: string;
   children: React.ReactNode;
 };
 
 export function BlurBackdrop({
   imageUrl,
+  imageHeaders,
   dominantColor,
   children,
 }: BlurBackdropProps) {
   return (
     <View style={styles.container}>
       <Image
-        source={{ uri: imageUrl }}
+        source={{
+          uri: imageUrl,
+          headers: imageHeaders,
+        }}
         style={StyleSheet.absoluteFill}
         contentFit="cover"
         blurRadius={40}

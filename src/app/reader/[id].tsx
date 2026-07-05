@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SymbolView } from 'expo-symbols';
+import { useTranslation } from 'react-i18next';
 import { useSQLiteContext } from 'expo-sqlite';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -31,6 +32,7 @@ export default function ReaderScreen() {
   const db = useSQLiteContext();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,43 +43,43 @@ export default function ReaderScreen() {
   const [title, setTitle] = useState('');
 
   useEffect(() => {
-    async function load() {
-      if (!id) return;
+    queueMicrotask(() => {
+      void (async () => {
+        if (!id) return;
 
-      try {
-        const book = await getBookById(db, id);
-        const download = await getDownloadByBookId(db, id);
-        const saved = await getReadingProgress(db, id);
+        try {
+          const book = await getBookById(db, id);
+          const download = await getDownloadByBookId(db, id);
+          const saved = await getReadingProgress(db, id);
 
-        if (!book || !download?.local_uri) {
-          setError('Book not downloaded');
+          if (!book || !download?.local_uri) {
+            setError(t('reader.bookNotDownloaded'));
+            setLoading(false);
+            return;
+          }
+
+          const content = await loadBookContent(download.local_uri, book.mime);
+          const charsPerPage = charsPerPageForFontSize(
+            saved?.font_size ?? appTheme.reader.fontSizeDefault,
+          );
+          const paginated = paginateText(content.plainText, charsPerPage);
+
+          setTitle(content.title || book.title);
+          setPages(paginated);
+          setFontSize(saved?.font_size ?? appTheme.reader.fontSizeDefault);
+          setCurrentPage(
+            saved?.position != null
+              ? Math.min(saved.position, paginated.length - 1)
+              : 0,
+          );
+        } catch (err) {
+          setError(err instanceof Error ? err.message : t('reader.loadFailed'));
+        } finally {
           setLoading(false);
-          return;
         }
-
-        const content = await loadBookContent(download.local_uri, book.mime);
-        const charsPerPage = charsPerPageForFontSize(
-          saved?.font_size ?? appTheme.reader.fontSizeDefault,
-        );
-        const paginated = paginateText(content.plainText, charsPerPage);
-
-        setTitle(content.title || book.title);
-        setPages(paginated);
-        setFontSize(saved?.font_size ?? appTheme.reader.fontSizeDefault);
-        setCurrentPage(
-          saved?.position != null
-            ? Math.min(saved.position, paginated.length - 1)
-            : 0,
-        );
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load book');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    void load();
-  }, [db, id]);
+      })();
+    });
+  }, [db, id, t]);
 
   const persistProgress = useCallback(
     async (page: number, size: number) => {
@@ -138,7 +140,7 @@ export default function ReaderScreen() {
       <View style={[styles.centered, { backgroundColor: theme.colors.background }]}>
         <ThemedText color={theme.colors.error}>{error}</ThemedText>
         <Pressable onPress={() => router.back()}>
-          <ThemedText color={theme.colors.textSecondary}>Go back</ThemedText>
+          <ThemedText color={theme.colors.textSecondary}>{t('common.goBack')}</ThemedText>
         </Pressable>
       </View>
     );

@@ -16,10 +16,12 @@ export function useDownloads() {
   }, [db]);
 
   useEffect(() => {
-    void refresh();
+    queueMicrotask(() => {
+      void refresh();
+    });
     const interval = setInterval(() => {
       void refresh();
-    }, 1000);
+    }, 2000);
     return () => clearInterval(interval);
   }, [refresh]);
 
@@ -36,10 +38,12 @@ export function useDownloadStatus(bookId: string) {
   }, [db, bookId]);
 
   useEffect(() => {
-    void refresh();
+    queueMicrotask(() => {
+      void refresh();
+    });
     const interval = setInterval(() => {
       void refresh();
-    }, 500);
+    }, 1000);
     return () => clearInterval(interval);
   }, [refresh]);
 

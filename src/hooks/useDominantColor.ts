@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ImageColors from 'react-native-image-colors';
 
 import { theme } from '@/theme/theme';
@@ -24,67 +24,100 @@ function hashToColor(input: string): string {
   return `hsl(${hue}, 45%, 25%)`;
 }
 
+function fallbackFromBlurhash(blurhash?: string): ColorResult {
+  if (!blurhash) {
+    return FALLBACK;
+  }
+
+  return {
+    ...FALLBACK,
+    dominant: hashToColor(blurhash),
+    background: hashToColor(`${blurhash}bg`),
+  };
+}
+
 export function useDominantColor(imageUrl: string | undefined, blurhash?: string) {
-  const [colors, setColors] = useState<ColorResult>(FALLBACK);
+  const placeholder = useMemo(() => fallbackFromBlurhash(blurhash), [blurhash]);
+  const [extracted, setExtracted] = useState<{ url: string; colors: ColorResult } | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!imageUrl) {
-      setColors({
-        ...FALLBACK,
-        dominant: blurhash ? hashToColor(blurhash) : FALLBACK.dominant,
-        background: blurhash ? hashToColor(blurhash + 'bg') : FALLBACK.background,
-      });
       return;
     }
 
+    const url = imageUrl;
     let cancelled = false;
 
     async function extract() {
       try {
-        const result = await ImageColors.getColors(imageUrl!, {
-          fallback: hashToColor(imageUrl!),
+        const result = await ImageColors.getColors(url, {
+          fallback: hashToColor(url),
           cache: true,
-          key: imageUrl!,
+          key: url,
         });
 
         if (cancelled) return;
 
         if (result.platform === 'ios') {
-          setColors({
-            dominant: result.primary,
-            background: result.background,
-            detail: result.detail,
+          setExtracted({
+            url,
+            colors: {
+              dominant: result.primary,
+              background: result.background,
+              detail: result.detail,
+            },
           });
         } else if (result.platform === 'android') {
-          setColors({
-            dominant: result.dominant,
-            background: result.average,
-            detail: result.vibrant,
+          setExtracted({
+            url,
+            colors: {
+              dominant: result.dominant,
+              background: result.average,
+              detail: result.vibrant,
+            },
           });
         } else {
-          setColors({
-            dominant: result.dominant,
-            background: result.dominant,
-            detail: result.vibrant,
+          setExtracted({
+            url,
+            colors: {
+              dominant: result.dominant,
+              background: result.dominant,
+              detail: result.vibrant,
+            },
           });
         }
       } catch {
         if (!cancelled) {
-          setColors({
-            ...FALLBACK,
-            dominant: hashToColor(imageUrl!),
-            background: hashToColor(imageUrl! + 'bg'),
+          setExtracted({
+            url,
+            colors: {
+              ...FALLBACK,
+              dominant: hashToColor(url),
+              background: hashToColor(`${url}bg`),
+            },
           });
         }
       }
     }
 
-    void extract();
+    queueMicrotask(() => {
+      void extract();
+    });
 
     return () => {
       cancelled = true;
     };
-  }, [imageUrl, blurhash]);
+  }, [imageUrl]);
 
-  return colors;
+  if (!imageUrl) {
+    return placeholder;
+  }
+
+  if (extracted?.url === imageUrl) {
+    return extracted.colors;
+  }
+
+  return placeholder;
 }

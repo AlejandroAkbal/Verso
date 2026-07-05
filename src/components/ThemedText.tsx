@@ -1,4 +1,4 @@
-import { StyleSheet, Text, type TextProps, type TextStyle } from 'react-native';
+import { Text, type TextProps, type TextStyle } from 'react-native';
 
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -28,7 +28,10 @@ export function ThemedText({
   return (
     <Text
       style={[
-        { color: color ?? theme.colors.text },
+        {
+          color: color ?? theme.colors.text,
+          flexShrink: 1,
+        },
         variantStyles[variant],
         style,
       ]}

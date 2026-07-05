@@ -2,7 +2,14 @@ export type ServerRow = {
   id: string;
   title: string;
   url: string;
+  auth_username: string;
   created_at: number;
+};
+
+export type UserPreferencesRow = {
+  id: number;
+  onboarding_completed: number;
+  active_server_id: string;
 };
 
 export type BookRow = {
@@ -18,6 +25,7 @@ export type BookRow = {
   mime: string;
   updated_at: string;
   cached_at: number;
+  categories: string;
 };
 
 export type DownloadStatus =
@@ -46,19 +54,27 @@ export type ReadingProgressRow = {
   updated_at: number;
 };
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 7;
 
 export const CREATE_TABLES_SQL = `
   PRAGMA journal_mode = WAL;
+  PRAGMA busy_timeout = 5000;
 
   CREATE TABLE IF NOT EXISTS schema_version (
     version INTEGER NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS user_preferences (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    onboarding_completed INTEGER NOT NULL DEFAULT 0,
+    active_server_id TEXT NOT NULL DEFAULT ''
   );
 
   CREATE TABLE IF NOT EXISTS servers (
     id TEXT PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
     url TEXT NOT NULL UNIQUE,
+    auth_username TEXT NOT NULL DEFAULT '',
     created_at INTEGER NOT NULL
   );
 
@@ -75,6 +91,7 @@ export const CREATE_TABLES_SQL = `
     mime TEXT NOT NULL DEFAULT '',
     updated_at TEXT NOT NULL DEFAULT '',
     cached_at INTEGER NOT NULL,
+    categories TEXT NOT NULL DEFAULT '[]',
     FOREIGN KEY (server_id) REFERENCES servers(id) ON DELETE CASCADE,
     UNIQUE(server_id, opds_id)
   );
@@ -104,14 +121,3 @@ export const CREATE_TABLES_SQL = `
   CREATE INDEX IF NOT EXISTS idx_books_cached_at ON books(cached_at DESC);
   CREATE INDEX IF NOT EXISTS idx_downloads_status ON downloads(status);
 `;
-
-export const DEFAULT_OPDS_SERVERS: Omit<ServerRow, 'id' | 'created_at'>[] = [
-  {
-    title: 'Project Gutenberg',
-    url: 'https://m.gutenberg.org/ebooks.opds/',
-  },
-  {
-    title: 'Standard Ebooks',
-    url: 'https://standardebooks.org/feeds/opds',
-  },
-];

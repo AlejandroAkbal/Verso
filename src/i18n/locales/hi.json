@@ -1,0 +1,141 @@
+{
+  "common": {
+    "back": "वापस",
+    "done": "हो गया",
+    "cancel": "रद्द करें",
+    "delete": "हटाएँ",
+    "edit": "संपादित करें",
+    "search": "खोजें",
+    "catalog": "कैटलॉग",
+    "goBack": "वापस जाएँ"
+  },
+  "loading": {
+    "openingLibrary": "लाइब्रेरी खोली जा रही है…"
+  },
+  "library": {
+    "title": "लाइब्रेरी",
+    "searchPlaceholder": "अपनी लाइब्रेरी खोजें",
+    "filterAll": "सभी",
+    "filterDownloaded": "डाउनलोड किए",
+    "filterAllGenres": "सभी श्रेणियाँ",
+    "noLibrary": "कोई लाइब्रेरी कनेक्ट नहीं",
+    "noLibraryHint": "अपनी किताबें देखने के लिए सेटिंग्स में OPDS कैटलॉग जोड़ें।",
+    "connectServer": "OPDS सर्वर कनेक्ट करें",
+    "emptyDownloaded": "अभी कुछ डाउनलोड नहीं — किताब पर बादल आइकन टैप करें।",
+    "emptySearch": "आपकी खोज से कोई किताब मेल नहीं खाती।",
+    "emptyCatalog": "इस कैटलॉग में कोई किताब नहीं मिली",
+    "offlineBanner": "ऑफ़लाइन — डिवाइस की किताबें सामान्य; बाकी धुंधली",
+    "footer": {
+      "books_one": "{{count}} किताब",
+      "books_other": "{{count}} किताबें",
+      "filtered": "{{visible}} / {{total}} किताबें",
+      "downloaded_one": "{{count}} डाउनलोड",
+      "downloaded_other": "{{count}} डाउनलोड",
+      "inProgress_one": "{{count}} पढ़ी जा रही",
+      "inProgress_other": "{{count}} पढ़ी जा रही",
+      "finished_one": "{{count}} पूर्ण",
+      "finished_other": "{{count}} पूर्ण"
+    }
+  },
+  "progress": {
+    "finished": "पूर्ण",
+    "percent": "{{percent}}%"
+  },
+  "book": {
+    "read": "पढ़ें",
+    "download": "डाउनलोड",
+    "new": "नया",
+    "downloadToRead": "पढ़ने के लिए डाउनलोड करें",
+    "onDevice": "डिवाइस पर",
+    "onThisDevice": "इस डिवाइस पर",
+    "about": "परिचय",
+    "showMore": "और देखें",
+    "showLess": "कम देखें",
+    "showMoreCategories": "{{count}} और देखें",
+    "continueReading": "जारी रखें · {{percent}}%",
+    "downloading": "डाउनलोड हो रहा है… {{percent}}%",
+    "downloadFailed": "डाउनलोड विफल — पुनः प्रयास करें",
+    "shareFile": "फ़ाइल साझा करें",
+    "shareFileError": "फ़ाइल साझा नहीं हो सकी",
+    "fileDetails": "{{format}} · {{size}}"
+  },
+  "downloads": {
+    "remove": "डाउनलोड हटाएँ",
+    "removeTitle": "डाउनलोड हटाएँ?",
+    "removeMessage": "\"{{title}}\" इस डिवाइस से हटा दिया जाएगा। पढ़ने की प्रगति सुरक्षित रहेगी।",
+    "removeAll": "सभी डाउनलोड हटाएँ",
+    "removeAllTitle": "सभी डाउनलोड हटाएँ?",
+    "removeAllMessage": "{{count}} किताबें ({{size}}) इस डिवाइस से हटा दी जाएँगी।",
+    "storageHeader": "डिवाइस पर संग्रहण",
+    "storageSummary": "{{count}} किताबें · {{size}}",
+    "storageEmpty": "अभी कोई किताब डाउनलोड नहीं",
+    "storageFooter": "डाउनलोड हटाने से इस डिवाइस पर जगह मुक्त होती है। किताबें आपके OPDS कैटलॉग में रहती हैं।"
+  },
+  "reader": {
+    "bookNotDownloaded": "किताब डाउनलोड नहीं",
+    "loadFailed": "किताब लोड नहीं हो सकी"
+  },
+  "settings": {
+    "title": "OPDS सर्वर",
+    "addServer": "OPDS सर्वर जोड़ें",
+    "editServer": "OPDS सर्वर संपादित करें",
+    "configuredServers": "लाइब्रेरी",
+    "auth": "प्रमाणन: {{username}}",
+    "deleteTitle": "सर्वर हटाएँ",
+    "deleteMessage": "\"{{name}}\" हटाएँ?",
+    "cancelEdit": "संपादन रद्द करें",
+    "addButton": "सर्वर जोड़ें",
+    "updateButton": "सर्वर अपडेट करें",
+    "deleteServer": "सर्वर हटाएँ",
+    "listFooter": "कैटलॉग में खोलने के लिए लाइब्रेरी टैप करें। URL या क्रेडेंशियल संपादित करने के लिए तीर का उपयोग करें।",
+    "emptyServers": "अभी कोई लाइब्रेरी कनेक्ट नहीं। शुरू करने के लिए OPDS सर्वर जोड़ें।",
+    "serverFooter": "क्रेडेंशियल केवल इस डिवाइस पर सुरक्षित रूप से संग्रहीत हैं।",
+    "advancedHeader": "उन्नत",
+    "showIntroAgain": "परिचय फिर देखें",
+    "showIntroAgainFooter": "स्वागत स्क्रीन फिर चलाएँ। आपकी लाइब्रेरी और डाउनलोड रहेंगे।",
+    "resetAllData": "सभी ऐप डेटा रीसेट करें",
+    "resetAllTitle": "सभी ऐप डेटा रीसेट करें?",
+    "resetAllMessage": "यह सर्वर, किताबें, डाउनलोड, पढ़ने की प्रगति और सहेजे पासवर्ड हटा देगा। Verso नए इंस्टॉल जैसा शुरू होगा।",
+    "resetAllConfirm": "रीसेट करें"
+  },
+  "serverForm": {
+    "helper": "अपना OPDS फ़ीड URL पेस्ट करें — Calibre-Web में एडमिन सेटिंग्स में OPDS चालू करें और {{url}} उपयोग करें। निजी सर्वर के लिए ही उपयोगकर्ता नाम और पासवर्ड चाहिए।",
+    "helperUrl": "https://आपका-सर्वर/opds",
+    "urlLabel": "OPDS URL",
+    "urlPlaceholder": "https://calibre.example.com/opds",
+    "authLabel": "प्रमाणीकरण (यदि आवश्यक)",
+    "usernamePlaceholder": "उपयोगकर्ता नाम",
+    "passwordPlaceholder": "पासवर्ड",
+    "loadingPassword": "सहेजा पासवर्ड लोड हो रहा है…",
+    "testConnection": "कनेक्शन जाँचें",
+    "connect": "कनेक्ट करें",
+    "saveAndOpen": "सहेजें और लाइब्रेरी खोलें",
+    "errorUrlRequired": "OPDS URL दर्ज करें।",
+    "errorUrlFirst": "पहले OPDS URL दर्ज करें।",
+    "errorSaveFailed": "सर्वर सहेजा नहीं जा सका",
+    "errorConnectionFailed": "कनेक्शन विफल",
+    "statusConnected": "कनेक्ट — {{countLabel}} (\"{{title}}\")",
+    "statusBooksFound": "{{count}}+ किताबें मिलीं",
+    "statusCatalogReachable": "कैटलॉग उपलब्ध"
+  },
+  "onboarding": {
+    "tagline": "आपकी किताबें। आपका सर्वर। ऑफ़लाइन।",
+    "description": "Verso आपकी स्व-होस्ट OPDS लाइब्रेरी के लिए प्रीमियम रीडर है। Calibre-Web या कोई OPDS कैटलॉग कनेक्ट करें, किताबें डाउनलोड करें, बिना विकर्षण पढ़ें।",
+    "point1Title": "अपना कैटलॉग कनेक्ट करें",
+    "point1Body": "Verso को अपने OPDS फ़ीड पर इंगित करें — सार्वजनिक ई-बुक डंप नहीं, सिर्फ़ आपका संग्रह।",
+    "point2Title": "एक बार डाउनलोड, कहीं भी पढ़ें",
+    "point2Body": "डाउनलोड कतार में लगाएँ और ऑफ़लाइन पढ़ने के लिए डिवाइस पर रखें।",
+    "point3Title": "डिफ़ॉल्ट रूप से निजी",
+    "point3Body": "क्रेडेंशियल आपके डिवाइस पर रहते हैं। लाइब्रेरी हमारे सर्वर से नहीं गुज़रती।",
+    "connectButton": "मेरी लाइब्रेरी कनेक्ट करें",
+    "connectTitle": "OPDS कनेक्ट करें",
+    "connectStep": "चरण 2 / 2 — Calibre-Web या OPDS सर्वर लिंक करें।",
+    "backToLibrary": "लाइब्रेरी पर वापस"
+  },
+  "errors": {
+    "authFailed": "प्रमाणीकरण विफल। उपयोगकर्ता नाम और पासवर्ड जाँचें।",
+    "noBooksFound": "कनेक्ट हुआ लेकिन कोई किताब नहीं। सर्वर पर OPDS सक्षम है या नहीं जाँचें।",
+    "connectionFailed": "कनेक्शन विफल",
+    "catalogConnectionFailed": "कैटलॉग से कनेक्ट नहीं हो सका"
+  }
+}

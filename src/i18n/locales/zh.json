@@ -1,0 +1,137 @@
+{
+  "common": {
+    "back": "返回",
+    "done": "完成",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "search": "搜索",
+    "catalog": "目录",
+    "goBack": "返回"
+  },
+  "loading": {
+    "openingLibrary": "正在打开书库…"
+  },
+  "library": {
+    "title": "书库",
+    "searchPlaceholder": "搜索书库",
+    "filterAll": "全部",
+    "filterDownloaded": "已下载",
+    "filterAllGenres": "全部类型",
+    "noLibrary": "未连接书库",
+    "noLibraryHint": "在设置中添加 OPDS 目录以浏览图书。",
+    "connectServer": "连接 OPDS 服务器",
+    "emptyDownloaded": "尚无下载 — 点击图书上的云图标。",
+    "emptySearch": "没有匹配的图书。",
+    "emptyCatalog": "此目录中未找到图书",
+    "offlineBanner": "离线 — 已下载图书正常显示，其余变暗",
+    "footer": {
+      "books_other": "{{count}} 本图书",
+      "filtered": "{{visible}} / {{total}} 本图书",
+      "downloaded_other": "已下载 {{count}} 本",
+      "inProgress_other": "阅读中 {{count}} 本",
+      "finished_other": "已读完 {{count}} 本"
+    }
+  },
+  "progress": {
+    "finished": "已读完",
+    "percent": "{{percent}}%"
+  },
+  "book": {
+    "read": "阅读",
+    "download": "下载",
+    "new": "新书",
+    "downloadToRead": "下载后阅读",
+    "onDevice": "已在本机",
+    "onThisDevice": "本机图书",
+    "about": "简介",
+    "showMore": "展开",
+    "showLess": "收起",
+    "showMoreCategories": "展开其余 {{count}} 个",
+    "continueReading": "继续阅读 · {{percent}}%",
+    "downloading": "下载中… {{percent}}%",
+    "downloadFailed": "下载失败 — 点击重试",
+    "shareFile": "分享文件",
+    "shareFileError": "无法分享此文件",
+    "fileDetails": "{{format}} · {{size}}"
+  },
+  "downloads": {
+    "remove": "移除下载",
+    "removeTitle": "移除下载？",
+    "removeMessage": "「{{title}}」将从本设备删除。阅读进度会保留。",
+    "removeAll": "移除全部下载",
+    "removeAllTitle": "移除全部下载？",
+    "removeAllMessage": "{{count}} 本图书（{{size}}）将从本设备删除。",
+    "storageHeader": "本机存储",
+    "storageSummary": "{{count}} 本图书 · {{size}}",
+    "storageEmpty": "尚无下载的图书",
+    "storageFooter": "移除下载可释放本机空间。图书仍保留在 OPDS 目录中。"
+  },
+  "reader": {
+    "bookNotDownloaded": "图书未下载",
+    "loadFailed": "无法加载图书"
+  },
+  "settings": {
+    "title": "OPDS 服务器",
+    "addServer": "添加 OPDS 服务器",
+    "editServer": "编辑 OPDS 服务器",
+    "configuredServers": "书库",
+    "auth": "认证：{{username}}",
+    "deleteTitle": "删除服务器",
+    "deleteMessage": "移除「{{name}}」？",
+    "cancelEdit": "取消编辑",
+    "addButton": "添加服务器",
+    "updateButton": "更新服务器",
+    "deleteServer": "删除服务器",
+    "listFooter": "点按书库在目录中打开。使用箭头编辑地址或凭据。",
+    "emptyServers": "尚未连接书库。添加 OPDS 服务器即可开始。",
+    "serverFooter": "凭据仅安全存储在此设备上。",
+    "advancedHeader": "高级",
+    "showIntroAgain": "再次查看介绍",
+    "showIntroAgainFooter": "重新播放欢迎界面。书库和下载会保留。",
+    "resetAllData": "重置所有应用数据",
+    "resetAllTitle": "重置所有应用数据？",
+    "resetAllMessage": "将删除服务器、图书、下载、阅读进度和已保存的密码。应用将恢复到初始安装状态。",
+    "resetAllConfirm": "重置"
+  },
+  "serverForm": {
+    "helper": "粘贴 OPDS 订阅地址 — Calibre-Web 请在管理设置中启用 OPDS 并使用 {{url}}。私有服务器才需要用户名和密码。",
+    "helperUrl": "https://你的服务器/opds",
+    "urlLabel": "OPDS 地址",
+    "urlPlaceholder": "https://calibre.example.com/opds",
+    "authLabel": "身份验证（如需要）",
+    "usernamePlaceholder": "用户名",
+    "passwordPlaceholder": "密码",
+    "loadingPassword": "正在加载已保存的密码…",
+    "testConnection": "测试连接",
+    "connect": "连接",
+    "saveAndOpen": "保存并打开书库",
+    "errorUrlRequired": "请输入 OPDS 地址。",
+    "errorUrlFirst": "请先输入 OPDS 地址。",
+    "errorSaveFailed": "无法保存服务器",
+    "errorConnectionFailed": "连接失败",
+    "statusConnected": "已连接 — {{countLabel}}（「{{title}}」）",
+    "statusBooksFound": "找到 {{count}}+ 本图书",
+    "statusCatalogReachable": "目录可访问"
+  },
+  "onboarding": {
+    "tagline": "你的图书。你的服务器。离线可读。",
+    "description": "Verso 是面向自托管 OPDS 书库的高端阅读器。连接 Calibre-Web 或任意 OPDS 目录，下载图书，专注阅读。",
+    "point1Title": "连接你的目录",
+    "point1Body": "将 Verso 指向 OPDS 订阅 — 没有公共书库，只有你的收藏。",
+    "point2Title": "一次下载，随处阅读",
+    "point2Body": "排队下载，把书库保存在设备上，离线阅读。",
+    "point3Title": "默认私密",
+    "point3Body": "凭据仅保存在你的设备上。书库不会经过我们的服务器。",
+    "connectButton": "连接我的书库",
+    "connectTitle": "连接 OPDS",
+    "connectStep": "第 2 步，共 2 步 — 链接 Calibre-Web 或 OPDS 服务器。",
+    "backToLibrary": "返回书库"
+  },
+  "errors": {
+    "authFailed": "身份验证失败。请检查用户名和密码。",
+    "noBooksFound": "已连接但未找到图书。请确认服务器已启用 OPDS。",
+    "connectionFailed": "连接失败",
+    "catalogConnectionFailed": "无法连接到目录"
+  }
+}

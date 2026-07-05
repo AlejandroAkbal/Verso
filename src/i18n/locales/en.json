@@ -1,0 +1,141 @@
+{
+  "common": {
+    "back": "Back",
+    "done": "Done",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "catalog": "Catalog",
+    "goBack": "Go back"
+  },
+  "loading": {
+    "openingLibrary": "Opening library…"
+  },
+  "library": {
+    "title": "Library",
+    "searchPlaceholder": "Search your library",
+    "filterAll": "All",
+    "filterDownloaded": "Downloaded",
+    "filterAllGenres": "All genres",
+    "noLibrary": "No library connected",
+    "noLibraryHint": "Add an OPDS catalog in Settings to browse your books.",
+    "connectServer": "Connect OPDS server",
+    "emptyDownloaded": "Nothing downloaded yet — tap the cloud icon on a book.",
+    "emptySearch": "No books match your search.",
+    "emptyCatalog": "No books found in this catalog",
+    "offlineBanner": "Offline — on-device books stay bright; others are dimmed",
+    "footer": {
+      "books_one": "{{count}} book",
+      "books_other": "{{count}} books",
+      "filtered": "{{visible}} of {{total}} books",
+      "downloaded_one": "{{count}} downloaded",
+      "downloaded_other": "{{count}} downloaded",
+      "inProgress_one": "{{count}} in progress",
+      "inProgress_other": "{{count}} in progress",
+      "finished_one": "{{count}} finished",
+      "finished_other": "{{count}} finished"
+    }
+  },
+  "progress": {
+    "finished": "Finished",
+    "percent": "{{percent}}%"
+  },
+  "book": {
+    "read": "Read",
+    "download": "Download",
+    "new": "New",
+    "downloadToRead": "Download to read",
+    "onDevice": "On device",
+    "onThisDevice": "On This Device",
+    "about": "About",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "showMoreCategories": "Show {{count}} more",
+    "continueReading": "Continue · {{percent}}%",
+    "downloading": "Downloading… {{percent}}%",
+    "downloadFailed": "Download Failed — Tap to Retry",
+    "shareFile": "Share File",
+    "shareFileError": "Could not share this file",
+    "fileDetails": "{{format}} · {{size}}"
+  },
+  "downloads": {
+    "remove": "Remove Download",
+    "removeTitle": "Remove download?",
+    "removeMessage": "\"{{title}}\" will be deleted from this device. Reading progress is kept.",
+    "removeAll": "Remove All Downloads",
+    "removeAllTitle": "Remove all downloads?",
+    "removeAllMessage": "{{count}} books ({{size}}) will be deleted from this device.",
+    "storageHeader": "On-Device Storage",
+    "storageSummary": "{{count}} books · {{size}}",
+    "storageEmpty": "No books downloaded yet",
+    "storageFooter": "Removing downloads frees space on this device. Books stay in your OPDS catalog."
+  },
+  "reader": {
+    "bookNotDownloaded": "Book not downloaded",
+    "loadFailed": "Failed to load book"
+  },
+  "settings": {
+    "title": "OPDS Servers",
+    "addServer": "Add OPDS Server",
+    "editServer": "Edit OPDS Server",
+    "configuredServers": "Libraries",
+    "auth": "Auth: {{username}}",
+    "deleteTitle": "Delete server",
+    "deleteMessage": "Remove \"{{name}}\"?",
+    "cancelEdit": "Cancel edit",
+    "addButton": "Add Server",
+    "updateButton": "Update Server",
+    "deleteServer": "Delete Server",
+    "listFooter": "Tap a library to open it in your catalog. Use the arrow to edit its URL or credentials.",
+    "emptyServers": "No libraries connected yet. Add an OPDS server to get started.",
+    "serverFooter": "Credentials are stored securely on this device only.",
+    "advancedHeader": "Advanced",
+    "showIntroAgain": "Show Intro Again",
+    "showIntroAgainFooter": "Replay the welcome screens. Your library and downloads stay on this device.",
+    "resetAllData": "Reset All App Data",
+    "resetAllTitle": "Reset all app data?",
+    "resetAllMessage": "This removes servers, books, downloads, reading progress, and saved passwords from this device. You will start fresh as if Verso was just installed.",
+    "resetAllConfirm": "Reset App"
+  },
+  "serverForm": {
+    "helper": "Paste your OPDS feed URL — for Calibre-Web, enable OPDS in admin settings and use {{url}}. Username and password are only needed for private servers.",
+    "helperUrl": "https://your-server/opds",
+    "urlLabel": "OPDS URL",
+    "urlPlaceholder": "https://calibre.example.com/opds",
+    "authLabel": "Authentication (if required)",
+    "usernamePlaceholder": "Username",
+    "passwordPlaceholder": "Password",
+    "loadingPassword": "Loading saved password…",
+    "testConnection": "Test connection",
+    "connect": "Connect",
+    "saveAndOpen": "Save & open library",
+    "errorUrlRequired": "Enter your OPDS URL.",
+    "errorUrlFirst": "Enter your OPDS URL first.",
+    "errorSaveFailed": "Failed to save server",
+    "errorConnectionFailed": "Connection failed",
+    "statusConnected": "Connected — {{countLabel}} (\"{{title}}\")",
+    "statusBooksFound": "{{count}}+ books found",
+    "statusCatalogReachable": "catalog reachable"
+  },
+  "onboarding": {
+    "tagline": "Your books. Your server. Offline.",
+    "description": "Verso is a premium reader for your self-hosted OPDS library. Connect Calibre-Web or any OPDS catalog, download books, and read without distractions.",
+    "point1Title": "Connect your catalog",
+    "point1Body": "Point Verso at your OPDS feed — no public ebook dumps, just your collection.",
+    "point2Title": "Download once, read anywhere",
+    "point2Body": "Queue downloads and keep your library on device for offline reading.",
+    "point3Title": "Private by default",
+    "point3Body": "Credentials stay on your device. Your library never passes through our servers.",
+    "connectButton": "Connect my library",
+    "connectTitle": "Connect OPDS",
+    "connectStep": "Step 2 of 2 — link your Calibre-Web or OPDS server.",
+    "backToLibrary": "Back to Library"
+  },
+  "errors": {
+    "authFailed": "Authentication failed. Check username and password.",
+    "noBooksFound": "Connected but no books found. Check that OPDS is enabled on your server.",
+    "connectionFailed": "Connection failed",
+    "catalogConnectionFailed": "Could not connect to catalog"
+  }
+}
