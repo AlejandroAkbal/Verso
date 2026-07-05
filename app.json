@@ -1,22 +1,29 @@
 {
   "expo": {
     "name": "Verso",
-    "slug": "Verso",
+    "slug": "verso",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "verso",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "supportsTablet": true,
+      "bundleIdentifier": "dev.akbal.verso",
+      "infoPlist": {
+        "UIBackgroundModes": ["fetch", "processing"]
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#000000",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
+      "package": "dev.akbal.verso",
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -25,10 +32,13 @@
     },
     "plugins": [
       "expo-router",
+      "expo-sqlite",
+      "expo-background-task",
+      "expo-task-manager",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#000000",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
