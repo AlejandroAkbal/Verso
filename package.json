@@ -2,6 +2,17 @@
   "name": "verso",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "description": "Premium local-first OPDS e-book reader built with Expo SDK 57",
+  "license": "MIT",
+  "author": "Alejandro Akbal (https://github.com/AlejandroAkbal)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AlejandroAkbal/Verso.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AlejandroAkbal/Verso/issues"
+  },
+  "homepage": "https://github.com/AlejandroAkbal/Verso#readme",
   "packageManager": "pnpm@11.10.0",
   "dependencies": {
     "@expo/ui": "~57.0.3",
