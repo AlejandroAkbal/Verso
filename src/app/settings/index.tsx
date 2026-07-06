@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, Switch } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -8,6 +8,7 @@ import { SettingsGroup } from '@/components/settings/SettingsGroup';
 import { SettingsRow } from '@/components/settings/SettingsRow';
 import { ThemedText } from '@/components/ThemedText';
 import { Box, ScrollBox } from '@/components/ui';
+import { useUserPreferences } from '@/db/hooks/useUserPreferences';
 import { useServers } from '@/db/hooks/useServers';
 import { useActiveServer } from '@/db/hooks/useActiveServer';
 import { useDownloadStorageStats } from '@/hooks/useDownloadStorage';
@@ -35,6 +36,8 @@ export default function SettingsIndexScreen() {
   const { activeServerId, setActive } = useActiveServer();
   const { stats, refresh } = useDownloadStorageStats();
   const insets = useSafeAreaInsets();
+  const { prefs, updateResumeLastBook } = useUserPreferences();
+  const resumeLastBook = (prefs?.resume_last_book ?? 0) === 1;
 
   const handleRemoveAll = () => {
     if (stats.count === 0) return;
@@ -127,6 +130,33 @@ export default function SettingsIndexScreen() {
         />
       </SettingsGroup>
 
+      <SettingsGroup header={t('sync.title')} footer={t('sync.settingsFooter')}>
+        <SettingsRow
+          title={t('sync.title')}
+          subtitle={t('sync.settingsRowHint')}
+          showChevron
+          testID="settings-koreader-sync"
+          onPress={() => router.push('/settings/koreader')}
+        />
+      </SettingsGroup>
+
+      <SettingsGroup header={t('settings.readingHeader')}>
+        <SettingsRow
+          title={t('settings.resumeLastBook')}
+          subtitle={t('settings.resumeLastBookHint')}
+          rightElement={
+            <Switch
+              value={resumeLastBook}
+              onValueChange={(value) => {
+                void updateResumeLastBook(value);
+              }}
+              trackColor={{ false: theme.colors.border, true: theme.colors.accentMuted }}
+            />
+          }
+          testID="settings-resume-last-book"
+        />
+      </SettingsGroup>
+
       <SettingsGroup
         header={t('downloads.storageHeader')}
         footer={t('downloads.storageFooter')}
@@ -148,18 +178,6 @@ export default function SettingsIndexScreen() {
             onPress={handleRemoveAll}
           />
         ) : null}
-      </SettingsGroup>
-
-      <SettingsGroup
-        header={t('sync.title')}
-        footer={t('sync.settingsFooter')}
-      >
-        <SettingsRow
-          title={t('sync.title')}
-          showChevron
-          testID="settings-koreader-sync"
-          onPress={() => router.push('/settings/koreader')}
-        />
       </SettingsGroup>
 
       <SettingsGroup

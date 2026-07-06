@@ -10,32 +10,46 @@ import { SettingsRow } from '@/components/settings/SettingsRow';
 import { ThemedText } from '@/components/ThemedText';
 import { Box, PressableBox, ScrollBox } from '@/components/ui';
 import { appIdentity } from '@/config/appIdentity';
+import { useActiveServer } from '@/db/hooks/useActiveServer';
+import { useServers } from '@/db/hooks/useServers';
 import { useUserPreferences } from '@/db/hooks/useUserPreferences';
+import { getLatestSyncError } from '@/db/queries';
 import type { DocumentIdMode } from '@/db/schema';
+import { lightImpactHaptic, notificationErrorHaptic, notificationSuccessHaptic } from '@/lib/haptics';
 import { buildAuthHeaders, getKoreaderPassword } from '@/services/koreader/credentials';
 import { testKoreaderConnection } from '@/services/koreader/client';
 import { saveDefaultSyncAccount } from '@/services/koreader/syncBook';
+import { getServerPassword } from '@/services/opds/credentials';
+import { deriveKosyncUrlFromOpdsUrl } from '@/services/opds/url';
 import { useTheme } from '@/theme/ThemeProvider';
+
+type ActionFeedback = {
+  variant: 'success' | 'error';
+  message: string;
+};
 
 export default function KoreaderSettingsScreen() {
   const theme = useTheme();
   const db = useSQLiteContext();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const { syncAccount, loading, refresh, updateKoreaderSyncEnabled, updateResumeLastBook, prefs } =
-    useUserPreferences();
+  const { servers } = useServers();
+  const { activeServerId } = useActiveServer();
+  const { syncAccount, loading, refresh, updateKoreaderSyncEnabled } = useUserPreferences();
 
   const [serverUrl, setServerUrl] = useState(appIdentity.koreaderDefaultServerUrl);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [documentIdMode, setDocumentIdMode] = useState<DocumentIdMode>('partial_md5');
   const [enabled, setEnabled] = useState(false);
-  const [resumeLastBook, setResumeLastBook] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const [testing, setTesting] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [status, setStatus] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [lastSyncError, setLastSyncError] = useState<string | null>(null);
+  const [testFeedback, setTestFeedback] = useState<ActionFeedback | null>(null);
+  const [saveFeedback, setSaveFeedback] = useState<ActionFeedback | null>(null);
+
+  const activeServer = servers.find((server) => server.id === activeServerId) ?? servers[0];
 
   useEffect(() => {
     if (loading || initialized) {
@@ -45,21 +59,30 @@ export default function KoreaderSettingsScreen() {
     queueMicrotask(() => {
       void (async () => {
         const stored = await getKoreaderPassword();
-        setServerUrl(syncAccount?.server_url ?? appIdentity.koreaderDefaultServerUrl);
-        setUsername(syncAccount?.username ?? '');
-        setPassword(stored ?? '');
+        const latestError = await getLatestSyncError(db);
+        const defaultUrl = activeServer
+          ? deriveKosyncUrlFromOpdsUrl(activeServer.url)
+          : appIdentity.koreaderDefaultServerUrl;
+
+        let effectivePassword = stored ?? '';
+        if (!effectivePassword && activeServer?.auth_username) {
+          effectivePassword = (await getServerPassword(activeServer.id)) ?? '';
+        }
+
+        setServerUrl(syncAccount?.server_url ?? defaultUrl);
+        setUsername(syncAccount?.username ?? activeServer?.auth_username ?? '');
+        setPassword(effectivePassword);
         setDocumentIdMode(syncAccount?.document_id_mode ?? 'partial_md5');
         setEnabled((syncAccount?.enabled ?? 0) === 1);
-        setResumeLastBook((prefs?.resume_last_book ?? 0) === 1);
+        setLastSyncError(latestError);
         setInitialized(true);
       })();
     });
-  }, [initialized, loading, prefs?.resume_last_book, syncAccount]);
+  }, [activeServer, db, initialized, loading, syncAccount]);
 
   const handleTest = useCallback(async () => {
     setTesting(true);
-    setError(null);
-    setStatus(null);
+    setTestFeedback(null);
 
     try {
       const auth = await buildAuthHeaders(username.trim(), password);
@@ -67,9 +90,12 @@ export default function KoreaderSettingsScreen() {
         throw new Error(t('sync.errorCredentials'));
       }
       await testKoreaderConnection(serverUrl.trim(), auth);
-      setStatus(t('sync.testSuccess'));
+      setTestFeedback({ variant: 'success', message: t('sync.testSuccess') });
+      void notificationSuccessHaptic();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('sync.testFailed'));
+      const message = err instanceof Error ? err.message : t('sync.testFailed');
+      setTestFeedback({ variant: 'error', message });
+      void notificationErrorHaptic();
     } finally {
       setTesting(false);
     }
@@ -77,8 +103,7 @@ export default function KoreaderSettingsScreen() {
 
   const handleSave = useCallback(async () => {
     setSaving(true);
-    setError(null);
-    setStatus(null);
+    setSaveFeedback(null);
 
     try {
       if (!serverUrl.trim() || !username.trim() || !password) {
@@ -93,11 +118,14 @@ export default function KoreaderSettingsScreen() {
         enabled,
       });
       await updateKoreaderSyncEnabled(enabled);
-      await updateResumeLastBook(resumeLastBook);
       await refresh();
-      setStatus(t('sync.saveSuccess'));
+      setLastSyncError(null);
+      setSaveFeedback({ variant: 'success', message: t('sync.saveSuccess') });
+      void notificationSuccessHaptic();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('sync.saveFailed'));
+      const message = err instanceof Error ? err.message : t('sync.saveFailed');
+      setSaveFeedback({ variant: 'error', message });
+      void notificationErrorHaptic();
     } finally {
       setSaving(false);
     }
@@ -107,11 +135,9 @@ export default function KoreaderSettingsScreen() {
     enabled,
     password,
     refresh,
-    resumeLastBook,
     serverUrl,
     t,
     updateKoreaderSyncEnabled,
-    updateResumeLastBook,
     username,
   ]);
 
@@ -154,7 +180,11 @@ export default function KoreaderSettingsScreen() {
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="url"
-            placeholder={appIdentity.koreaderDefaultServerUrl}
+            placeholder={
+              activeServer
+                ? deriveKosyncUrlFromOpdsUrl(activeServer.url)
+                : appIdentity.koreaderDefaultServerUrl
+            }
           />
           <SettingsFieldRow
             label={t('sync.username')}
@@ -173,6 +203,14 @@ export default function KoreaderSettingsScreen() {
           />
         </SettingsGroup>
 
+        {lastSyncError ? (
+          <Box paddingHorizontal="md" paddingBottom="sm">
+            <ThemedText variant="caption" color={theme.colors.error}>
+              {t('sync.lastError', { message: lastSyncError })}
+            </ThemedText>
+          </Box>
+        ) : null}
+
         <SettingsGroup header={t('sync.documentIdHeader')} footer={t('sync.documentIdFooter')}>
           <SettingsRow
             title={t('sync.documentIdPartial')}
@@ -186,20 +224,6 @@ export default function KoreaderSettingsScreen() {
           />
         </SettingsGroup>
 
-        <SettingsGroup header={t('sync.readingHeader')}>
-          <SettingsRow
-            title={t('sync.resumeLastBook')}
-            subtitle={t('sync.resumeLastBookHint')}
-            rightElement={
-              <Switch
-                value={resumeLastBook}
-                onValueChange={setResumeLastBook}
-                trackColor={{ false: theme.colors.border, true: theme.colors.accentMuted }}
-              />
-            }
-          />
-        </SettingsGroup>
-
         <Box gap="sm" marginTop="md">
           <PressableBox
             alignItems="center"
@@ -207,8 +231,12 @@ export default function KoreaderSettingsScreen() {
             minHeight={48}
             borderRadius="full"
             backgroundColor="secondary"
-            onPress={() => void handleTest()}
+            onPress={() => {
+              void lightImpactHaptic();
+              void handleTest();
+            }}
             disabled={testing}
+            testID="sync-test-connection"
           >
             {testing ? (
               <ActivityIndicator color={theme.colors.text} />
@@ -217,14 +245,30 @@ export default function KoreaderSettingsScreen() {
             )}
           </PressableBox>
 
+          {testFeedback ? (
+            <ThemedText
+              variant="caption"
+              color={testFeedback.variant === 'error' ? theme.colors.error : theme.colors.success}
+              testID="sync-test-feedback"
+              accessibilityLiveRegion="polite"
+              style={{ textAlign: 'center' }}
+            >
+              {testFeedback.message}
+            </ThemedText>
+          ) : null}
+
           <PressableBox
             alignItems="center"
             justifyContent="center"
             minHeight={48}
             borderRadius="full"
             backgroundColor="primary"
-            onPress={() => void handleSave()}
+            onPress={() => {
+              void lightImpactHaptic();
+              void handleSave();
+            }}
             disabled={saving}
+            testID="sync-save-settings"
           >
             {saving ? (
               <ActivityIndicator color={theme.colors.onPrimary} />
@@ -233,14 +277,15 @@ export default function KoreaderSettingsScreen() {
             )}
           </PressableBox>
 
-          {status ? (
-            <ThemedText variant="caption" color={theme.colors.textSecondary}>
-              {status}
-            </ThemedText>
-          ) : null}
-          {error ? (
-            <ThemedText variant="caption" color={theme.colors.error}>
-              {error}
+          {saveFeedback ? (
+            <ThemedText
+              variant="caption"
+              color={saveFeedback.variant === 'error' ? theme.colors.error : theme.colors.success}
+              testID="sync-save-feedback"
+              accessibilityLiveRegion="polite"
+              style={{ textAlign: 'center' }}
+            >
+              {saveFeedback.message}
             </ThemedText>
           ) : null}
         </Box>

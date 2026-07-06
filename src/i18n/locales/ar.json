@@ -86,7 +86,18 @@
     "storageHeader": "التخزين على الجهاز",
     "storageSummary": "{{count}} كتاب · {{size}}",
     "storageEmpty": "لا كتب منزّلة بعد",
-    "storageFooter": "إزالة التنزيلات تُفرّغ مساحة على الجهاز. تبقى الكتب في فهرس OPDS."
+    "storageFooter": "إزالة التنزيلات تُفرّغ مساحة على الجهاز. تبقى الكتب في فهرس OPDS.",
+    "failedToast": "تعذّر تنزيل «{{title}}»: {{reason}}",
+    "errorFallbackTitle": "كتاب",
+    "errorUnknown": "فشل التنزيل. حاول مرة أخرى.",
+    "errorAuth": "فشلت المصادقة. تحقق من اسم المستخدم وكلمة مرور OPDS في الإعدادات.",
+    "errorForbidden": "تم رفض الوصول. قد لا يملك هذا الحساب إذن تنزيل هذا الكتاب.",
+    "errorNotFound": "لم يُعثر على رابط التنزيل على الخادم.",
+    "errorOpds": "تعذّر قراءة تفاصيل الكتاب من خادم OPDS.",
+    "errorNoLink": "لا يوجد رابط EPUB في خلاصة OPDS لهذا الكتاب.",
+    "errorTransport": "فشل التنزيل بسبب مشكلة شبكة على الجهاز. حاول مرة أخرى.",
+    "errorHttp": "خطأ من الخادم: {{detail}}",
+    "errorGeneric": "{{detail}}"
   },
   "reader": {
     "bookNotDownloaded": "الكتاب غير منزّل",
@@ -118,7 +129,10 @@
     "resetAllData": "إعادة تعيين كل بيانات التطبيق",
     "resetAllTitle": "إعادة تعيين كل البيانات؟",
     "resetAllMessage": "سيُحذف الخوادم والكتب والتنزيلات وتقدّم القراءة وكلمات المرور المحفوظة. ستبدأ كما لو ثبّتت {{appName}} للتو.",
-    "resetAllConfirm": "إعادة التعيين"
+    "resetAllConfirm": "إعادة التعيين",
+    "readingHeader": "القراءة",
+    "resumeLastBook": "استئناف آخر كتاب عند التشغيل",
+    "resumeLastBookHint": "يفتح آخر كتاب تلقائياً عند بدء التطبيق."
   },
   "serverForm": {
     "helper": "الصق رابط خلاصة OPDS — في Calibre-Web فعّل OPDS من إعدادات المسؤول واستخدم {{url}}. اسم المستخدم وكلمة المرور للخوادم الخاصة فقط.",
@@ -164,8 +178,14 @@
   "sync": {
     "title": "مزامنة KOReader",
     "header": "خادم المزامنة",
-    "footer": "تتم مزامنة التقدّم مع خوادم KOReader. بيانات الاعتماد تبقى على هذا الجهاز.",
+    "footer": "في Calibre-Web Automated استخدم مضيف مكتبتك مع /kosync (مثل https://books.example.com/kosync). MD5 الجزئي يوافق التقدّم مع KOReader ومكتبة Calibre.",
     "settingsFooter": "تابع القراءة عبر KOReader وThorium وهذا التطبيق.",
+    "settingsRowHint": "Calibre-Web /kosync — نفس تقدّم KOReader في مكتبتك",
+    "useLibraryServer": "استخدام خادم المكتبة",
+    "useLibraryServerHint": "ملء رابط /kosync وبيانات الاعتماد من OPDS النشط",
+    "libraryServerFilled": "تم الملء من خادم المكتبة",
+    "noLibraryServer": "أضف مكتبة OPDS أولاً",
+    "lastError": "آخر خطأ مزامنة: {{message}}",
     "enable": "تفعيل المزامنة",
     "serverUrl": "رابط الخادم",
     "username": "اسم المستخدم",
@@ -174,9 +194,6 @@
     "documentIdFooter": "MD5 الجزئي يطابق إعداد KOReader الافتراضي. وضع اسم الملف أسرع لكن قد يتعارض.",
     "documentIdPartial": "MD5 جزئي (موصى به)",
     "documentIdFilename": "تجزئة اسم الملف",
-    "readingHeader": "القراءة",
-    "resumeLastBook": "استئناف آخر كتاب عند التشغيل",
-    "resumeLastBookHint": "يفتح آخر كتاب تلقائياً عند بدء التطبيق.",
     "testConnection": "اختبار الاتصال",
     "save": "حفظ إعدادات المزامنة",
     "testSuccess": "تم الاتصال بخادم المزامنة",

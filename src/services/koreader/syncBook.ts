@@ -15,6 +15,7 @@ import {
 } from '@/db/queries';
 import type { DocumentIdMode } from '@/db/schema';
 import { resolveDownloadLocalUri } from '@/services/downloads/manage';
+import { showSyncErrorToast } from '@/lib/toast';
 
 import { buildAuthHeaders, setKoreaderPassword } from './credentials';
 import {
@@ -37,6 +38,7 @@ export type SyncPullResult = {
   remote: KoreaderProgressResponse | null;
   hasConflict: boolean;
   documentId: string | null;
+  error?: string;
 };
 
 export async function isSyncActive(db: SQLiteDatabase): Promise<boolean> {
@@ -145,7 +147,8 @@ export async function pullRemoteProgressForBook(
     if (existing) {
       await upsertBookSyncState(db, { ...existing, last_error: message });
     }
-    return { remote: null, hasConflict: false, documentId };
+    showSyncErrorToast(message);
+    return { remote: null, hasConflict: false, documentId, error: message };
   }
 }
 
@@ -223,6 +226,7 @@ export async function pushLocalProgressForBook(
     if (syncState) {
       await upsertBookSyncState(db, { ...syncState, last_error: message });
     }
+    showSyncErrorToast(message);
   }
 }
 

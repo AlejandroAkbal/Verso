@@ -13,11 +13,9 @@ type CloudDownloadButtonProps = {
 
 export function CloudDownloadButton({ bookId, size = 28 }: CloudDownloadButtonProps) {
   const theme = useTheme();
-  const { isDownloading, isCompleted, progress, startDownload } =
+  const { isDownloading, isCompleted, isFailed, progress, startDownload } =
     useBackgroundDownload(bookId);
 
-  // Downloaded books show no chrome on the cover — absence of the cloud is the signal
-  // (Apple Books / Infuse pattern). Progress bar + detail screen carry read state.
   if (isCompleted) {
     return null;
   }
@@ -37,6 +35,33 @@ export function CloudDownloadButton({ bookId, size = 28 }: CloudDownloadButtonPr
     );
   }
 
+  if (isFailed) {
+    return (
+      <PressableBox
+        alignItems="center"
+        justifyContent="center"
+        borderRadius="full"
+        backgroundColor="overlay"
+        width={size}
+        height={size}
+        onPress={(event) => {
+          event.stopPropagation();
+          void lightImpactHaptic();
+          void startDownload();
+        }}
+        hitSlop={8}
+        testID={`book-download-retry-${bookId}`}
+        accessibilityLabel="Download failed, tap to retry"
+      >
+        <SymbolView
+          name="exclamationmark.icloud"
+          size={size - 4}
+          tintColor={theme.colors.error}
+        />
+      </PressableBox>
+    );
+  }
+
   return (
     <PressableBox
       alignItems="center"
@@ -51,6 +76,7 @@ export function CloudDownloadButton({ bookId, size = 28 }: CloudDownloadButtonPr
         void startDownload();
       }}
       hitSlop={8}
+      testID={`book-download-${bookId}`}
     >
       <SymbolView
         name="icloud.and.arrow.down"

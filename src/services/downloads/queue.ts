@@ -1,4 +1,5 @@
 import { Directory, File, Paths } from 'expo-file-system';
+import * as LegacyFS from 'expo-file-system/legacy';
 import type { SQLiteDatabase } from 'expo-sqlite';
 
 import {
@@ -22,6 +23,7 @@ import { ensureBookDocumentId } from '@/services/koreader/syncBook';
 export const DOWNLOADS_DIR_NAME = 'books';
 
 const MAX_CONCURRENT = 2;
+const PROGRESS_WRITE_MS = 400;
 
 export function getDownloadsDirectory(): Directory {
   return new Directory(Paths.document, DOWNLOADS_DIR_NAME);
@@ -39,6 +41,21 @@ function getExtensionFromMime(mime: string, url: string): string {
   if (mime.includes('pdf') || url.endsWith('.pdf')) return '.pdf';
   if (mime.includes('text') || url.endsWith('.txt')) return '.txt';
   return '.epub';
+}
+
+async function removeExistingFile(uri: string): Promise<void> {
+  const info = await LegacyFS.getInfoAsync(uri);
+  if (info.exists) {
+    await LegacyFS.deleteAsync(uri, { idempotent: true });
+  }
+}
+
+async function fileSize(uri: string): Promise<number> {
+  const info = await LegacyFS.getInfoAsync(uri);
+  if (info.exists && 'size' in info && typeof info.size === 'number') {
+    return info.size;
+  }
+  return 0;
 }
 
 export async function enqueueDownload(
@@ -139,29 +156,28 @@ async function downloadBook(db: SQLiteDatabase, bookId: string): Promise<void> {
   const ext = getExtensionFromMime(downloadMime, downloadUrl);
   const destFile = new File(getDownloadsDirectory(), `${bookId}${ext}`);
 
-  if (destFile.exists) {
-    destFile.delete();
-  }
+  // Legacy delete avoids File.delete(); reads use legacy getInfo — not Blob APIs.
+  await removeExistingFile(destFile.uri);
 
   await updateDownloadStatus(db, bookId, 'downloading', { progress: 0 });
 
   const downloadHeaders = authToHeaders(auth);
-
   let lastProgressWrite = 0;
 
   try {
     const task = File.createDownloadTask(downloadUrl, destFile, {
       headers: downloadHeaders,
+      sessionType: 'background',
       onProgress: ({ bytesWritten, totalBytes }) => {
         const now = Date.now();
-        if (now - lastProgressWrite < 400) {
+        if (now - lastProgressWrite < PROGRESS_WRITE_MS) {
           return;
         }
         lastProgressWrite = now;
         const progress = totalBytes > 0 ? bytesWritten / totalBytes : 0;
         void updateDownloadStatus(db, bookId, 'downloading', {
           progress,
-          bytes_total: totalBytes,
+          bytes_total: totalBytes > 0 ? totalBytes : 0,
           bytes_written: bytesWritten,
         });
       },
@@ -170,17 +186,24 @@ async function downloadBook(db: SQLiteDatabase, bookId: string): Promise<void> {
     const downloadResult = await task.downloadAsync();
 
     if (!downloadResult) {
-      throw new Error('Download returned no file');
+      throw new Error('Download cancelled');
     }
+
+    const size = await fileSize(downloadResult.uri);
 
     await updateDownloadStatus(db, bookId, 'completed', {
       progress: 1,
       local_uri: downloadResult.uri,
-      bytes_total: downloadResult.size ?? 0,
-      bytes_written: downloadResult.size ?? 0,
+      bytes_total: size,
+      bytes_written: size,
+      error: '',
     });
 
-    await ensureBookDocumentId(db, bookId);
+    try {
+      await ensureBookDocumentId(db, bookId);
+    } catch {
+      // KOReader document ID is best-effort; never fail a completed download for sync setup.
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Download failed';
     await updateDownloadStatus(db, bookId, 'failed', { error: message });

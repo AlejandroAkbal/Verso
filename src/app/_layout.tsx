@@ -9,6 +9,8 @@ import { useTranslation } from 'react-i18next';
 import 'react-native-reanimated';
 
 import { SyncForegroundListener } from '@/components/SyncForegroundListener';
+import { DownloadFeedbackListener } from '@/components/DownloadFeedbackListener';
+import { ToastProvider } from '@/components/toast/ToastProvider';
 import { ThemedText } from '@/components/ThemedText';
 import { Box } from '@/components/ui';
 import { appIdentity } from '@/config/appIdentity';
@@ -56,8 +58,10 @@ export default function RootLayout() {
           useSuspense
         >
           <QueryClientProvider client={queryClient}>
-            <SyncForegroundListener />
-            <Stack
+            <ToastProvider>
+              <DownloadFeedbackListener />
+              <SyncForegroundListener />
+              <Stack
               screenOptions={{
                 headerStyle: { backgroundColor: theme.colors.background },
                 headerTintColor: theme.colors.text,
@@ -81,6 +85,7 @@ export default function RootLayout() {
                 options={{ headerShown: false, presentation: 'modal' }}
               />
             </Stack>
+            </ToastProvider>
           </QueryClientProvider>
         </SQLiteProvider>
       </Suspense>

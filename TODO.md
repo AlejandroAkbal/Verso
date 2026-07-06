@@ -4,32 +4,34 @@ Living product and engineering backlog. Keep this file current when new durable 
 
 ## Now
 
-- [x] Finish the full Restyle migration and remove `StyleSheet.create` from app UI code.
-- [x] Add cover skeleton loaders so unloaded covers do not appear as black boxes.
-- [x] Make NEW badges smarter (acknowledge on open/download/read; age-out).
-- [x] Add an onboarding button to add/select an example public library.
-- [x] Add subtle haptics for key actions.
+- [ ] Dogfood KOReader sync against Calibre-Web Automated `/kosync` on personal library (partial MD5, same credentials as OPDS).
+- [ ] Expand Maestro E2E coverage (reader open, download → read, conflict prompt) — see `docs/e2e.md`.
+- [x] Toast feedback for sync errors + last-error on KOReader settings.
+- [x] Move KOReader sync next to libraries in Settings; “Use library server” prefills CWA `/kosync` URL.
 
 ## Next
 
-- [x] KOReader sync — design (`docs/koreader-sync.md`) + v1 implementation (Settings, push/pull, conflict prompt).
-- [x] Optional auto-launch/resume last book (Settings toggle + `StartupGate`).
-- [x] Improve link rendering/styling for rich OPDS descriptions (`BookAboutSection`).
+- [ ] Android Maestro E2E on emulator.
+- [ ] CI job: Maestro smoke on macOS + dev client artifact.
+- [ ] Surface sync status per book on detail screen (optional).
 
 ## Later
 
-- [x] Research Bionic Reading Mode (`docs/bionic-reading.md`).
-- [x] Revisit monetization gates (`docs/monetization.md`).
-
-## Follow-ups (new)
-
-- [ ] Dogfood KOReader sync against real `sync.koreader.rocks` account + KOReader app on device.
-- [ ] Android Readium E2E via Maestro on emulator.
 - [ ] Bionic Reading technical spike in Readium (only if pursuing Premium).
+- [ ] Revisit monetization gates (`docs/monetization.md`).
 
-## Maestro (iOS)
+## Done (archive)
 
-Smoke flows in `.maestro/` — run with Metro on `127.0.0.1:8081`:
+- [x] Restyle migration, cover skeletons, NEW badges, onboarding, haptics.
+- [x] KOReader sync v1 (Settings, push/pull, conflict prompt, Readium locators).
+- [x] Auto-launch/resume last book, OPDS summary links, research docs.
+- [x] Maestro iOS smokes: library, settings, KOReader form, book detail.
 
-- `library-smoke.yaml` — app launches to Library
-- `koreader-settings.yaml` — Settings → KOReader Sync form
+## E2E
+
+**Policy:** E2E only — no unit/component tests. See `docs/e2e.md`.
+
+```bash
+pnpm start      # Metro on 127.0.0.1:8081
+pnpm e2e:ios    # all flows in .maestro/
+```

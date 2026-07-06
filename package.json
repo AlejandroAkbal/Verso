@@ -76,7 +76,8 @@
     "run:android": "NODE_PATH=./node_modules node ./node_modules/expo/bin/cli run:android",
     "pod-install": "bash ./scripts/ios-pod-install.sh",
     "lint": "NODE_PATH=./node_modules node ./node_modules/expo/bin/cli lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "e2e:ios": "maestro test .maestro/"
   },
   "private": true
 }

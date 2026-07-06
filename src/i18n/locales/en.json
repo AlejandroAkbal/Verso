@@ -70,7 +70,18 @@
     "storageHeader": "On-Device Storage",
     "storageSummary": "{{count}} books · {{size}}",
     "storageEmpty": "No books downloaded yet",
-    "storageFooter": "Removing downloads frees space on this device. Books stay in your OPDS catalog."
+    "storageFooter": "Removing downloads frees space on this device. Books stay in your OPDS catalog.",
+    "failedToast": "Could not download “{{title}}”: {{reason}}",
+    "errorFallbackTitle": "Book",
+    "errorUnknown": "Download failed. Try again.",
+    "errorAuth": "Authentication failed. Check your OPDS username and password in Settings.",
+    "errorForbidden": "Access denied. This account may not have permission to download this book.",
+    "errorNotFound": "Download link not found on the server.",
+    "errorOpds": "Could not read the book details from your OPDS server.",
+    "errorNoLink": "No EPUB download link in the OPDS feed for this book.",
+    "errorTransport": "Download failed due to a device networking issue. Try again.",
+    "errorHttp": "Server error: {{detail}}",
+    "errorGeneric": "{{detail}}"
   },
   "reader": {
     "bookNotDownloaded": "Book not downloaded",
@@ -102,7 +113,10 @@
     "resetAllData": "Reset All App Data",
     "resetAllTitle": "Reset all app data?",
     "resetAllMessage": "This removes servers, books, downloads, reading progress, and saved passwords from this device. You will start fresh as if {{appName}} was just installed.",
-    "resetAllConfirm": "Reset App"
+    "resetAllConfirm": "Reset App",
+    "readingHeader": "Reading",
+    "resumeLastBook": "Resume last book on launch",
+    "resumeLastBookHint": "Opens your last book automatically when the app starts."
   },
   "serverForm": {
     "helper": "Paste your OPDS feed URL — for Calibre-Web, enable OPDS in admin settings and use {{url}}. Username and password are only needed for private servers.",
@@ -148,8 +162,14 @@
   "sync": {
     "title": "KOReader Sync",
     "header": "Sync server",
-    "footer": "Progress syncs with KOReader-compatible servers. Credentials stay on this device.",
+    "footer": "For Calibre-Web Automated, use your library host with /kosync (e.g. https://books.example.com/kosync). Partial MD5 keeps progress aligned with KOReader and your Calibre library.",
     "settingsFooter": "Resume reading across KOReader, Thorium, and this app.",
+    "settingsRowHint": "Calibre-Web /kosync — same progress as KOReader on your library",
+    "useLibraryServer": "Use library server",
+    "useLibraryServerHint": "Prefill /kosync URL and credentials from your active OPDS library",
+    "libraryServerFilled": "Filled from your library server",
+    "noLibraryServer": "Add an OPDS library first",
+    "lastError": "Last sync error: {{message}}",
     "enable": "Enable sync",
     "serverUrl": "Server URL",
     "username": "Username",
@@ -158,9 +178,6 @@
     "documentIdFooter": "Partial MD5 matches KOReader default. Filename mode is faster but can collide.",
     "documentIdPartial": "Partial MD5 (recommended)",
     "documentIdFilename": "Filename hash",
-    "readingHeader": "Reading",
-    "resumeLastBook": "Resume last book on launch",
-    "resumeLastBookHint": "Opens your last book automatically when the app starts.",
     "testConnection": "Test connection",
     "save": "Save sync settings",
     "testSuccess": "Connected to sync server",

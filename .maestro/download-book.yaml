@@ -1,0 +1,27 @@
+appId: dev.akbal.opdsreader
+---
+- openLink: exp+opds-reader://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081
+- tapOn:
+    text: "Reload"
+    optional: true
+- extendedWaitUntil:
+    visible: "Library"
+    timeout: 90000
+# Deep-link to a catalog book that is not on device (stable first-row seed title).
+- openLink: opds-reader://book/c346a37a339d1158bd27def605dcf8e9
+- extendedWaitUntil:
+    visible:
+      id: "book-detail-download"
+    timeout: 30000
+- tapOn:
+    id: "book-detail-download"
+- extendedWaitUntil:
+    visible:
+      id: "book-detail-downloading"
+    timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: "book-detail-read"
+    timeout: 120000
+- assertVisible:
+    id: "book-detail-read"

@@ -1,27 +1,41 @@
-import { File } from 'expo-file-system';
+import * as LegacyFS from 'expo-file-system/legacy';
 
 import { md5Hex, Md5Hasher } from '@/lib/md5';
 import type { DocumentIdMode } from '@/db/schema';
 
 import { fileNameFromUri } from './fileName';
 
-export async function partialMd5DocumentId(localUri: string): Promise<string> {
-  const file = new File(localUri);
-  if (!file.exists) {
-    throw new Error('EPUB file not found for document ID');
+function base64ToBytes(base64: string): Uint8Array {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
   }
+  return bytes;
+}
 
+export async function partialMd5DocumentId(localUri: string): Promise<string> {
   const hasher = new Md5Hasher();
   const step = 1024;
   const size = 1024;
 
   for (let i = -1; i <= 10; i += 1) {
     const offset = step << (2 * i);
-    const slice = file.slice(offset, offset + size);
-    if (slice.size === 0) {
+    const base64 = await LegacyFS.readAsStringAsync(localUri, {
+      encoding: LegacyFS.EncodingType.Base64,
+      position: offset,
+      length: size,
+    });
+
+    if (!base64) {
       break;
     }
-    const chunk = new Uint8Array(await slice.arrayBuffer());
+
+    const chunk = base64ToBytes(base64);
+    if (chunk.length === 0) {
+      break;
+    }
+
     hasher.update(chunk);
   }
 

@@ -66,7 +66,18 @@
     "storageHeader": "本机存储",
     "storageSummary": "{{count}} 本图书 · {{size}}",
     "storageEmpty": "尚无下载的图书",
-    "storageFooter": "移除下载可释放本机空间。图书仍保留在 OPDS 目录中。"
+    "storageFooter": "移除下载可释放本机空间。图书仍保留在 OPDS 目录中。",
+    "failedToast": "无法下载「{{title}}」：{{reason}}",
+    "errorFallbackTitle": "图书",
+    "errorUnknown": "下载失败，请重试。",
+    "errorAuth": "认证失败。请在设置中检查 OPDS 用户名和密码。",
+    "errorForbidden": "访问被拒绝。此账户可能没有下载权限。",
+    "errorNotFound": "服务器上未找到下载链接。",
+    "errorOpds": "无法从 OPDS 服务器读取图书详情。",
+    "errorNoLink": "此图书的 OPDS 订阅中没有 EPUB 下载链接。",
+    "errorTransport": "设备网络问题导致下载失败，请重试。",
+    "errorHttp": "服务器错误：{{detail}}",
+    "errorGeneric": "{{detail}}"
   },
   "reader": {
     "bookNotDownloaded": "图书未下载",
@@ -98,7 +109,10 @@
     "resetAllData": "重置所有应用数据",
     "resetAllTitle": "重置所有应用数据？",
     "resetAllMessage": "将删除服务器、图书、下载、阅读进度和已保存的密码。应用将恢复到初始安装状态。",
-    "resetAllConfirm": "重置"
+    "resetAllConfirm": "重置",
+    "readingHeader": "阅读",
+    "resumeLastBook": "启动时恢复上次书籍",
+    "resumeLastBookHint": "应用启动时自动打开上次阅读的书。"
   },
   "serverForm": {
     "helper": "粘贴 OPDS 订阅地址 — Calibre-Web 请在管理设置中启用 OPDS 并使用 {{url}}。私有服务器才需要用户名和密码。",
@@ -144,8 +158,14 @@
   "sync": {
     "title": "KOReader 同步",
     "header": "同步服务器",
-    "footer": "阅读进度与 KOReader 兼容服务器同步。凭据仅保存在本设备。",
+    "footer": "Calibre-Web Automated 请使用书库主机加 /kosync（如 https://books.example.com/kosync）。部分 MD5 与 KOReader 及 Calibre 书库进度一致。",
     "settingsFooter": "在 KOReader、Thorium 和本应用之间续读。",
+    "settingsRowHint": "Calibre-Web /kosync — 与 KOReader 共享书库进度",
+    "useLibraryServer": "使用书库服务器",
+    "useLibraryServerHint": "从当前 OPDS 书库填入 /kosync 地址和凭据",
+    "libraryServerFilled": "已从书库服务器填入",
+    "noLibraryServer": "请先添加 OPDS 书库",
+    "lastError": "上次同步错误：{{message}}",
     "enable": "启用同步",
     "serverUrl": "服务器 URL",
     "username": "用户名",
@@ -154,9 +174,6 @@
     "documentIdFooter": "部分 MD5 与 KOReader 默认一致。文件名模式更快但可能冲突。",
     "documentIdPartial": "部分 MD5（推荐）",
     "documentIdFilename": "文件名哈希",
-    "readingHeader": "阅读",
-    "resumeLastBook": "启动时恢复上次书籍",
-    "resumeLastBookHint": "应用启动时自动打开上次阅读的书。",
     "testConnection": "测试连接",
     "save": "保存同步设置",
     "testSuccess": "已连接到同步服务器",

@@ -425,6 +425,16 @@ export async function getBookSyncState(
   );
 }
 
+export async function getLatestSyncError(db: SQLiteDatabase): Promise<string | null> {
+  const row = await db.getFirstAsync<{ last_error: string }>(
+    `SELECT last_error FROM book_sync_state
+     WHERE last_error != ''
+     ORDER BY last_pushed_at DESC, last_pulled_at DESC
+     LIMIT 1`,
+  );
+  return row?.last_error ?? null;
+}
+
 export async function upsertBookSyncState(
   db: SQLiteDatabase,
   state: BookSyncStateRow,

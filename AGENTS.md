@@ -20,8 +20,11 @@ Read https://docs.expo.dev/versions/v57.0.0/ before changing Expo APIs. **Expo G
 | Android build + run | `pnpm run:android` |
 | Pod issues | `pnpm pod-install` |
 | Lint / types | `pnpm lint` / `pnpm typecheck` |
+| E2E (Maestro) | `pnpm e2e:ios` — see `docs/e2e.md` |
 
 `pnpm` only. iOS + Android only — no web. Config is `app.config.ts` (not `app.json`).
+
+**Testing:** E2E only (Maestro). No unit/component tests unless explicitly requested.
 
 ---
 
@@ -29,7 +32,7 @@ Read https://docs.expo.dev/versions/v57.0.0/ before changing Expo APIs. **Expo G
 
 Expo Router · Restyle + `theme.ts` (no Tailwind) · TanStack Query · `expo-sqlite` · OPDS via `fast-xml-parser` · downloads via `expo-file-system` + background tasks · i18n (`en/es/zh/hi/ar`) · FlashList · `expo-image` / blur / dominant color.
 
-**Reader:** `react-native-readium` + `react-native-nitro-modules`. Progress = Readium locator JSON. **KOReader sync:** Settings → partial MD5 document ID, push/pull on read lifecycle.
+**Reader:** `react-native-readium` + `react-native-nitro-modules`. Progress = Readium locator JSON. **KOReader sync:** Calibre-Web Automated `/kosync` (derive from OPDS URL) or any KOSync server; partial MD5 document ID; conflict prompt defaults to Keep here.
 
 ---
 

@@ -22,6 +22,30 @@ export function normalizeOpdsUrl(url: string): string {
   return parsed.href.replace(/\/+$/, '');
 }
 
+/**
+ * Calibre-Web Automated exposes KOSync at `/kosync` beside the OPDS feed.
+ * `https://host/opds` → `https://host/kosync`
+ */
+export function deriveKosyncUrlFromOpdsUrl(opdsUrl: string): string {
+  const trimmed = opdsUrl.trim();
+  if (!trimmed) {
+    return trimmed;
+  }
+
+  const parsed = new URL(trimmed);
+  const path = parsed.pathname.replace(/\/+$/, '');
+
+  if (path.endsWith('/opds')) {
+    parsed.pathname = `${path.slice(0, -'/opds'.length)}/kosync`;
+  } else if (path === '' || path === '/') {
+    parsed.pathname = '/kosync';
+  } else {
+    parsed.pathname = `${path}/kosync`;
+  }
+
+  return parsed.href.replace(/\/+$/, '');
+}
+
 /** Display name when the user does not provide one. */
 export function deriveServerTitle(url: string, feedTitle?: string): string {
   const trimmedFeed = feedTitle?.trim();

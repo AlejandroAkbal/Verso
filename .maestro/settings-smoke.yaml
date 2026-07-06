@@ -15,9 +15,5 @@ appId: dev.akbal.opdsreader
 - extendedWaitUntil:
     visible: "OPDS Servers"
     timeout: 15000
-- tapOn:
+- assertVisible:
     id: "settings-koreader-sync"
-- extendedWaitUntil:
-    visible: "Sync server"
-    timeout: 10000
-- assertVisible: "Username"

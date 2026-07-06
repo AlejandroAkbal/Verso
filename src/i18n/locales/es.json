@@ -70,7 +70,18 @@
     "storageHeader": "Almacenamiento en el dispositivo",
     "storageSummary": "{{count}} libros · {{size}}",
     "storageEmpty": "Aún no hay libros descargados",
-    "storageFooter": "Eliminar descargas libera espacio en este dispositivo. Los libros siguen en tu catálogo OPDS."
+    "storageFooter": "Eliminar descargas libera espacio en este dispositivo. Los libros siguen en tu catálogo OPDS.",
+    "failedToast": "No se pudo descargar «{{title}}»: {{reason}}",
+    "errorFallbackTitle": "Libro",
+    "errorUnknown": "Error al descargar. Inténtalo de nuevo.",
+    "errorAuth": "Autenticación fallida. Revisa usuario y contraseña OPDS en Ajustes.",
+    "errorForbidden": "Acceso denegado. Esta cuenta puede no tener permiso para descargar este libro.",
+    "errorNotFound": "Enlace de descarga no encontrado en el servidor.",
+    "errorOpds": "No se pudieron leer los detalles del libro desde tu servidor OPDS.",
+    "errorNoLink": "No hay enlace EPUB en el feed OPDS de este libro.",
+    "errorTransport": "Error de red del dispositivo. Inténtalo de nuevo.",
+    "errorHttp": "Error del servidor: {{detail}}",
+    "errorGeneric": "{{detail}}"
   },
   "reader": {
     "bookNotDownloaded": "Libro no descargado",
@@ -102,7 +113,10 @@
     "resetAllData": "Restablecer todos los datos",
     "resetAllTitle": "¿Restablecer todos los datos?",
     "resetAllMessage": "Esto elimina servidores, libros, descargas, progreso de lectura y contraseñas guardadas. Empezarás de cero como si acabaras de instalar {{appName}}.",
-    "resetAllConfirm": "Restablecer"
+    "resetAllConfirm": "Restablecer",
+    "readingHeader": "Lectura",
+    "resumeLastBook": "Reanudar último libro al abrir",
+    "resumeLastBookHint": "Abre automáticamente tu último libro al iniciar la app."
   },
   "serverForm": {
     "helper": "Pega la URL de tu feed OPDS — en Calibre-Web, activa OPDS en ajustes de admin y usa {{url}}. Usuario y contraseña solo para servidores privados.",
@@ -148,8 +162,14 @@
   "sync": {
     "title": "Sincronización KOReader",
     "header": "Servidor de sincronización",
-    "footer": "El progreso se sincroniza con servidores compatibles con KOReader. Las credenciales permanecen en este dispositivo.",
+    "footer": "En Calibre-Web Automated, usa tu host con /kosync (p. ej. https://libros.ejemplo.com/kosync). MD5 parcial alinea el progreso con KOReader y tu biblioteca Calibre.",
     "settingsFooter": "Continúa leyendo en KOReader, Thorium y esta app.",
+    "settingsRowHint": "Calibre-Web /kosync — mismo progreso que KOReader en tu biblioteca",
+    "useLibraryServer": "Usar servidor de biblioteca",
+    "useLibraryServerHint": "Rellenar URL /kosync y credenciales de tu OPDS activo",
+    "libraryServerFilled": "Rellenado desde tu servidor de biblioteca",
+    "noLibraryServer": "Añade primero una biblioteca OPDS",
+    "lastError": "Último error de sincronización: {{message}}",
     "enable": "Activar sincronización",
     "serverUrl": "URL del servidor",
     "username": "Usuario",
@@ -158,9 +178,6 @@
     "documentIdFooter": "MD5 parcial coincide con KOReader. El modo nombre de archivo es más rápido pero puede colisionar.",
     "documentIdPartial": "MD5 parcial (recomendado)",
     "documentIdFilename": "Hash del nombre de archivo",
-    "readingHeader": "Lectura",
-    "resumeLastBook": "Reanudar último libro al abrir",
-    "resumeLastBookHint": "Abre automáticamente tu último libro al iniciar la app.",
     "testConnection": "Probar conexión",
     "save": "Guardar ajustes de sincronización",
     "testSuccess": "Conectado al servidor de sincronización",

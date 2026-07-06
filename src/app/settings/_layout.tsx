@@ -1,6 +1,7 @@
 import { Stack, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
+import { ToastProvider } from '@/components/toast/ToastProvider';
 import { PressableBox, Text } from '@/components/ui';
 import { theme } from '@/theme/theme';
 
@@ -9,6 +10,7 @@ export default function SettingsLayout() {
   const router = useRouter();
 
   return (
+    <ToastProvider>
     <Stack
       screenOptions={{
         headerStyle: { backgroundColor: theme.colors.background },
@@ -52,5 +54,6 @@ export default function SettingsLayout() {
         }}
       />
     </Stack>
+    </ToastProvider>
   );
 }

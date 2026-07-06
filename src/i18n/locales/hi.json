@@ -70,7 +70,18 @@
     "storageHeader": "डिवाइस पर संग्रहण",
     "storageSummary": "{{count}} किताबें · {{size}}",
     "storageEmpty": "अभी कोई किताब डाउनलोड नहीं",
-    "storageFooter": "डाउनलोड हटाने से इस डिवाइस पर जगह मुक्त होती है। किताबें आपके OPDS कैटलॉग में रहती हैं।"
+    "storageFooter": "डाउनलोड हटाने से इस डिवाइस पर जगह मुक्त होती है। किताबें आपके OPDS कैटलॉग में रहती हैं।",
+    "failedToast": "«{{title}}» डाउनलोड नहीं हो सका: {{reason}}",
+    "errorFallbackTitle": "किताब",
+    "errorUnknown": "डाउनलोड विफल। पुनः प्रयास करें।",
+    "errorAuth": "प्रमाणीकरण विफल। सेटिंग्स में OPDS उपयोगकर्ता नाम और पासवर्ड जाँचें।",
+    "errorForbidden": "पहुँच अस्वीकृत। इस खाते को यह किताब डाउनलोड करने की अनुमति नहीं हो सकती।",
+    "errorNotFound": "सर्वर पर डाउनलोड लिंक नहीं मिला।",
+    "errorOpds": "OPDS सर्वर से किताब विवरण पढ़े नहीं जा सके।",
+    "errorNoLink": "इस किताब के OPDS फ़ीड में EPUB लिंक नहीं है।",
+    "errorTransport": "डिवाइस नेटवर्क समस्या के कारण डाउनलोड विफल। पुनः प्रयास करें।",
+    "errorHttp": "सर्वर त्रुटि: {{detail}}",
+    "errorGeneric": "{{detail}}"
   },
   "reader": {
     "bookNotDownloaded": "किताब डाउनलोड नहीं",
@@ -102,7 +113,10 @@
     "resetAllData": "सभी ऐप डेटा रीसेट करें",
     "resetAllTitle": "सभी ऐप डेटा रीसेट करें?",
     "resetAllMessage": "यह सर्वर, किताबें, डाउनलोड, पढ़ने की प्रगति और सहेजे पासवर्ड हटा देगा। {{appName}} नए इंस्टॉल जैसा शुरू होगा।",
-    "resetAllConfirm": "रीसेट करें"
+    "resetAllConfirm": "रीसेट करें",
+    "readingHeader": "पढ़ना",
+    "resumeLastBook": "लॉन्च पर अंतिम पुस्तक फिर खोलें",
+    "resumeLastBookHint": "ऐप शुरू होने पर अंतिम पुस्तक स्वतः खुलती है।"
   },
   "serverForm": {
     "helper": "अपना OPDS फ़ीड URL पेस्ट करें — Calibre-Web में एडमिन सेटिंग्स में OPDS चालू करें और {{url}} उपयोग करें। निजी सर्वर के लिए ही उपयोगकर्ता नाम और पासवर्ड चाहिए।",
@@ -148,8 +162,14 @@
   "sync": {
     "title": "KOReader सिंक",
     "header": "सिंक सर्वर",
-    "footer": "प्रगति KOReader-संगत सर्वर से सिंक होती है। क्रेडेंशियल इस डिवाइस पर रहते हैं।",
+    "footer": "Calibre-Web Automated के लिए अपने होस्ट पर /kosync उपयोग करें (जैसे https://books.example.com/kosync)। आंशिक MD5 KOReader और Calibre लाइब्रेरी के साथ प्रगति मिलाता है।",
     "settingsFooter": "KOReader, Thorium और इस ऐप में पढ़ना जारी रखें।",
+    "settingsRowHint": "Calibre-Web /kosync — आपकी लाइब्रेरी में KOReader जैसी प्रगति",
+    "useLibraryServer": "लाइब्रेरी सर्वर उपयोग करें",
+    "useLibraryServerHint": "सक्रिय OPDS लाइब्रेरी से /kosync URL और क्रेडेंशियल भरें",
+    "libraryServerFilled": "आपके लाइब्रेरी सर्वर से भरा गया",
+    "noLibraryServer": "पहले OPDS लाइब्रेरी जोड़ें",
+    "lastError": "अंतिम सिंक त्रुटि: {{message}}",
     "enable": "सिंक चालू करें",
     "serverUrl": "सर्वर URL",
     "username": "उपयोगकर्ता नाम",
@@ -158,9 +178,6 @@
     "documentIdFooter": "आंशिक MD5 KOReader डिफ़ॉल्ट से मेल खाता है। फ़ाइलनाम मोड तेज़ है लेकिन टकरा सकता है।",
     "documentIdPartial": "आंशिक MD5 (अनुशंसित)",
     "documentIdFilename": "फ़ाइलनाम हैश",
-    "readingHeader": "पढ़ना",
-    "resumeLastBook": "लॉन्च पर अंतिम पुस्तक फिर खोलें",
-    "resumeLastBookHint": "ऐप शुरू होने पर अंतिम पुस्तक स्वतः खुलती है।",
     "testConnection": "कनेक्शन जाँचें",
     "save": "सिंक सेटिंग्स सहेजें",
     "testSuccess": "सिंक सर्वर से जुड़ा",
