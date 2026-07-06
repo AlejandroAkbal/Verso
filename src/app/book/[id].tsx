@@ -1,14 +1,6 @@
-import { Image } from 'expo-image';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { ActivityIndicator, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SymbolView } from 'expo-symbols';
 import { useTranslation } from 'react-i18next';
@@ -18,11 +10,11 @@ import { BlurBackdrop } from '@/components/BlurBackdrop';
 import { BookAboutSection } from '@/components/book/BookAboutSection';
 import { BookDetailPrimaryAction } from '@/components/book/BookDetailPrimaryAction';
 import { BookDetailQuickActions } from '@/components/book/BookDetailQuickActions';
-import { BookBadge } from '@/components/BookBadge';
 import { CoverProgressBar } from '@/components/CoverProgressBar';
 import { ThemedText } from '@/components/ThemedText';
+import { Box, ImageBox, PressableBox, ScrollBox } from '@/components/ui';
 import { useDownloadStatus } from '@/db/hooks/useDownloads';
-import { getBookById } from '@/db/queries';
+import { acknowledgeBook, getBookById } from '@/db/queries';
 import type { BookRow } from '@/db/schema';
 import { useBackgroundDownload } from '@/hooks/useBackgroundDownload';
 import { useBookReadingProgress } from '@/hooks/useBookReadingProgress';
@@ -30,8 +22,12 @@ import { useDominantColor } from '@/hooks/useDominantColor';
 import { useServerAuthHeaders } from '@/hooks/useServerAuthHeaders';
 import { parseBookCategories } from '@/hooks/useOPDSCatalog';
 import { isFinished, progressPercent } from '@/lib/readingProgress';
-import { isNewBook } from '@/lib/bookIndicators';
+import { promptSyncConflict } from '@/lib/syncPrompt';
 import { isDownloadComplete } from '@/services/downloads/manage';
+import {
+  applyRemotePercentage,
+  pullRemoteProgressForBook,
+} from '@/services/koreader/syncBook';
 import { useTheme } from '@/theme/ThemeProvider';
 
 export default function BookDetailScreen() {
@@ -44,26 +40,29 @@ export default function BookDetailScreen() {
   const [book, setBook] = useState<BookRow | null>(null);
   const [loading, setLoading] = useState(true);
   const download = useDownloadStatus(id ?? '');
-  const readingProgress = useBookReadingProgress(id ?? '');
+  const { progress: readingProgress, refresh: refreshProgress } = useBookReadingProgress(id ?? '');
   const { removeDownload } = useBackgroundDownload(id ?? '');
   const isDownloaded = isDownloadComplete(download);
   const authHeaders = useServerAuthHeaders(book?.server_id);
+  const [loadedCoverUrl, setLoadedCoverUrl] = useState('');
 
   const colors = useDominantColor(book?.cover_url, book?.blurhash);
   const percent = progressPercent(readingProgress ?? undefined);
   const finished = isFinished(readingProgress ?? undefined);
   const showProgress = percent != null && percent > 0;
 
-  useEffect(() => {
-    queueMicrotask(() => {
+  useFocusEffect(
+    useCallback(() => {
+      if (!id) return;
       void (async () => {
-        if (!id) return;
+        await acknowledgeBook(db, id);
         const row = await getBookById(db, id);
         setBook(row);
         setLoading(false);
+        await refreshProgress();
       })();
-    });
-  }, [db, id]);
+    }, [db, id, refreshProgress]),
+  );
 
   const handleRemoveDownload = () => {
     if (!book) return;
@@ -84,16 +83,43 @@ export default function BookDetailScreen() {
     );
   };
 
+  const handleRead = () => {
+    if (!book) return;
+
+    void (async () => {
+      const pull = await pullRemoteProgressForBook(db, book.id);
+      const navigate = () => router.push(`/reader/${book.id}`);
+
+      if (pull.hasConflict && pull.remote) {
+        promptSyncConflict(
+          t,
+          () => {
+            void applyRemotePercentage(db, book.id, pull.remote!.percentage).then(navigate);
+          },
+          navigate,
+        );
+        return;
+      }
+
+      navigate();
+    })();
+  };
+
   if (loading || !book) {
     return (
-      <View style={[styles.centered, { backgroundColor: theme.colors.background }]}>
+      <Box
+        flex={1}
+        alignItems="center"
+        justifyContent="center"
+        backgroundColor="background"
+      >
         <ActivityIndicator color={theme.colors.text} />
-      </View>
+      </Box>
     );
   }
 
   const categories = parseBookCategories(book);
-  const isNew = isNewBook(book, { isDownloaded, readingProgress });
+  const coverLoaded = loadedCoverUrl === book.cover_url;
 
   return (
     <BlurBackdrop
@@ -101,36 +127,69 @@ export default function BookDetailScreen() {
       imageHeaders={authHeaders}
       dominantColor={colors.dominant}
     >
-      <ScrollView
-        contentContainerStyle={[
-          styles.content,
-          { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 32 },
-        ]}
+      <ScrollBox
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          gap: 28,
+          paddingTop: insets.top + 8,
+          paddingBottom: insets.bottom + 32,
+        }}
         showsVerticalScrollIndicator={false}
       >
-        <Pressable onPress={() => router.back()} style={styles.backButton} hitSlop={12}>
+        <PressableBox
+          onPress={() => router.back()}
+          alignSelf="flex-start"
+          padding="xs"
+          marginBottom="xs"
+          hitSlop={12}
+        >
           <SymbolView name="chevron.left" size={18} tintColor={theme.colors.text} />
-        </Pressable>
+        </PressableBox>
 
-        <View style={styles.hero}>
-          <View style={styles.coverWrap}>
-            <Image
+        <Box alignItems="center" gap="lg">
+          <Box
+            borderRadius="lg"
+            overflow="hidden"
+            shadowColor="background"
+            shadowOffset={{ width: 0, height: 12 }}
+            shadowOpacity={0.45}
+            shadowRadius={24}
+            elevation={12}
+          >
+            {!coverLoaded ? (
+              <Box
+                position="absolute"
+                top={0}
+                right={0}
+                bottom={0}
+                left={0}
+                backgroundColor="surfaceElevated"
+                borderRadius="lg"
+              />
+            ) : null}
+            <ImageBox
               source={{
                 uri: book.cover_url,
                 headers: Object.keys(authHeaders).length > 0 ? authHeaders : undefined,
               }}
-              style={styles.cover}
+              width={168}
+              height={252}
+              borderRadius="lg"
               contentFit="cover"
               transition={300}
+              onLoad={() => setLoadedCoverUrl(book.cover_url)}
+              onError={() => setLoadedCoverUrl(book.cover_url)}
             />
             {showProgress && !finished ? (
               <CoverProgressBar percent={percent ?? 0} />
             ) : null}
-            {isNew ? <BookBadge label={t('book.new')} /> : null}
-          </View>
+          </Box>
 
-          <View style={styles.heroText}>
-            <ThemedText variant="title" style={styles.title}>
+          <Box alignItems="center" gap="xs" paddingHorizontal="sm">
+            <ThemedText
+              variant="title"
+              style={{ letterSpacing: -0.3, textAlign: 'center' }}
+            >
               {book.title}
             </ThemedText>
             {book.author ? (
@@ -143,13 +202,13 @@ export default function BookDetailScreen() {
                 {t('progress.percent', { percent: percent ?? 0 })}
               </ThemedText>
             ) : null}
-          </View>
-        </View>
+          </Box>
+        </Box>
 
-        <View style={styles.actionBlock}>
+        <Box gap="md">
           <BookDetailPrimaryAction
             bookId={book.id}
-            onRead={() => router.push(`/reader/${book.id}`)}
+            onRead={handleRead}
             continuePercent={percent}
             isFinished={finished}
           />
@@ -159,57 +218,10 @@ export default function BookDetailScreen() {
             isDownloaded={isDownloaded}
             onRemoveDownload={handleRemoveDownload}
           />
-        </View>
+        </Box>
 
         <BookAboutSection summary={book.summary} categories={categories} />
-      </ScrollView>
+      </ScrollBox>
     </BlurBackdrop>
   );
 }
-
-const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  content: {
-    paddingHorizontal: 20,
-    gap: 28,
-  },
-  backButton: {
-    alignSelf: 'flex-start',
-    padding: 4,
-    marginBottom: 4,
-  },
-  hero: {
-    alignItems: 'center',
-    gap: 20,
-  },
-  coverWrap: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.45,
-    shadowRadius: 24,
-    elevation: 12,
-  },
-  cover: {
-    width: 168,
-    height: 252,
-    borderRadius: 12,
-  },
-  heroText: {
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 8,
-  },
-  title: {
-    textAlign: 'center',
-    letterSpacing: -0.3,
-  },
-  actionBlock: {
-    gap: 16,
-  },
-});

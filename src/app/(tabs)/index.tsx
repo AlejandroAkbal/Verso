@@ -1,14 +1,10 @@
 import { FlashList } from '@shopify/flash-list';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  Pressable,
   RefreshControl,
-  ScrollView,
-  StyleSheet,
   useWindowDimensions,
-  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +16,7 @@ import { LibraryFooter } from '@/components/LibraryFooter';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { SearchField } from '@/components/SearchField';
 import { ThemedText } from '@/components/ThemedText';
+import { Box, PressableBox, ScrollBox } from '@/components/ui';
 import { useDownloads } from '@/db/hooks/useDownloads';
 import { useActiveServer } from '@/db/hooks/useActiveServer';
 import { useServers } from '@/db/hooks/useServers';
@@ -53,12 +50,12 @@ export default function LibraryScreen() {
   const { servers, loading: serversLoading } = useServers();
   const { activeServer, loading: activeServerLoading } = useActiveServer();
   const { downloads } = useDownloads();
-  const progressByBookId = useReadingProgressMap();
+  const { progressByBookId, refresh: refreshProgress } = useReadingProgressMap();
   const [filter, setFilter] = useState<LibraryFilter>('all');
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { books, isOffline, isLoading, isRefetching, refresh, error, searchUrl } =
+  const { books, isOffline, isLoading, isRefetching, refresh, refreshBooks, error, searchUrl } =
     useOPDSCatalog(
       activeServer?.id,
       activeServer?.url,
@@ -71,6 +68,13 @@ export default function LibraryScreen() {
     activeServer?.auth_username ?? '',
     searchUrl,
     searchQuery,
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      void refreshProgress();
+      void refreshBooks();
+    }, [refreshBooks, refreshProgress]),
   );
 
   const downloadedIds = useMemo(
@@ -205,14 +209,14 @@ export default function LibraryScreen() {
       const dimmed = isOffline && !isOnDevice;
 
       return (
-        <View style={{ marginBottom: theme.grid.gap }}>
+        <Box style={{ marginBottom: theme.grid.gap }}>
           <BookCard
             book={item}
             width={cardWidth}
             readingProgress={progressByBookId.get(item.id)}
             dimmed={dimmed}
           />
-        </View>
+        </Box>
       );
     },
     [cardWidth, downloadedIds, isOffline, progressByBookId, theme.grid.gap],
@@ -220,12 +224,23 @@ export default function LibraryScreen() {
 
   const listHeader = useMemo(
     () => (
-      <View style={styles.listHeader}>
-        <ScrollView
+      <Box paddingTop="xs" style={{ paddingBottom: 12 }} gap="sm">
+        <ScrollBox
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={styles.filterScroll}
-          contentContainerStyle={styles.filterRow}
+          style={{
+            flexGrow: 0,
+            flexShrink: 0,
+            maxHeight: 44,
+            marginHorizontal: -4,
+          }}
+          contentContainerStyle={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 8,
+            paddingHorizontal: 4,
+            paddingVertical: 2,
+          }}
         >
           <FilterChip
             label={t('library.filterAll')}
@@ -244,7 +259,12 @@ export default function LibraryScreen() {
             }}
           />
           {categoryOptions.length > 0 ? (
-            <View style={[styles.filterDivider, { backgroundColor: theme.colors.border }]} />
+            <Box
+              width={0.5}
+              height={20}
+              backgroundColor="border"
+              style={{ marginHorizontal: 2 }}
+            />
           ) : null}
           {categoryOptions.map((category) => (
             <FilterChip
@@ -257,57 +277,105 @@ export default function LibraryScreen() {
               }}
             />
           ))}
-        </ScrollView>
+        </ScrollBox>
         <OfflineBanner visible={isOffline} />
-      </View>
+      </Box>
     ),
-    [categoryFilter, categoryOptions, filter, isOffline, t, theme.colors.border],
+    [categoryFilter, categoryOptions, filter, isOffline, t],
   );
 
   if (serversLoading || activeServerLoading) {
     return (
-      <View style={[styles.centered, { backgroundColor: theme.colors.background }]}>
+      <Box
+        flex={1}
+        alignItems="center"
+        justifyContent="center"
+        backgroundColor="background"
+        padding="lg"
+        gap="md"
+      >
         <ActivityIndicator color={theme.colors.text} />
-      </View>
+      </Box>
     );
   }
 
   if (servers.length === 0) {
     return (
-      <View style={[styles.centered, { backgroundColor: theme.colors.background }]}>
+      <Box
+        flex={1}
+        alignItems="center"
+        justifyContent="center"
+        backgroundColor="background"
+        padding="lg"
+        gap="md"
+      >
         <ThemedText variant="subtitle">{t('library.noLibrary')}</ThemedText>
-        <ThemedText variant="body" color={theme.colors.textSecondary} style={styles.emptyCopy}>
+        <ThemedText
+          variant="body"
+          color={theme.colors.textSecondary}
+          style={{ paddingHorizontal: 24, textAlign: 'center' }}
+        >
           {t('library.noLibraryHint')}
         </ThemedText>
-        <Pressable onPress={() => router.push('/settings')} style={styles.linkButton}>
+        <PressableBox onPress={() => router.push('/settings')} padding="sm">
           <ThemedText color={theme.colors.textSecondary}>{t('library.connectServer')}</ThemedText>
-        </Pressable>
-      </View>
+        </PressableBox>
+      </Box>
     );
   }
 
   const isSearching = searchQuery.trim().length >= 2 && remoteSearch.isFetching;
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <View style={[styles.chrome, { paddingTop: insets.top + 4 }]}>
-        <View style={styles.header}>
-          <View style={styles.headerText}>
-            <ThemedText style={styles.largeTitle}>{t('library.title')}</ThemedText>
+    <Box flex={1} backgroundColor="background">
+      <Box
+        gap="md"
+        style={{ paddingHorizontal: 20, paddingBottom: 12, paddingTop: insets.top + 4 }}
+      >
+        <Box
+          flexDirection="row"
+          alignItems="flex-start"
+          justifyContent="space-between"
+        >
+          <Box flex={1} gap="xs" style={{ paddingRight: 12 }}>
+            <ThemedText
+              style={{
+                fontSize: 34,
+                fontWeight: '700',
+                letterSpacing: -0.4,
+                lineHeight: 40,
+              }}
+            >
+              {t('library.title')}
+            </ThemedText>
             <ThemedText variant="caption" color={theme.colors.textMuted}>
               {activeServer?.title ?? t('common.catalog')}
             </ThemedText>
-          </View>
-          <Pressable
+          </Box>
+          <PressableBox
             onPress={() => router.push('/settings')}
-            style={[styles.iconButton, { backgroundColor: theme.colors.surfaceElevated }]}
+            accessibilityRole="button"
+            accessibilityLabel={t('library.openSettings')}
+            testID="library-settings"
+            alignItems="center"
+            justifyContent="center"
+            width={36}
+            height={36}
+            borderRadius="full"
+            backgroundColor="surfaceElevated"
+            marginTop="xs"
             hitSlop={8}
           >
-            <SymbolView name="gearshape" size={18} tintColor={theme.colors.textSecondary} />
-          </Pressable>
-        </View>
+            <SymbolView
+              name="gearshape"
+              size={18}
+              tintColor={theme.colors.textSecondary}
+              importantForAccessibility="no-hide-descendants"
+            />
+          </PressableBox>
+        </Box>
 
-        <View style={styles.searchWrap}>
+        <Box position="relative">
           <SearchField
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -317,23 +385,23 @@ export default function LibraryScreen() {
             <ActivityIndicator
               color={theme.colors.textSecondary}
               size="small"
-              style={styles.searchSpinner}
+              style={{ position: 'absolute', right: 14, top: 14 }}
             />
           ) : null}
-        </View>
-      </View>
+        </Box>
+      </Box>
 
       {isLoading ? (
-        <View style={styles.centered}>
+        <Box flex={1} alignItems="center" justifyContent="center" padding="lg" gap="md">
           <ActivityIndicator color={theme.colors.text} />
-        </View>
+        </Box>
       ) : (
         <FlashList
           data={visibleBooks}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           numColumns={numColumns}
-          style={styles.list}
+          style={{ flex: 1 }}
           ListHeaderComponent={listHeader}
           ListFooterComponent={visibleBooks.length > 0 ? listFooter : null}
           contentContainerStyle={{
@@ -348,7 +416,7 @@ export default function LibraryScreen() {
             />
           }
           ListEmptyComponent={
-            <View style={styles.emptyState}>
+            <Box alignItems="center" paddingVertical="xxl" paddingHorizontal="lg">
               <ThemedText color={theme.colors.textSecondary}>
                 {filter === 'on-device'
                   ? t('library.emptyDownloaded')
@@ -356,98 +424,10 @@ export default function LibraryScreen() {
                     ? t('library.emptySearch')
                     : (error ?? t('library.emptyCatalog'))}
               </ThemedText>
-            </View>
+            </Box>
           }
         />
       )}
-    </View>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  chrome: {
-    paddingHorizontal: 20,
-    paddingBottom: 12,
-    gap: 16,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-  },
-  headerText: {
-    flex: 1,
-    gap: 4,
-    paddingRight: 12,
-  },
-  largeTitle: {
-    fontSize: 34,
-    fontWeight: '700',
-    lineHeight: 40,
-    letterSpacing: -0.4,
-  },
-  iconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 4,
-  },
-  searchWrap: {
-    position: 'relative',
-  },
-  searchSpinner: {
-    position: 'absolute',
-    right: 14,
-    top: 14,
-  },
-  listHeader: {
-    paddingTop: 4,
-    paddingBottom: 12,
-    gap: 8,
-  },
-  filterScroll: {
-    flexGrow: 0,
-    flexShrink: 0,
-    maxHeight: 44,
-    marginHorizontal: -4,
-  },
-  filterRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-  },
-  filterDivider: {
-    width: StyleSheet.hairlineWidth,
-    height: 20,
-    marginHorizontal: 2,
-  },
-  list: {
-    flex: 1,
-  },
-  centered: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-    gap: 12,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 48,
-    paddingHorizontal: 24,
-  },
-  linkButton: {
-    padding: 8,
-  },
-  emptyCopy: {
-    textAlign: 'center',
-    paddingHorizontal: 24,
-  },
-});

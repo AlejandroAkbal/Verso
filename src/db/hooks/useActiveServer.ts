@@ -43,9 +43,12 @@ export function useActiveServer() {
 
     const isCurrentValid = servers.some((server) => server.id === activeServerId);
     if (!isCurrentValid) {
-      void setActive(servers[0].id);
+      const fallbackServerId = servers[0].id;
+      queueMicrotask(() => {
+        void setActive(fallbackServerId);
+      });
     }
-  }, [activeServer, activeServerId, prefsLoading, servers, serversLoading, setActive]);
+  }, [activeServerId, prefsLoading, servers, serversLoading, setActive]);
 
   return {
     activeServer,

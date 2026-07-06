@@ -21,6 +21,7 @@
     "noLibrary": "لا توجد مكتبة متصلة",
     "noLibraryHint": "أضف فهرس OPDS من الإعدادات لتصفح كتبك.",
     "connectServer": "ربط خادم OPDS",
+    "openSettings": "الإعدادات",
     "emptyDownloaded": "لا تنزيلات بعد — اضغط أيقونة السحابة على الكتاب.",
     "emptySearch": "لا كتب تطابق بحثك.",
     "emptyCatalog": "لم يُعثر على كتب في هذا الفهرس",
@@ -89,7 +90,12 @@
   },
   "reader": {
     "bookNotDownloaded": "الكتاب غير منزّل",
-    "loadFailed": "تعذّر تحميل الكتاب"
+    "loadFailed": "تعذّر تحميل الكتاب",
+    "unsupportedFormat": "هذا التنسيق غير مدعوم بعد",
+    "tableOfContents": "جدول المحتويات",
+    "decreaseFontSize": "تصغير حجم الخط",
+    "increaseFontSize": "تكبير حجم الخط",
+    "noChapters": "لا توجد فصول"
   },
   "settings": {
     "title": "خوادم OPDS",
@@ -111,7 +117,7 @@
     "showIntroAgainFooter": "إعادة شاشات الترحيب. تبقى مكتبتك وتنزيلاتك على الجهاز.",
     "resetAllData": "إعادة تعيين كل بيانات التطبيق",
     "resetAllTitle": "إعادة تعيين كل البيانات؟",
-    "resetAllMessage": "سيُحذف الخوادم والكتب والتنزيلات وتقدّم القراءة وكلمات المرور المحفوظة. ستبدأ كما لو ثبّتت Verso للتو.",
+    "resetAllMessage": "سيُحذف الخوادم والكتب والتنزيلات وتقدّم القراءة وكلمات المرور المحفوظة. ستبدأ كما لو ثبّتت {{appName}} للتو.",
     "resetAllConfirm": "إعادة التعيين"
   },
   "serverForm": {
@@ -136,13 +142,14 @@
   },
   "onboarding": {
     "tagline": "كتبك. خادمك. دون اتصال.",
-    "description": "Verso قارئ متميز لمكتبة OPDS المستضافة ذاتيًا. اربط Calibre-Web أو أي فهرس OPDS، نزّل الكتب، واقرأ بلا تشتيت.",
+    "description": "{{appName}} قارئ متميز لمكتبة OPDS المستضافة ذاتيًا. اربط Calibre-Web أو أي فهرس OPDS، نزّل الكتب، واقرأ بلا تشتيت.",
     "point1Title": "اربط فهرسك",
-    "point1Body": "وجّه Verso إلى خلاصة OPDS — لا مستودعات عامة، فقط مجموعتك.",
+    "point1Body": "وجّه {{appName}} إلى خلاصة OPDS — لا مستودعات عامة، فقط مجموعتك.",
     "point2Title": "نزّل مرة، اقرأ في أي مكان",
     "point2Body": "أضف التنزيلات إلى الطابور واحتفظ بمكتبتك على الجهاز للقراءة دون اتصال.",
     "point3Title": "خاص افتراضيًا",
     "point3Body": "بيانات الاعتماد تبقى على جهازك. مكتبتك لا تمر عبر خوادمنا.",
+    "exampleButton": "استكشاف مكتبة عامة",
     "connectButton": "ربط مكتبتي",
     "connectTitle": "ربط OPDS",
     "connectStep": "الخطوة ٢ من ٢ — اربط خادم Calibre-Web أو OPDS.",
@@ -153,5 +160,33 @@
     "noBooksFound": "متصل لكن لا كتب. تحقق من تفعيل OPDS على الخادم.",
     "connectionFailed": "فشل الاتصال",
     "catalogConnectionFailed": "تعذّر الاتصال بالفهرس"
+  },
+  "sync": {
+    "title": "مزامنة KOReader",
+    "header": "خادم المزامنة",
+    "footer": "تتم مزامنة التقدّم مع خوادم KOReader. بيانات الاعتماد تبقى على هذا الجهاز.",
+    "settingsFooter": "تابع القراءة عبر KOReader وThorium وهذا التطبيق.",
+    "enable": "تفعيل المزامنة",
+    "serverUrl": "رابط الخادم",
+    "username": "اسم المستخدم",
+    "password": "كلمة المرور",
+    "documentIdHeader": "معرّف المستند",
+    "documentIdFooter": "MD5 الجزئي يطابق إعداد KOReader الافتراضي. وضع اسم الملف أسرع لكن قد يتعارض.",
+    "documentIdPartial": "MD5 جزئي (موصى به)",
+    "documentIdFilename": "تجزئة اسم الملف",
+    "readingHeader": "القراءة",
+    "resumeLastBook": "استئناف آخر كتاب عند التشغيل",
+    "resumeLastBookHint": "يفتح آخر كتاب تلقائياً عند بدء التطبيق.",
+    "testConnection": "اختبار الاتصال",
+    "save": "حفظ إعدادات المزامنة",
+    "testSuccess": "تم الاتصال بخادم المزامنة",
+    "testFailed": "فشل الاتصال",
+    "saveSuccess": "تم حفظ إعدادات المزامنة",
+    "saveFailed": "تعذّر حفظ إعدادات المزامنة",
+    "errorCredentials": "أدخل رابط الخادم واسم المستخدم وكلمة المرور.",
+    "conflictTitle": "موضع أحدث متاح",
+    "conflictMessage": "جهاز آخر لديه تقدّم أحدث. الانتقال إلى ذلك الموضع أم البقاء هنا؟",
+    "jump": "انتقال",
+    "keep": "البقاء هنا"
   }
 }

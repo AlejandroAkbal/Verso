@@ -1,10 +1,14 @@
-import { Alert, Pressable, StyleSheet, View } from 'react-native';
+import { Alert } from 'react-native';
 import { SymbolView } from 'expo-symbols';
 import { useTranslation } from 'react-i18next';
 
 import { ThemedText } from '@/components/ThemedText';
+import { Box, PressableBox } from '@/components/ui';
 import type { BookRow, DownloadRow } from '@/db/schema';
-import { formatStorageSize } from '@/services/downloads/manage';
+import {
+  formatStorageSize,
+  resolveDownloadLocalUri,
+} from '@/services/downloads/manage';
 import { formatLabelFromMime, shareDownloadedBookFile } from '@/services/downloads/share';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -28,7 +32,7 @@ export function BookDetailQuickActions({
     if (!download?.local_uri) return;
 
     try {
-      await shareDownloadedBookFile(download.local_uri, {
+      await shareDownloadedBookFile(resolveDownloadLocalUri(download), {
         title: book.title,
         mime: book.mime,
       });
@@ -44,68 +48,60 @@ export function BookDetailQuickActions({
 
   if (!isDownloaded) {
     return (
-      <ThemedText variant="caption" color={theme.colors.textMuted} style={styles.meta}>
+      <ThemedText variant="caption" color={theme.colors.textMuted} style={{ textAlign: 'center' }}>
         {formatLabelFromMime(book.mime)}
       </ThemedText>
     );
   }
 
   return (
-    <View style={styles.wrap}>
-      <View style={styles.row}>
-        <Pressable
-          style={[styles.chip, { backgroundColor: theme.colors.secondary }]}
+    <Box gap="sm" alignItems="center">
+      <Box flexDirection="row" gap="sm" width="100%">
+        <PressableBox
+          flex={1}
+          flexDirection="row"
+          alignItems="center"
+          justifyContent="center"
+          gap="sm"
+          minHeight={48}
+          borderRadius="lg"
+          paddingHorizontal="md"
+          paddingVertical="sm"
+          backgroundColor="secondary"
           onPress={() => void handleShareFile()}
         >
           <SymbolView name="square.and.arrow.up" size={18} tintColor={theme.colors.text} />
           <ThemedText variant="caption" color={theme.colors.textSecondary}>
             {t('book.shareFile')}
           </ThemedText>
-        </Pressable>
-        <Pressable
-          style={[styles.chip, { backgroundColor: theme.colors.secondary }]}
+        </PressableBox>
+        <PressableBox
+          flex={1}
+          flexDirection="row"
+          alignItems="center"
+          justifyContent="center"
+          gap="sm"
+          minHeight={48}
+          borderRadius="lg"
+          paddingHorizontal="md"
+          paddingVertical="sm"
+          backgroundColor="secondary"
           onPress={onRemoveDownload}
         >
           <SymbolView name="trash" size={18} tintColor={theme.colors.error} />
           <ThemedText variant="caption" color={theme.colors.error}>
             {t('downloads.remove')}
           </ThemedText>
-        </Pressable>
-      </View>
+        </PressableBox>
+      </Box>
       {fileSize ? (
-        <ThemedText variant="caption" color={theme.colors.textMuted} style={styles.meta}>
+        <ThemedText variant="caption" color={theme.colors.textMuted} style={{ textAlign: 'center' }}>
           {t('book.fileDetails', {
             format: formatLabelFromMime(book.mime),
             size: fileSize,
           })}
         </ThemedText>
       ) : null}
-    </View>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: {
-    gap: 8,
-    alignItems: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-    gap: 10,
-    width: '100%',
-  },
-  chip: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    minHeight: 48,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  meta: {
-    textAlign: 'center',
-  },
-});

@@ -4,15 +4,18 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { SQLiteProvider } from 'expo-sqlite';
 import { Stack } from 'expo-router';
 import { Suspense, useEffect } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import 'react-native-reanimated';
 
+import { SyncForegroundListener } from '@/components/SyncForegroundListener';
 import { ThemedText } from '@/components/ThemedText';
+import { Box } from '@/components/ui';
+import { appIdentity } from '@/config/appIdentity';
 import { migrateDatabase } from '@/db/migrations';
 import { queryClient } from '@/lib/queryClient';
 import { registerBackgroundDownloadTask } from '@/services/downloads/task';
-import { VersoThemeProvider } from '@/theme/ThemeProvider';
+import { AppThemeProvider } from '@/theme/ThemeProvider';
 import { theme } from '@/theme/theme';
 
 export { ErrorBoundary } from 'expo-router';
@@ -24,10 +27,18 @@ export const unstable_settings = {
 function DatabaseLoading() {
   const { t } = useTranslation();
   return (
-    <View style={styles.centered}>
+    <Box
+      flex={1}
+      alignItems="center"
+      backgroundColor="background"
+      justifyContent="center"
+      p="lg"
+    >
       <ActivityIndicator color={theme.colors.accent} size="large" />
-      <ThemedText style={styles.loadingText}>{t('loading.openingLibrary')}</ThemedText>
-    </View>
+      <ThemedText color={theme.colors.textSecondary} style={{ marginTop: theme.spacing.md }}>
+        {t('loading.openingLibrary')}
+      </ThemedText>
+    </Box>
   );
 }
 
@@ -37,14 +48,15 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <VersoThemeProvider>
+    <AppThemeProvider>
       <Suspense fallback={<DatabaseLoading />}>
         <SQLiteProvider
-          databaseName="verso.db"
+          databaseName={appIdentity.database}
           onInit={migrateDatabase}
           useSuspense
         >
           <QueryClientProvider client={queryClient}>
+            <SyncForegroundListener />
             <Stack
               screenOptions={{
                 headerStyle: { backgroundColor: theme.colors.background },
@@ -72,20 +84,6 @@ export default function RootLayout() {
           </QueryClientProvider>
         </SQLiteProvider>
       </Suspense>
-    </VersoThemeProvider>
+    </AppThemeProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: theme.colors.background,
-    justifyContent: 'center',
-    padding: theme.spacing.lg,
-  },
-  loadingText: {
-    color: theme.colors.textSecondary,
-    marginTop: theme.spacing.md,
-  },
-});

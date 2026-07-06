@@ -4,13 +4,14 @@ import * as TaskManager from 'expo-task-manager';
 import type { SQLiteDatabase } from 'expo-sqlite';
 import { openDatabaseSync } from 'expo-sqlite';
 
+import { appIdentity } from '@/config/appIdentity';
 import { processDownloadQueue } from './queue';
 
-export const BACKGROUND_DOWNLOAD_TASK = 'verso-background-download';
+export const BACKGROUND_DOWNLOAD_TASK = appIdentity.backgroundDownloadTask;
 
 TaskManager.defineTask(BACKGROUND_DOWNLOAD_TASK, async () => {
   try {
-    const db = openDatabaseSync('verso.db');
+    const db = openDatabaseSync(appIdentity.database);
     await processDownloadQueue(db);
     return BackgroundTask.BackgroundTaskResult.Success;
   } catch {

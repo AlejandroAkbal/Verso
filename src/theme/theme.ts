@@ -1,4 +1,6 @@
-export const theme = {
+import { createTheme } from '@shopify/restyle';
+
+const rawTheme = {
   colors: {
     background: '#000000',
     surface: '#0A0A0A',
@@ -29,16 +31,36 @@ export const theme = {
     /** Reading progress on covers. */
     progress: '#FFFFFF',
     progressTrack: 'rgba(255, 255, 255, 0.2)',
-    /** De-emphasized completed library items. */
-    finishedOpacity: 0.42,
+  },
+  opacity: {
+    dimmed: 0.35,
+    finished: 0.42,
   },
   spacing: {
+    none: 0,
+    xxs: 2,
     xs: 4,
     sm: 8,
     md: 16,
     lg: 24,
     xl: 32,
     xxl: 48,
+    0: 0,
+    2: 2,
+    4: 4,
+    6: 6,
+    8: 8,
+    10: 10,
+    12: 12,
+    14: 14,
+    16: 16,
+    18: 18,
+    20: 20,
+    24: 24,
+    28: 28,
+    32: 32,
+    40: 40,
+    48: 48,
   },
   radii: {
     sm: 6,
@@ -46,6 +68,51 @@ export const theme = {
     lg: 12,
     xl: 16,
     full: 9999,
+  },
+  borderRadii: {
+    sm: 6,
+    md: 10,
+    lg: 12,
+    xl: 16,
+    full: 9999,
+  },
+  textVariants: {
+    title: {
+      color: 'text',
+      fontSize: 22,
+      fontWeight: '700',
+      lineHeight: 28,
+    },
+    subtitle: {
+      color: 'text',
+      fontSize: 17,
+      fontWeight: '600',
+      lineHeight: 24,
+    },
+    body: {
+      color: 'text',
+      fontSize: 15,
+      fontWeight: '400',
+      lineHeight: 22,
+    },
+    caption: {
+      color: 'text',
+      fontSize: 13,
+      fontWeight: '400',
+      lineHeight: 18,
+    },
+    label: {
+      color: 'text',
+      fontSize: 11,
+      fontWeight: '600',
+      lineHeight: 14,
+      letterSpacing: 0.5,
+      textTransform: 'uppercase',
+    },
+    defaults: {
+      color: 'text',
+      flexShrink: 1,
+    },
   },
   typography: {
     fontFamily: {
@@ -91,5 +158,7 @@ export const theme = {
     slow: 400,
   },
 } as const;
+
+export const theme = createTheme(rawTheme);
 
 export type Theme = typeof theme;

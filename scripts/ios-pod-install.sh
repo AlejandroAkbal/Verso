@@ -13,7 +13,7 @@ fi
 if ! grep -q "github.com/CocoaPods/Specs.git" "$PODFILE"; then
   # Avoid CocoaPods CDN SSL flakes (cdn.cocoapods.org over IPv6).
   sed -i '' "1s;^;${SOURCE_LINE}\n\n;" "$PODFILE"
-  echo "[verso] Added git CocoaPods specs source to ios/Podfile"
+  echo "[${APP_SLUG:-opds-reader}] Added git CocoaPods specs source to ios/Podfile"
 fi
 
 cd "$ROOT/ios"

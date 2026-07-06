@@ -21,6 +21,7 @@
     "noLibrary": "未连接书库",
     "noLibraryHint": "在设置中添加 OPDS 目录以浏览图书。",
     "connectServer": "连接 OPDS 服务器",
+    "openSettings": "设置",
     "emptyDownloaded": "尚无下载 — 点击图书上的云图标。",
     "emptySearch": "没有匹配的图书。",
     "emptyCatalog": "此目录中未找到图书",
@@ -69,7 +70,12 @@
   },
   "reader": {
     "bookNotDownloaded": "图书未下载",
-    "loadFailed": "无法加载图书"
+    "loadFailed": "无法加载图书",
+    "unsupportedFormat": "暂不支持此格式",
+    "tableOfContents": "目录",
+    "decreaseFontSize": "减小字号",
+    "increaseFontSize": "增大字号",
+    "noChapters": "暂无章节"
   },
   "settings": {
     "title": "OPDS 服务器",
@@ -116,13 +122,14 @@
   },
   "onboarding": {
     "tagline": "你的图书。你的服务器。离线可读。",
-    "description": "Verso 是面向自托管 OPDS 书库的高端阅读器。连接 Calibre-Web 或任意 OPDS 目录，下载图书，专注阅读。",
+    "description": "{{appName}} 是面向自托管 OPDS 书库的高端阅读器。连接 Calibre-Web 或任意 OPDS 目录，下载图书，专注阅读。",
     "point1Title": "连接你的目录",
-    "point1Body": "将 Verso 指向 OPDS 订阅 — 没有公共书库，只有你的收藏。",
+    "point1Body": "将 {{appName}} 指向 OPDS 订阅 — 没有公共书库，只有你的收藏。",
     "point2Title": "一次下载，随处阅读",
     "point2Body": "排队下载，把书库保存在设备上，离线阅读。",
     "point3Title": "默认私密",
     "point3Body": "凭据仅保存在你的设备上。书库不会经过我们的服务器。",
+    "exampleButton": "浏览公共书库",
     "connectButton": "连接我的书库",
     "connectTitle": "连接 OPDS",
     "connectStep": "第 2 步，共 2 步 — 链接 Calibre-Web 或 OPDS 服务器。",
@@ -133,5 +140,33 @@
     "noBooksFound": "已连接但未找到图书。请确认服务器已启用 OPDS。",
     "connectionFailed": "连接失败",
     "catalogConnectionFailed": "无法连接到目录"
+  },
+  "sync": {
+    "title": "KOReader 同步",
+    "header": "同步服务器",
+    "footer": "阅读进度与 KOReader 兼容服务器同步。凭据仅保存在本设备。",
+    "settingsFooter": "在 KOReader、Thorium 和本应用之间续读。",
+    "enable": "启用同步",
+    "serverUrl": "服务器 URL",
+    "username": "用户名",
+    "password": "密码",
+    "documentIdHeader": "文档 ID",
+    "documentIdFooter": "部分 MD5 与 KOReader 默认一致。文件名模式更快但可能冲突。",
+    "documentIdPartial": "部分 MD5（推荐）",
+    "documentIdFilename": "文件名哈希",
+    "readingHeader": "阅读",
+    "resumeLastBook": "启动时恢复上次书籍",
+    "resumeLastBookHint": "应用启动时自动打开上次阅读的书。",
+    "testConnection": "测试连接",
+    "save": "保存同步设置",
+    "testSuccess": "已连接到同步服务器",
+    "testFailed": "连接失败",
+    "saveSuccess": "同步设置已保存",
+    "saveFailed": "无法保存同步设置",
+    "errorCredentials": "请输入服务器 URL、用户名和密码。",
+    "conflictTitle": "有更新的阅读位置",
+    "conflictMessage": "另一台设备有更新的进度。跳转到该位置还是继续在此阅读？",
+    "jump": "跳转",
+    "keep": "留在此处"
   }
 }

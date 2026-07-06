@@ -2,9 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useMemo } from 'react';
 
-import { upsertBooks } from '@/db/queries';
+import { getBookCountByServerId, getBooksByServerId, upsertBooks } from '@/db/queries';
 import { useBooksCache } from '@/db/hooks/useBooksCache';
 import type { BookRow } from '@/db/schema';
+import { queryClient } from '@/lib/queryClient';
 import { getServerAuth } from '@/services/opds/credentials';
 import { resolveBookListingUrl } from '@/services/opds/catalog';
 import {
@@ -35,9 +36,14 @@ async function fetchAndCacheCatalog(
     CATALOG_MAX_PAGES,
     auth,
   );
+  const existingCount = await getBookCountByServerId(db, serverId);
   const rows = await entriesToBookRows(entries, serverId);
-  await upsertBooks(db, rows);
-  return { books: rows, searchUrl };
+  const normalizedRows = existingCount === 0
+    ? rows.map((book) => ({ ...book, cached_at: 0 }))
+    : rows;
+  await upsertBooks(db, normalizedRows);
+  const cachedRows = await getBooksByServerId(db, serverId);
+  return { books: cachedRows, searchUrl };
 }
 
 export function useOPDSCatalog(
@@ -65,6 +71,17 @@ export function useOPDSCatalog(
     await query.refetch();
     await refreshCache();
   }, [query, refreshCache]);
+
+  const refreshBooks = useCallback(async () => {
+    if (!serverId || !serverUrl) return;
+    const rows = await getBooksByServerId(db, serverId);
+    await refreshCache();
+    queryClient.setQueryData(
+      ['opds-catalog', serverId, serverUrl, authUsername],
+      (old: { books: BookRow[]; searchUrl: string | null } | undefined) =>
+        old ? { ...old, books: rows } : { books: rows, searchUrl: null },
+    );
+  }, [authUsername, db, refreshCache, serverId, serverUrl]);
 
   const result: CatalogResult = useMemo(() => {
     const catalogBooks = query.data?.books;
@@ -121,6 +138,7 @@ export function useOPDSCatalog(
     isLoading: query.isLoading && cachedBooks.length === 0,
     isRefetching: query.isRefetching,
     refresh,
+    refreshBooks,
     error: result.error,
   };
 }

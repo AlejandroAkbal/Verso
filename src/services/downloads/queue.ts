@@ -2,6 +2,7 @@ import { Directory, File, Paths } from 'expo-file-system';
 import type { SQLiteDatabase } from 'expo-sqlite';
 
 import {
+  acknowledgeBook,
   getActiveDownloads,
   getBookById,
   getDownloadByBookId,
@@ -16,6 +17,7 @@ import {
   isOpdsCatalogReference,
   resolveAcquisitionFromDetail,
 } from '@/services/opds/parser';
+import { ensureBookDocumentId } from '@/services/koreader/syncBook';
 
 export const DOWNLOADS_DIR_NAME = 'books';
 
@@ -69,6 +71,7 @@ export async function enqueueDownload(
   };
 
   await upsertDownload(db, download);
+  await acknowledgeBook(db, bookId);
 }
 
 export async function processDownloadQueue(db: SQLiteDatabase): Promise<void> {
@@ -176,6 +179,8 @@ async function downloadBook(db: SQLiteDatabase, bookId: string): Promise<void> {
       bytes_total: downloadResult.size ?? 0,
       bytes_written: downloadResult.size ?? 0,
     });
+
+    await ensureBookDocumentId(db, bookId);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Download failed';
     await updateDownloadStatus(db, bookId, 'failed', { error: message });

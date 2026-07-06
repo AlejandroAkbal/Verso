@@ -2,10 +2,11 @@ import type { SQLiteDatabase } from 'expo-sqlite';
 
 import { DEFAULT_PUBLIC_SERVERS } from '@/config/defaultServers';
 import { getAllServers, insertServer } from '@/db/queries';
+import type { ServerRow } from '@/db/schema';
 import { normalizeOpdsUrl } from '@/services/opds/url';
 
 /** Insert bundled public catalogs when missing (idempotent by stable id + URL). */
-export async function ensureDefaultPublicServers(db: SQLiteDatabase): Promise<void> {
+export async function ensureDefaultPublicServers(db: SQLiteDatabase): Promise<ServerRow[]> {
   const existing = await getAllServers(db);
   const urls = new Set(existing.map((server) => normalizeOpdsUrl(server.url)));
   const ids = new Set(existing.map((server) => server.id));
@@ -26,4 +27,6 @@ export async function ensureDefaultPublicServers(db: SQLiteDatabase): Promise<vo
     });
     urls.add(url);
   }
+
+  return getAllServers(db);
 }

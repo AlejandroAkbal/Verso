@@ -10,6 +10,33 @@ export type UserPreferencesRow = {
   id: number;
   onboarding_completed: number;
   active_server_id: string;
+  koreader_sync_enabled: number;
+  resume_last_book: number;
+  last_open_book_id: string;
+};
+
+export type DocumentIdMode = 'partial_md5' | 'filename';
+
+export type SyncAccountRow = {
+  id: string;
+  server_url: string;
+  username: string;
+  document_id_mode: DocumentIdMode;
+  device_id: string;
+  enabled: number;
+  created_at: number;
+};
+
+export type BookSyncStateRow = {
+  book_id: string;
+  document_id: string;
+  document_id_mode: DocumentIdMode;
+  last_pushed_at: number;
+  last_pulled_at: number;
+  remote_timestamp: number;
+  remote_percentage: number | null;
+  remote_progress: string;
+  last_error: string;
 };
 
 export type BookRow = {
@@ -48,13 +75,12 @@ export type DownloadRow = {
 
 export type ReadingProgressRow = {
   book_id: string;
-  position: number;
-  total: number;
-  font_size: number;
+  progression: number;
+  locator_json: string;
   updated_at: number;
 };
 
-export const SCHEMA_VERSION = 7;
+export const SCHEMA_VERSION = 10;
 
 export const CREATE_TABLES_SQL = `
   PRAGMA journal_mode = WAL;
@@ -67,7 +93,10 @@ export const CREATE_TABLES_SQL = `
   CREATE TABLE IF NOT EXISTS user_preferences (
     id INTEGER PRIMARY KEY CHECK (id = 1),
     onboarding_completed INTEGER NOT NULL DEFAULT 0,
-    active_server_id TEXT NOT NULL DEFAULT ''
+    active_server_id TEXT NOT NULL DEFAULT '',
+    koreader_sync_enabled INTEGER NOT NULL DEFAULT 0,
+    resume_last_book INTEGER NOT NULL DEFAULT 0,
+    last_open_book_id TEXT NOT NULL DEFAULT ''
   );
 
   CREATE TABLE IF NOT EXISTS servers (
@@ -110,9 +139,8 @@ export const CREATE_TABLES_SQL = `
 
   CREATE TABLE IF NOT EXISTS reading_progress (
     book_id TEXT PRIMARY KEY NOT NULL,
-    position INTEGER NOT NULL DEFAULT 0,
-    total INTEGER NOT NULL DEFAULT 0,
-    font_size INTEGER NOT NULL DEFAULT 18,
+    progression REAL NOT NULL DEFAULT 0,
+    locator_json TEXT NOT NULL DEFAULT '',
     updated_at INTEGER NOT NULL,
     FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
   );
@@ -120,4 +148,27 @@ export const CREATE_TABLES_SQL = `
   CREATE INDEX IF NOT EXISTS idx_books_server_id ON books(server_id);
   CREATE INDEX IF NOT EXISTS idx_books_cached_at ON books(cached_at DESC);
   CREATE INDEX IF NOT EXISTS idx_downloads_status ON downloads(status);
+
+  CREATE TABLE IF NOT EXISTS sync_accounts (
+    id TEXT PRIMARY KEY NOT NULL,
+    server_url TEXT NOT NULL,
+    username TEXT NOT NULL,
+    document_id_mode TEXT NOT NULL DEFAULT 'partial_md5',
+    device_id TEXT NOT NULL,
+    enabled INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS book_sync_state (
+    book_id TEXT PRIMARY KEY NOT NULL,
+    document_id TEXT NOT NULL,
+    document_id_mode TEXT NOT NULL,
+    last_pushed_at INTEGER NOT NULL DEFAULT 0,
+    last_pulled_at INTEGER NOT NULL DEFAULT 0,
+    remote_timestamp INTEGER NOT NULL DEFAULT 0,
+    remote_percentage REAL,
+    remote_progress TEXT NOT NULL DEFAULT '',
+    last_error TEXT NOT NULL DEFAULT '',
+    FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
+  );
 `;

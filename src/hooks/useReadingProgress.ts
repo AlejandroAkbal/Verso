@@ -25,5 +25,5 @@ export function useReadingProgressMap() {
     return () => clearInterval(interval);
   }, [refresh]);
 
-  return progressByBookId;
+  return { progressByBookId, refresh };
 }

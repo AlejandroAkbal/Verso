@@ -1,0 +1,27 @@
+appId: dev.akbal.opdsreader
+---
+- openLink: exp+opds-reader://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081
+- tapOn:
+    text: "Open"
+    optional: true
+- tapOn:
+    text: "Reload"
+    optional: true
+- extendedWaitUntil:
+    visible: "Library"
+    timeout: 90000
+- tapOn:
+    id: "library-settings"
+- extendedWaitUntil:
+    visible: "OPDS Servers"
+    timeout: 15000
+- scrollUntilVisible:
+    element:
+      id: "settings-koreader-sync"
+    direction: DOWN
+- tapOn:
+    id: "settings-koreader-sync"
+- extendedWaitUntil:
+    visible: "Sync server"
+    timeout: 10000
+- assertVisible: "Username"

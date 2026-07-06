@@ -1,7 +1,8 @@
-import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
+import type { TextInputProps } from 'react-native';
 import { SymbolView } from 'expo-symbols';
 import { useTranslation } from 'react-i18next';
 
+import { Box, InputBox } from '@/components/ui';
 import { useTheme } from '@/theme/ThemeProvider';
 
 type SearchFieldProps = TextInputProps & {
@@ -14,15 +15,22 @@ export function SearchField({ value, onChangeText, placeholder, ...props }: Sear
   const { t } = useTranslation();
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border },
-      ]}
+    <Box
+      flexDirection="row"
+      alignItems="center"
+      gap="sm"
+      borderRadius="lg"
+      borderWidth={0.5}
+      borderColor="border"
+      paddingHorizontal="md"
+      minHeight={44}
+      backgroundColor="surfaceElevated"
     >
       <SymbolView name="magnifyingglass" size={16} tintColor={theme.colors.textMuted} />
-      <TextInput
-        style={[styles.input, { color: theme.colors.text }]}
+      <InputBox
+        flex={1}
+        paddingVertical="sm"
+        style={{ color: theme.colors.text, fontSize: 16 }}
         placeholder={placeholder ?? t('common.search')}
         placeholderTextColor={theme.colors.textMuted}
         value={value}
@@ -34,23 +42,6 @@ export function SearchField({ value, onChangeText, placeholder, ...props }: Sear
         keyboardAppearance="dark"
         {...props}
       />
-    </View>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 12,
-    minHeight: 44,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    paddingVertical: 10,
-  },
-});

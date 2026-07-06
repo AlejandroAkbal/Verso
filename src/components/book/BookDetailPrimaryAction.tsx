@@ -1,10 +1,11 @@
-import { Pressable, StyleSheet, View } from 'react-native';
 import { SymbolView } from 'expo-symbols';
 import { useTranslation } from 'react-i18next';
 
 import { ThemedText } from '@/components/ThemedText';
+import { Box, PressableBox } from '@/components/ui';
 import { ProgressRing } from '@/components/ProgressRing';
 import { useBackgroundDownload } from '@/hooks/useBackgroundDownload';
+import { lightImpactHaptic } from '@/lib/haptics';
 import { useTheme } from '@/theme/ThemeProvider';
 
 type BookDetailPrimaryActionProps = {
@@ -32,69 +33,94 @@ export function BookDetailPrimaryAction({
         : t('book.read');
 
     return (
-      <Pressable
-        style={[styles.primary, { backgroundColor: theme.colors.primary }]}
-        onPress={onRead}
+      <PressableBox
+        flexDirection="row"
+        alignItems="center"
+        justifyContent="center"
+        gap="sm"
+        minHeight={50}
+        borderRadius="full"
+        paddingHorizontal="lg"
+        backgroundColor="primary"
+        onPress={() => {
+          void lightImpactHaptic();
+          onRead();
+        }}
       >
         <SymbolView name="book.fill" size={18} tintColor={theme.colors.onPrimary} />
         <ThemedText variant="subtitle" color={theme.colors.onPrimary}>
           {label}
         </ThemedText>
-      </Pressable>
+      </PressableBox>
     );
   }
 
   if (isDownloading) {
     const percent = Math.round(progress * 100);
     return (
-      <View style={[styles.primary, styles.disabled, { borderColor: theme.colors.border }]}>
+      <Box
+        flexDirection="row"
+        alignItems="center"
+        justifyContent="center"
+        gap="sm"
+        minHeight={50}
+        borderRadius="full"
+        paddingHorizontal="lg"
+        borderWidth={0.5}
+        borderColor="border"
+      >
         <ProgressRing progress={progress} size={22} strokeWidth={2} />
         <ThemedText variant="subtitle" color={theme.colors.textSecondary}>
           {t('book.downloading', { percent })}
         </ThemedText>
-      </View>
+      </Box>
     );
   }
 
   if (isFailed) {
     return (
-      <Pressable
-        style={[styles.primary, { borderColor: theme.colors.error, borderWidth: 1 }]}
-        onPress={() => void startDownload()}
+      <PressableBox
+        flexDirection="row"
+        alignItems="center"
+        justifyContent="center"
+        gap="sm"
+        minHeight={50}
+        borderRadius="full"
+        paddingHorizontal="lg"
+        borderColor="error"
+        borderWidth={1}
+        onPress={() => {
+          void lightImpactHaptic();
+          void startDownload();
+        }}
       >
         <SymbolView name="arrow.clockwise" size={18} tintColor={theme.colors.error} />
         <ThemedText variant="subtitle" color={theme.colors.error}>
           {t('book.downloadFailed')}
         </ThemedText>
-      </Pressable>
+      </PressableBox>
     );
   }
 
   return (
-    <Pressable
-      style={[styles.primary, { backgroundColor: theme.colors.primary }]}
-      onPress={() => void startDownload()}
+    <PressableBox
+      flexDirection="row"
+      alignItems="center"
+      justifyContent="center"
+      gap="sm"
+      minHeight={50}
+      borderRadius="full"
+      paddingHorizontal="lg"
+      backgroundColor="primary"
+      onPress={() => {
+          void lightImpactHaptic();
+          void startDownload();
+        }}
     >
       <SymbolView name="icloud.and.arrow.down" size={18} tintColor={theme.colors.onPrimary} />
       <ThemedText variant="subtitle" color={theme.colors.onPrimary}>
         {t('book.download')}
       </ThemedText>
-    </Pressable>
+    </PressableBox>
   );
 }
-
-const styles = StyleSheet.create({
-  primary: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    minHeight: 50,
-    borderRadius: 9999,
-    paddingHorizontal: 24,
-  },
-  disabled: {
-    backgroundColor: 'transparent',
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-});

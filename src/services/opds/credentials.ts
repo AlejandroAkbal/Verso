@@ -1,8 +1,9 @@
 import * as SecureStore from 'expo-secure-store';
 
+import { appIdentity } from '@/config/appIdentity';
 import type { OpdsAuth } from './types';
 
-const PASSWORD_PREFIX = 'verso.server.password.';
+const PASSWORD_PREFIX = appIdentity.secureStorePasswordPrefix;
 
 export async function getServerPassword(serverId: string): Promise<string | null> {
   return SecureStore.getItemAsync(`${PASSWORD_PREFIX}${serverId}`);

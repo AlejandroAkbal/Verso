@@ -1,11 +1,11 @@
 import { useRouter } from 'expo-router';
-import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SymbolView } from 'expo-symbols';
 import { useTranslation } from 'react-i18next';
 
 import { ServerForm } from '@/components/settings/ServerForm';
 import { ThemedText } from '@/components/ThemedText';
+import { Box, PressableBox } from '@/components/ui';
 import { useActiveServer } from '@/db/hooks/useActiveServer';
 import { useOnboarding } from '@/db/hooks/useOnboarding';
 import { useServers } from '@/db/hooks/useServers';
@@ -36,22 +36,30 @@ export default function OnboardingConnectScreen() {
   const { completeOnboarding } = useOnboarding();
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <View style={[styles.nav, { paddingTop: insets.top + 8 }]}>
-        <Pressable onPress={() => router.back()} style={styles.backButton} hitSlop={12}>
+    <Box flex={1} backgroundColor="background">
+      <Box paddingHorizontal="sm" style={{ paddingTop: insets.top + 8 }}>
+        <PressableBox
+          onPress={() => router.back()}
+          flexDirection="row"
+          alignItems="center"
+          gap="xs"
+          paddingHorizontal="sm"
+          paddingVertical="xs"
+          hitSlop={12}
+        >
           <SymbolView name="chevron.left" size={18} tintColor={theme.colors.textSecondary} />
           <ThemedText variant="body" color={theme.colors.textSecondary}>
             {t('common.back')}
           </ThemedText>
-        </Pressable>
-      </View>
+        </PressableBox>
+      </Box>
 
-      <View style={styles.header}>
+      <Box gap="sm" style={{ paddingHorizontal: 20 }} paddingBottom="sm">
         <ThemedText variant="title">{t('onboarding.connectTitle')}</ThemedText>
         <ThemedText variant="body" color={theme.colors.textSecondary}>
           {t('onboarding.connectStep')}
         </ThemedText>
-      </View>
+      </Box>
 
       <ServerForm
         initial={devPrefill}
@@ -64,27 +72,6 @@ export default function OnboardingConnectScreen() {
           router.replace('/(tabs)');
         }}
       />
-    </View>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  nav: {
-    paddingHorizontal: 8,
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  header: {
-    gap: 8,
-    paddingHorizontal: 20,
-    paddingBottom: 8,
-  },
-});

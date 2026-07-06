@@ -1,6 +1,6 @@
-import { StyleSheet, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 
+import { Box } from '@/components/ui';
 import { useTheme } from '@/theme/ThemeProvider';
 
 type ProgressRingProps = {
@@ -21,7 +21,7 @@ export function ProgressRing({
   const strokeDashoffset = circumference * (1 - clamped);
 
   return (
-    <View style={[styles.container, { width: size, height: size }]}>
+    <Box alignItems="center" justifyContent="center" width={size} height={size}>
       <Svg width={size} height={size}>
         <Circle
           cx={size / 2}
@@ -45,13 +45,6 @@ export function ProgressRing({
           origin={`${size / 2}, ${size / 2}`}
         />
       </Svg>
-    </View>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

@@ -51,6 +51,51 @@ function deleteLocalFile(localUri: string): void {
   }
 }
 
+function fileExists(localUri: string): boolean {
+  if (!localUri) return false;
+
+  try {
+    return new File(localUri).exists;
+  } catch {
+    return false;
+  }
+}
+
+function fileNameFromUri(localUri: string): string {
+  const withoutQuery = localUri.split(/[?#]/)[0];
+  const slashIndex = withoutQuery.lastIndexOf('/');
+  const fileName =
+    slashIndex >= 0 ? withoutQuery.slice(slashIndex + 1) : withoutQuery;
+
+  try {
+    return decodeURIComponent(fileName);
+  } catch {
+    return fileName;
+  }
+}
+
+export function resolveDownloadLocalUri(download: DownloadRow): string {
+  if (fileExists(download.local_uri)) {
+    return download.local_uri;
+  }
+
+  const fileName = fileNameFromUri(download.local_uri);
+  if (!fileName) {
+    return download.local_uri;
+  }
+
+  try {
+    const relocatedFile = new File(getDownloadsDirectory(), fileName);
+    if (relocatedFile.exists) {
+      return relocatedFile.uri;
+    }
+  } catch {
+    // Keep the stored URI and let the caller surface the missing file state.
+  }
+
+  return download.local_uri;
+}
+
 export async function removeDownloadedBook(
   db: SQLiteDatabase,
   bookId: string,
@@ -58,7 +103,11 @@ export async function removeDownloadedBook(
   const download = await getDownloadByBookId(db, bookId);
   if (!download) return;
 
+  const resolvedLocalUri = resolveDownloadLocalUri(download);
   deleteLocalFile(download.local_uri);
+  if (resolvedLocalUri !== download.local_uri) {
+    deleteLocalFile(resolvedLocalUri);
+  }
   await deleteDownload(db, bookId);
 }
 
@@ -67,7 +116,11 @@ export async function removeAllDownloads(db: SQLiteDatabase): Promise<number> {
   const completed = downloads.filter((d) => d.status === 'completed');
 
   for (const download of completed) {
+    const resolvedLocalUri = resolveDownloadLocalUri(download);
     deleteLocalFile(download.local_uri);
+    if (resolvedLocalUri !== download.local_uri) {
+      deleteLocalFile(resolvedLocalUri);
+    }
     await deleteDownload(db, download.book_id);
   }
 

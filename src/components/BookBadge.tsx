@@ -1,6 +1,5 @@
-import { StyleSheet, View } from 'react-native';
-
 import { ThemedText } from '@/components/ThemedText';
+import { Box } from '@/components/ui';
 
 type BookBadgeProps = {
   label: string;
@@ -8,29 +7,26 @@ type BookBadgeProps = {
 
 export function BookBadge({ label }: BookBadgeProps) {
   return (
-    <View style={styles.badge}>
-      <ThemedText variant="caption" style={styles.text}>
+    <Box
+      position="absolute"
+      top={6}
+      left={6}
+      backgroundColor="overlay"
+      borderRadius="sm"
+      paddingHorizontal="xs"
+    >
+      <ThemedText
+        variant="caption"
+        color="#FFFFFF"
+        style={{
+          fontSize: 9,
+          fontWeight: '700',
+          letterSpacing: 0.6,
+          textTransform: 'uppercase',
+        }}
+      >
         {label}
       </ThemedText>
-    </View>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  badge: {
-    position: 'absolute',
-    top: 6,
-    left: 6,
-    backgroundColor: 'rgba(0, 0, 0, 0.72)',
-    borderRadius: 4,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-  },
-  text: {
-    fontSize: 9,
-    fontWeight: '700',
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-    color: '#FFFFFF',
-  },
-});

@@ -24,5 +24,5 @@ export function useBookReadingProgress(bookId: string) {
     return () => clearInterval(interval);
   }, [refresh]);
 
-  return progress;
+  return { progress, refresh };
 }

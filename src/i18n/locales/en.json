@@ -21,6 +21,7 @@
     "noLibrary": "No library connected",
     "noLibraryHint": "Add an OPDS catalog in Settings to browse your books.",
     "connectServer": "Connect OPDS server",
+    "openSettings": "Settings",
     "emptyDownloaded": "Nothing downloaded yet — tap the cloud icon on a book.",
     "emptySearch": "No books match your search.",
     "emptyCatalog": "No books found in this catalog",
@@ -73,7 +74,12 @@
   },
   "reader": {
     "bookNotDownloaded": "Book not downloaded",
-    "loadFailed": "Failed to load book"
+    "loadFailed": "Failed to load book",
+    "unsupportedFormat": "This format is not supported yet",
+    "tableOfContents": "Table of contents",
+    "decreaseFontSize": "Decrease font size",
+    "increaseFontSize": "Increase font size",
+    "noChapters": "No chapters available"
   },
   "settings": {
     "title": "OPDS Servers",
@@ -95,7 +101,7 @@
     "showIntroAgainFooter": "Replay the welcome screens. Your library and downloads stay on this device.",
     "resetAllData": "Reset All App Data",
     "resetAllTitle": "Reset all app data?",
-    "resetAllMessage": "This removes servers, books, downloads, reading progress, and saved passwords from this device. You will start fresh as if Verso was just installed.",
+    "resetAllMessage": "This removes servers, books, downloads, reading progress, and saved passwords from this device. You will start fresh as if {{appName}} was just installed.",
     "resetAllConfirm": "Reset App"
   },
   "serverForm": {
@@ -120,13 +126,14 @@
   },
   "onboarding": {
     "tagline": "Your books. Your server. Offline.",
-    "description": "Verso is a premium reader for your self-hosted OPDS library. Connect Calibre-Web or any OPDS catalog, download books, and read without distractions.",
+    "description": "{{appName}} is a premium reader for your self-hosted OPDS library. Connect Calibre-Web or any OPDS catalog, download books, and read without distractions.",
     "point1Title": "Connect your catalog",
-    "point1Body": "Point Verso at your OPDS feed — no public ebook dumps, just your collection.",
+    "point1Body": "Point {{appName}} at your OPDS feed — no public ebook dumps, just your collection.",
     "point2Title": "Download once, read anywhere",
     "point2Body": "Queue downloads and keep your library on device for offline reading.",
     "point3Title": "Private by default",
     "point3Body": "Credentials stay on your device. Your library never passes through our servers.",
+    "exampleButton": "Explore public library",
     "connectButton": "Connect my library",
     "connectTitle": "Connect OPDS",
     "connectStep": "Step 2 of 2 — link your Calibre-Web or OPDS server.",
@@ -137,5 +144,33 @@
     "noBooksFound": "Connected but no books found. Check that OPDS is enabled on your server.",
     "connectionFailed": "Connection failed",
     "catalogConnectionFailed": "Could not connect to catalog"
+  },
+  "sync": {
+    "title": "KOReader Sync",
+    "header": "Sync server",
+    "footer": "Progress syncs with KOReader-compatible servers. Credentials stay on this device.",
+    "settingsFooter": "Resume reading across KOReader, Thorium, and this app.",
+    "enable": "Enable sync",
+    "serverUrl": "Server URL",
+    "username": "Username",
+    "password": "Password",
+    "documentIdHeader": "Document ID",
+    "documentIdFooter": "Partial MD5 matches KOReader default. Filename mode is faster but can collide.",
+    "documentIdPartial": "Partial MD5 (recommended)",
+    "documentIdFilename": "Filename hash",
+    "readingHeader": "Reading",
+    "resumeLastBook": "Resume last book on launch",
+    "resumeLastBookHint": "Opens your last book automatically when the app starts.",
+    "testConnection": "Test connection",
+    "save": "Save sync settings",
+    "testSuccess": "Connected to sync server",
+    "testFailed": "Connection failed",
+    "saveSuccess": "Sync settings saved",
+    "saveFailed": "Could not save sync settings",
+    "errorCredentials": "Enter server URL, username, and password.",
+    "conflictTitle": "Newer position available",
+    "conflictMessage": "Another device has newer reading progress. Jump to that position or keep reading here?",
+    "jump": "Jump",
+    "keep": "Keep here"
   }
 }

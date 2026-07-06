@@ -1,6 +1,7 @@
-import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
+import type { TextInputProps } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
+import { Box, InputBox } from '@/components/ui';
 import { useTheme } from '@/theme/ThemeProvider';
 
 type SettingsFieldRowProps = TextInputProps & {
@@ -11,20 +12,27 @@ export function SettingsFieldRow({ label, style, ...props }: SettingsFieldRowPro
   const theme = useTheme();
 
   return (
-    <View style={styles.row}>
+    <Box paddingHorizontal="md" paddingVertical="md" gap="sm">
       {label ? (
-        <ThemedText variant="caption" color={theme.colors.textMuted} style={styles.label}>
+        <ThemedText
+          variant="caption"
+          color={theme.colors.textMuted}
+          style={{ letterSpacing: 0.4, textTransform: 'uppercase' }}
+        >
           {label}
         </ThemedText>
       ) : null}
-      <TextInput
-        style={[styles.input, { color: theme.colors.text }, style]}
+      <InputBox
+        minHeight={40}
+        width="100%"
+        paddingVertical="xs"
+        style={[{ color: theme.colors.text, fontSize: 17, lineHeight: 22 }, style]}
         placeholderTextColor={theme.colors.textMuted}
         keyboardAppearance="dark"
         selectionColor={theme.colors.text}
         {...props}
       />
-    </View>
+    </Box>
   );
 }
 
@@ -36,14 +44,30 @@ export function SettingsMultilineField({ label, style, ...props }: SettingsMulti
   const theme = useTheme();
 
   return (
-    <View style={styles.multilineRow}>
+    <Box paddingHorizontal="md" paddingVertical="md" gap="sm">
       {label ? (
-        <ThemedText variant="caption" color={theme.colors.textMuted} style={styles.label}>
+        <ThemedText
+          variant="caption"
+          color={theme.colors.textMuted}
+          style={{ letterSpacing: 0.4, textTransform: 'uppercase' }}
+        >
           {label}
         </ThemedText>
       ) : null}
-      <TextInput
-        style={[styles.multilineInput, { color: theme.colors.text }, style]}
+      <InputBox
+        minHeight={88}
+        maxHeight={160}
+        width="100%"
+        paddingVertical="xs"
+        style={[
+          {
+            color: theme.colors.text,
+            fontSize: 17,
+            lineHeight: 22,
+            textAlignVertical: 'top',
+          },
+          style,
+        ]}
         placeholderTextColor={theme.colors.textMuted}
         keyboardAppearance="dark"
         selectionColor={theme.colors.text}
@@ -51,39 +75,6 @@ export function SettingsMultilineField({ label, style, ...props }: SettingsMulti
         scrollEnabled
         {...props}
       />
-    </View>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 8,
-  },
-  label: {
-    textTransform: 'uppercase',
-    letterSpacing: 0.4,
-  },
-  input: {
-    fontSize: 17,
-    lineHeight: 22,
-    minHeight: 40,
-    paddingVertical: 6,
-    width: '100%',
-  },
-  multilineRow: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 8,
-  },
-  multilineInput: {
-    fontSize: 17,
-    lineHeight: 22,
-    minHeight: 88,
-    maxHeight: 160,
-    paddingVertical: 6,
-    width: '100%',
-    textAlignVertical: 'top',
-  },
-});

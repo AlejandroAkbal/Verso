@@ -1,7 +1,7 @@
 import { Stack, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text } from 'react-native';
 
+import { PressableBox, Text } from '@/components/ui';
 import { theme } from '@/theme/theme';
 
 export default function SettingsLayout() {
@@ -24,9 +24,9 @@ export default function SettingsLayout() {
           title: t('settings.title'),
           headerLargeTitle: false,
           headerRight: () => (
-            <Pressable onPress={() => router.back()} hitSlop={12}>
+            <PressableBox onPress={() => router.back()} hitSlop={12}>
               <Text style={{ color: theme.colors.interactive, fontSize: 17 }}>{t('common.done')}</Text>
-            </Pressable>
+            </PressableBox>
           ),
         }}
       />
@@ -41,6 +41,13 @@ export default function SettingsLayout() {
         name="[id]"
         options={{
           title: t('settings.editServer'),
+          presentation: 'card',
+        }}
+      />
+      <Stack.Screen
+        name="koreader"
+        options={{
+          title: t('sync.title'),
           presentation: 'card',
         }}
       />

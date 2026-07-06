@@ -1,29 +1,21 @@
 import { StatusBar } from 'expo-status-bar';
-import { createContext, useContext, type ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ThemeProvider, useTheme as useRestyleTheme } from '@shopify/restyle';
+import type { ReactNode } from 'react';
 
+import { Box } from '@/components/ui';
 import { theme, type Theme } from './theme';
 
-const ThemeContext = createContext<Theme>(theme);
-
-export function VersoThemeProvider({ children }: { children: ReactNode }) {
+export function AppThemeProvider({ children }: { children: ReactNode }) {
   return (
-    <ThemeContext.Provider value={theme}>
-      <View style={styles.root}>
+    <ThemeProvider theme={theme}>
+      <Box flex={1} backgroundColor="background">
         <StatusBar style="light" />
         {children}
-      </View>
-    </ThemeContext.Provider>
+      </Box>
+    </ThemeProvider>
   );
 }
 
 export function useTheme(): Theme {
-  return useContext(ThemeContext);
+  return useRestyleTheme<Theme>();
 }
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-});

@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, View } from 'react-native';
 import { SymbolView } from 'expo-symbols';
 
+import { Box, PressableBox } from '@/components/ui';
 import { useBackgroundDownload } from '@/hooks/useBackgroundDownload';
+import { lightImpactHaptic } from '@/lib/haptics';
 import { useTheme } from '@/theme/ThemeProvider';
 import { ProgressRing } from './ProgressRing';
 
@@ -23,17 +24,30 @@ export function CloudDownloadButton({ bookId, size = 28 }: CloudDownloadButtonPr
 
   if (isDownloading) {
     return (
-      <View style={[styles.button, { width: size, height: size }]}>
+      <Box
+        alignItems="center"
+        justifyContent="center"
+        borderRadius="full"
+        backgroundColor="overlay"
+        width={size}
+        height={size}
+      >
         <ProgressRing progress={progress} size={size} />
-      </View>
+      </Box>
     );
   }
 
   return (
-    <Pressable
-      style={[styles.button, { width: size, height: size }]}
+    <PressableBox
+      alignItems="center"
+      justifyContent="center"
+      borderRadius="full"
+      backgroundColor="overlay"
+      width={size}
+      height={size}
       onPress={(event) => {
         event.stopPropagation();
+        void lightImpactHaptic();
         void startDownload();
       }}
       hitSlop={8}
@@ -43,15 +57,6 @@ export function CloudDownloadButton({ bookId, size = 28 }: CloudDownloadButtonPr
         size={size - 4}
         tintColor={theme.colors.text}
       />
-    </Pressable>
+    </PressableBox>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 9999,
-    backgroundColor: 'rgba(0, 0, 0, 0.55)',
-  },
-});

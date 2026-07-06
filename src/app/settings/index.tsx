@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -7,6 +7,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { SettingsGroup } from '@/components/settings/SettingsGroup';
 import { SettingsRow } from '@/components/settings/SettingsRow';
 import { ThemedText } from '@/components/ThemedText';
+import { Box, ScrollBox } from '@/components/ui';
 import { useServers } from '@/db/hooks/useServers';
 import { useActiveServer } from '@/db/hooks/useActiveServer';
 import { useDownloadStorageStats } from '@/hooks/useDownloadStorage';
@@ -84,12 +85,16 @@ export default function SettingsIndexScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 48 }]}
+      <ScrollBox
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 16,
+          paddingBottom: insets.bottom + 48,
+        }}
         contentInsetAdjustmentBehavior="automatic"
         automaticallyAdjustKeyboardInsets
         keyboardShouldPersistTaps="handled"
@@ -146,6 +151,18 @@ export default function SettingsIndexScreen() {
       </SettingsGroup>
 
       <SettingsGroup
+        header={t('sync.title')}
+        footer={t('sync.settingsFooter')}
+      >
+        <SettingsRow
+          title={t('sync.title')}
+          showChevron
+          testID="settings-koreader-sync"
+          onPress={() => router.push('/settings/koreader')}
+        />
+      </SettingsGroup>
+
+      <SettingsGroup
         header={t('settings.advancedHeader')}
         footer={t('settings.showIntroAgainFooter')}
       >
@@ -161,30 +178,17 @@ export default function SettingsIndexScreen() {
       </SettingsGroup>
 
       {servers.length === 0 ? (
-        <ThemedText variant="body" color={theme.colors.textSecondary} style={styles.empty}>
-          {t('settings.emptyServers')}
-        </ThemedText>
+        <Box paddingHorizontal="lg">
+          <ThemedText
+            variant="body"
+            color={theme.colors.textSecondary}
+            style={{ textAlign: 'center', lineHeight: 22 }}
+          >
+            {t('settings.emptyServers')}
+          </ThemedText>
+        </Box>
       ) : null}
-      </ScrollView>
+      </ScrollBox>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scroll: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 40,
-  },
-  empty: {
-    textAlign: 'center',
-    paddingHorizontal: 24,
-    lineHeight: 22,
-  },
-});

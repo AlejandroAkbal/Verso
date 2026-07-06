@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import { useEffect, useLayoutEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -8,6 +8,7 @@ import {
   ServerForm,
 } from '@/components/settings/ServerForm';
 import { SettingsGroup } from '@/components/settings/SettingsGroup';
+import { Box } from '@/components/ui';
 import { SettingsRow } from '@/components/settings/SettingsRow';
 import type { ServerInput } from '@/db/hooks/useServers';
 import { useServers } from '@/db/hooks/useServers';
@@ -63,31 +64,27 @@ export default function EditServerScreen() {
 
   if (loading || !serverId) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: theme.colors.background,
-        }}
+      <Box
+        flex={1}
+        alignItems="center"
+        justifyContent="center"
+        backgroundColor="background"
       >
         <ActivityIndicator color={theme.colors.text} />
-      </View>
+      </Box>
     );
   }
 
   if (!server || !initial) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: theme.colors.background,
-        }}
+      <Box
+        flex={1}
+        alignItems="center"
+        justifyContent="center"
+        backgroundColor="background"
       >
         <ActivityIndicator color={theme.colors.text} />
-      </View>
+      </Box>
     );
   }
 

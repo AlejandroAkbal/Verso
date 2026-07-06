@@ -4,10 +4,6 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SymbolView } from 'expo-symbols';
@@ -18,6 +14,7 @@ import { SettingsFieldRow, SettingsMultilineField } from '@/components/settings/
 import { SettingsGroup } from '@/components/settings/SettingsGroup';
 import { SettingsRow } from '@/components/settings/SettingsRow';
 import { ThemedText } from '@/components/ThemedText';
+import { Box, PressableBox, ScrollBox } from '@/components/ui';
 import type { ServerInput } from '@/db/hooks/useServers';
 import { getServerPassword } from '@/services/opds/credentials';
 import { testOpdsConnection } from '@/services/opds/connection';
@@ -157,20 +154,28 @@ export function ServerForm({
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 96 : 0}
     >
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 48 }]}
+      <ScrollBox
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 16,
+          paddingBottom: insets.bottom + 48,
+        }}
         contentInsetAdjustmentBehavior="automatic"
         automaticallyAdjustKeyboardInsets
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
       >
       {showHelper ? (
-        <ThemedText variant="caption" color={theme.colors.textMuted} style={styles.helper}>
+        <ThemedText
+          variant="caption"
+          color={theme.colors.textMuted}
+          style={{ marginBottom: 16, marginHorizontal: 4, lineHeight: 20 }}
+        >
           {t('serverForm.helper', { url: t('serverForm.helperUrl') })}
         </ThemedText>
       ) : null}
@@ -198,7 +203,7 @@ export function ServerForm({
           autoCorrect={false}
           textContentType="username"
         />
-        <View style={styles.passwordRow}>
+        <Box position="relative">
           <SettingsFieldRow
             label=""
             placeholder={
@@ -211,11 +216,14 @@ export function ServerForm({
             autoCorrect={false}
             textContentType="password"
             editable={!loadingPassword}
-            style={styles.passwordInput}
+            style={{ paddingRight: 40 }}
           />
-          <Pressable
+          <PressableBox
             onPress={() => setShowPassword((v) => !v)}
-            style={styles.eyeButton}
+            position="absolute"
+            right={12}
+            bottom={14}
+            padding="xs"
             hitSlop={8}
           >
             <SymbolView
@@ -223,17 +231,25 @@ export function ServerForm({
               size={18}
               tintColor={theme.colors.textMuted}
             />
-          </Pressable>
-        </View>
+          </PressableBox>
+        </Box>
       </SettingsGroup>
 
       {error ? (
-        <ThemedText variant="caption" color={theme.colors.error} style={styles.feedback}>
+        <ThemedText
+          variant="caption"
+          color={theme.colors.error}
+          style={{ marginHorizontal: 16, marginBottom: 12, lineHeight: 18 }}
+        >
           {error}
         </ThemedText>
       ) : null}
       {status ? (
-        <ThemedText variant="caption" color={theme.colors.textSecondary} style={styles.feedback}>
+        <ThemedText
+          variant="caption"
+          color={theme.colors.textSecondary}
+          style={{ marginHorizontal: 16, marginBottom: 12, lineHeight: 18 }}
+        >
           {status}
         </ThemedText>
       ) : null}
@@ -267,7 +283,7 @@ export function ServerForm({
       </SettingsGroup>
 
       {trailingContent}
-      </ScrollView>
+      </ScrollBox>
     </KeyboardAvoidingView>
   );
 }
@@ -286,39 +302,3 @@ export function confirmDeleteServer(
     ],
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scroll: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 40,
-  },
-  helper: {
-    marginBottom: 16,
-    marginHorizontal: 4,
-    lineHeight: 20,
-  },
-  passwordRow: {
-    position: 'relative',
-  },
-  eyeButton: {
-    position: 'absolute',
-    right: 12,
-    bottom: 14,
-    padding: 4,
-  },
-  passwordInput: {
-    paddingRight: 40,
-  },
-  feedback: {
-    marginHorizontal: 16,
-    marginBottom: 12,
-    lineHeight: 18,
-  },
-});

@@ -1,11 +1,16 @@
 import { useRouter } from 'expo-router';
-import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SymbolView } from 'expo-symbols';
 import { useTranslation } from 'react-i18next';
+import { useSQLiteContext } from 'expo-sqlite';
 
 import { ThemedText } from '@/components/ThemedText';
+import { Box, PressableBox } from '@/components/ui';
+import { useActiveServer } from '@/db/hooks/useActiveServer';
+import { useOnboarding } from '@/db/hooks/useOnboarding';
 import { useServers } from '@/db/hooks/useServers';
+import { ensureDefaultPublicServers } from '@/db/seedServers';
+import { appIdentity } from '@/config/appIdentity';
 import { useTheme } from '@/theme/ThemeProvider';
 
 export default function OnboardingWelcomeScreen() {
@@ -13,30 +18,52 @@ export default function OnboardingWelcomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const db = useSQLiteContext();
+  const { setActive } = useActiveServer();
+  const { completeOnboarding } = useOnboarding();
   const { servers } = useServers();
   const hasLibrary = servers.length > 0;
 
+  const explorePublicLibrary = async () => {
+    const rows = await ensureDefaultPublicServers(db);
+    const publicServer = rows.find((server) => server.id.startsWith('seed-')) ?? rows[0];
+    if (publicServer) {
+      await setActive(publicServer.id);
+    }
+    await completeOnboarding();
+    router.replace('/(tabs)');
+  };
+
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: theme.colors.background, paddingTop: insets.top + 32, paddingBottom: insets.bottom + 24 },
-      ]}
+    <Box
+      flex={1}
+      paddingHorizontal="lg"
+      justifyContent="space-between"
+      backgroundColor="background"
+      style={{ paddingTop: insets.top + 32, paddingBottom: insets.bottom + 24 }}
     >
-      <View style={styles.hero}>
+      <Box alignItems="center" gap="md">
         <SymbolView name="books.vertical.fill" size={56} tintColor={theme.colors.text} />
-        <ThemedText variant="title" style={styles.title}>
-          Verso
+        <ThemedText variant="title" style={{ fontSize: 34, marginTop: 8 }}>
+          {appIdentity.displayName}
         </ThemedText>
-        <ThemedText variant="subtitle" color={theme.colors.textSecondary} style={styles.subtitle}>
+        <ThemedText
+          variant="subtitle"
+          color={theme.colors.textSecondary}
+          style={{ textAlign: 'center' }}
+        >
           {t('onboarding.tagline')}
         </ThemedText>
-        <ThemedText variant="body" color={theme.colors.textSecondary} style={styles.body}>
+        <ThemedText
+          variant="body"
+          color={theme.colors.textSecondary}
+          style={{ textAlign: 'center', lineHeight: 24, marginTop: 8 }}
+        >
           {t('onboarding.description')}
         </ThemedText>
-      </View>
+      </Box>
 
-      <View style={styles.points}>
+      <Box gap="lg">
         <Point
           icon="server.rack"
           title={t('onboarding.point1Title')}
@@ -52,26 +79,35 @@ export default function OnboardingWelcomeScreen() {
           title={t('onboarding.point3Title')}
           body={t('onboarding.point3Body')}
         />
-      </View>
+      </Box>
 
-      <View style={styles.actions}>
-        <Pressable
-          style={[styles.button, { backgroundColor: theme.colors.primary }]}
+      <Box gap="md" alignItems="center">
+        <PressableBox
+          alignItems="center"
+          paddingVertical="md"
+          borderRadius="full"
+          width="100%"
+          backgroundColor="primary"
           onPress={() => router.push('/(onboarding)/connect')}
         >
           <ThemedText variant="subtitle" color={theme.colors.onPrimary}>
             {t('onboarding.connectButton')}
           </ThemedText>
-        </Pressable>
+        </PressableBox>
+        <PressableBox onPress={() => void explorePublicLibrary()} hitSlop={8}>
+          <ThemedText variant="body" color={theme.colors.textSecondary}>
+            {t('onboarding.exampleButton')}
+          </ThemedText>
+        </PressableBox>
         {hasLibrary ? (
-          <Pressable onPress={() => router.replace('/(tabs)')} hitSlop={8}>
+          <PressableBox onPress={() => router.replace('/(tabs)')} hitSlop={8}>
             <ThemedText variant="body" color={theme.colors.textSecondary}>
               {t('onboarding.backToLibrary')}
             </ThemedText>
-          </Pressable>
+          </PressableBox>
         ) : null}
-      </View>
-    </View>
+      </Box>
+    </Box>
   );
 }
 
@@ -87,60 +123,14 @@ function Point({
   const theme = useTheme();
 
   return (
-    <View style={styles.point}>
+    <Box flexDirection="row" gap="md" alignItems="flex-start">
       <SymbolView name={icon} size={22} tintColor={theme.colors.textSecondary} />
-      <View style={styles.pointText}>
+      <Box flex={1} gap="xs">
         <ThemedText variant="subtitle">{title}</ThemedText>
         <ThemedText variant="caption" color={theme.colors.textSecondary}>
           {body}
         </ThemedText>
-      </View>
-    </View>
+      </Box>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 24,
-    justifyContent: 'space-between',
-  },
-  hero: {
-    alignItems: 'center',
-    gap: 12,
-  },
-  title: {
-    fontSize: 34,
-    marginTop: 8,
-  },
-  subtitle: {
-    textAlign: 'center',
-  },
-  body: {
-    textAlign: 'center',
-    lineHeight: 24,
-    marginTop: 8,
-  },
-  points: {
-    gap: 20,
-  },
-  point: {
-    flexDirection: 'row',
-    gap: 14,
-    alignItems: 'flex-start',
-  },
-  pointText: {
-    flex: 1,
-    gap: 4,
-  },
-  button: {
-    alignItems: 'center',
-    paddingVertical: 16,
-    borderRadius: 9999,
-    width: '100%',
-  },
-  actions: {
-    gap: 16,
-    alignItems: 'center',
-  },
-});

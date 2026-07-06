@@ -1,5 +1,4 @@
-import { StyleSheet, View } from 'react-native';
-
+import { Box } from '@/components/ui';
 import { useTheme } from '@/theme/ThemeProvider';
 
 type CoverProgressBarProps = {
@@ -11,30 +10,20 @@ export function CoverProgressBar({ percent }: CoverProgressBarProps) {
   const clamped = Math.min(Math.max(percent, 0), 100);
 
   return (
-    <View style={[styles.track, { backgroundColor: theme.colors.progressTrack }]}>
-      <View
-        style={[
-          styles.fill,
-          {
-            width: `${clamped}%`,
-            backgroundColor: theme.colors.progress,
-          },
-        ]}
+    <Box
+      position="absolute"
+      left={0}
+      right={0}
+      bottom={0}
+      height={2}
+      overflow="hidden"
+      style={{ backgroundColor: theme.colors.progressTrack }}
+    >
+      <Box
+        height="100%"
+        width={`${clamped}%`}
+        backgroundColor="progress"
       />
-    </View>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  track: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 2,
-    overflow: 'hidden',
-  },
-  fill: {
-    height: '100%',
-  },
-});

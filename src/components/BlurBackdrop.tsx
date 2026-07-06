@@ -1,12 +1,13 @@
-import { StyleSheet, View } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { Image } from 'expo-image';
+import type { ReactNode } from 'react';
+
+import { Box, ImageBox } from '@/components/ui';
 
 type BlurBackdropProps = {
   imageUrl: string;
   imageHeaders?: Record<string, string>;
   dominantColor: string;
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export function BlurBackdrop({
@@ -16,31 +17,35 @@ export function BlurBackdrop({
   children,
 }: BlurBackdropProps) {
   return (
-    <View style={styles.container}>
-      <Image
+    <Box flex={1} backgroundColor="background">
+      <ImageBox
         source={{
           uri: imageUrl,
           headers: imageHeaders,
         }}
-        style={StyleSheet.absoluteFill}
+        position="absolute"
+        top={0}
+        right={0}
+        bottom={0}
+        left={0}
         contentFit="cover"
         blurRadius={40}
       />
-      <View
-        style={[StyleSheet.absoluteFill, { backgroundColor: dominantColor, opacity: 0.55 }]}
+      <Box
+        position="absolute"
+        top={0}
+        right={0}
+        bottom={0}
+        left={0}
+        opacity={0.55}
+        style={{ backgroundColor: dominantColor }}
       />
-      <BlurView intensity={60} tint="dark" style={StyleSheet.absoluteFill} />
-      <View style={styles.content}>{children}</View>
-    </View>
+      <BlurView
+        intensity={60}
+        tint="dark"
+        style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
+      />
+      <Box flex={1}>{children}</Box>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  content: {
-    flex: 1,
-  },
-});

@@ -21,6 +21,7 @@
     "noLibrary": "Sin biblioteca conectada",
     "noLibraryHint": "Añade un catálogo OPDS en Ajustes para explorar tus libros.",
     "connectServer": "Conectar servidor OPDS",
+    "openSettings": "Ajustes",
     "emptyDownloaded": "Nada descargado aún — toca el icono de nube en un libro.",
     "emptySearch": "Ningún libro coincide con tu búsqueda.",
     "emptyCatalog": "No se encontraron libros en este catálogo",
@@ -73,7 +74,12 @@
   },
   "reader": {
     "bookNotDownloaded": "Libro no descargado",
-    "loadFailed": "No se pudo cargar el libro"
+    "loadFailed": "No se pudo cargar el libro",
+    "unsupportedFormat": "Este formato aún no es compatible",
+    "tableOfContents": "Tabla de contenidos",
+    "decreaseFontSize": "Reducir tamaño de fuente",
+    "increaseFontSize": "Aumentar tamaño de fuente",
+    "noChapters": "No hay capítulos disponibles"
   },
   "settings": {
     "title": "Servidores OPDS",
@@ -95,7 +101,7 @@
     "showIntroAgainFooter": "Vuelve a ver las pantallas de bienvenida. Tu biblioteca y descargas se mantienen.",
     "resetAllData": "Restablecer todos los datos",
     "resetAllTitle": "¿Restablecer todos los datos?",
-    "resetAllMessage": "Esto elimina servidores, libros, descargas, progreso de lectura y contraseñas guardadas. Empezarás de cero como si acabaras de instalar Verso.",
+    "resetAllMessage": "Esto elimina servidores, libros, descargas, progreso de lectura y contraseñas guardadas. Empezarás de cero como si acabaras de instalar {{appName}}.",
     "resetAllConfirm": "Restablecer"
   },
   "serverForm": {
@@ -120,13 +126,14 @@
   },
   "onboarding": {
     "tagline": "Tus libros. Tu servidor. Sin conexión.",
-    "description": "Verso es un lector premium para tu biblioteca OPDS autoalojada. Conecta Calibre-Web u otro catálogo OPDS, descarga libros y lee sin distracciones.",
+    "description": "{{appName}} es un lector premium para tu biblioteca OPDS autoalojada. Conecta Calibre-Web u otro catálogo OPDS, descarga libros y lee sin distracciones.",
     "point1Title": "Conecta tu catálogo",
-    "point1Body": "Apunta Verso a tu feed OPDS — sin repositorios públicos, solo tu colección.",
+    "point1Body": "Apunta {{appName}} a tu feed OPDS — sin repositorios públicos, solo tu colección.",
     "point2Title": "Descarga una vez, lee en cualquier lugar",
     "point2Body": "Encola descargas y mantén tu biblioteca en el dispositivo para leer sin conexión.",
     "point3Title": "Privado por defecto",
     "point3Body": "Las credenciales permanecen en tu dispositivo. Tu biblioteca nunca pasa por nuestros servidores.",
+    "exampleButton": "Explorar biblioteca pública",
     "connectButton": "Conectar mi biblioteca",
     "connectTitle": "Conectar OPDS",
     "connectStep": "Paso 2 de 2 — vincula tu servidor Calibre-Web u OPDS.",
@@ -137,5 +144,33 @@
     "noBooksFound": "Conectado pero sin libros. Comprueba que OPDS esté activado en el servidor.",
     "connectionFailed": "Conexión fallida",
     "catalogConnectionFailed": "No se pudo conectar al catálogo"
+  },
+  "sync": {
+    "title": "Sincronización KOReader",
+    "header": "Servidor de sincronización",
+    "footer": "El progreso se sincroniza con servidores compatibles con KOReader. Las credenciales permanecen en este dispositivo.",
+    "settingsFooter": "Continúa leyendo en KOReader, Thorium y esta app.",
+    "enable": "Activar sincronización",
+    "serverUrl": "URL del servidor",
+    "username": "Usuario",
+    "password": "Contraseña",
+    "documentIdHeader": "ID del documento",
+    "documentIdFooter": "MD5 parcial coincide con KOReader. El modo nombre de archivo es más rápido pero puede colisionar.",
+    "documentIdPartial": "MD5 parcial (recomendado)",
+    "documentIdFilename": "Hash del nombre de archivo",
+    "readingHeader": "Lectura",
+    "resumeLastBook": "Reanudar último libro al abrir",
+    "resumeLastBookHint": "Abre automáticamente tu último libro al iniciar la app.",
+    "testConnection": "Probar conexión",
+    "save": "Guardar ajustes de sincronización",
+    "testSuccess": "Conectado al servidor de sincronización",
+    "testFailed": "Error de conexión",
+    "saveSuccess": "Ajustes de sincronización guardados",
+    "saveFailed": "No se pudieron guardar los ajustes",
+    "errorCredentials": "Introduce URL, usuario y contraseña.",
+    "conflictTitle": "Posición más reciente disponible",
+    "conflictMessage": "Otro dispositivo tiene un progreso más reciente. ¿Ir a esa posición o continuar aquí?",
+    "jump": "Ir",
+    "keep": "Quedarme aquí"
   }
 }

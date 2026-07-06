@@ -1,7 +1,7 @@
 import { Children, Fragment, type ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
+import { Box } from '@/components/ui';
 import { useTheme } from '@/theme/ThemeProvider';
 
 type SettingsGroupProps = {
@@ -15,50 +15,35 @@ export function SettingsGroup({ children, header, footer }: SettingsGroupProps) 
   const items = Children.toArray(children).filter(Boolean);
 
   return (
-    <View style={styles.section}>
+    <Box marginBottom="lg">
       {header ? (
-        <ThemedText variant="label" color={theme.colors.textMuted} style={styles.header}>
+        <ThemedText
+          variant="label"
+          color={theme.colors.textMuted}
+          style={{ marginBottom: 8, marginLeft: 16, textTransform: 'uppercase' }}
+        >
           {header}
         </ThemedText>
       ) : null}
-      <View style={[styles.group, { backgroundColor: theme.colors.groupedBackground }]}>
+      <Box borderRadius="lg" backgroundColor="groupedBackground">
         {items.map((child, index) => (
           <Fragment key={index}>
             {child}
             {index < items.length - 1 ? (
-              <View style={[styles.separator, { backgroundColor: theme.colors.separator }]} />
+              <Box height={0.5} marginLeft="md" backgroundColor="separator" />
             ) : null}
           </Fragment>
         ))}
-      </View>
+      </Box>
       {footer ? (
-        <ThemedText variant="caption" color={theme.colors.textMuted} style={styles.footer}>
+        <ThemedText
+          variant="caption"
+          color={theme.colors.textMuted}
+          style={{ marginTop: 8, marginHorizontal: 16, lineHeight: 18 }}
+        >
           {footer}
         </ThemedText>
       ) : null}
-    </View>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  section: {
-    marginBottom: 24,
-  },
-  header: {
-    marginBottom: 8,
-    marginLeft: 16,
-    textTransform: 'uppercase',
-  },
-  group: {
-    borderRadius: 12,
-  },
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    marginLeft: 16,
-  },
-  footer: {
-    marginTop: 8,
-    marginHorizontal: 16,
-    lineHeight: 18,
-  },
-});

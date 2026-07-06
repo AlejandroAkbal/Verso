@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import type { StyleProp, ViewStyle } from 'react-native';
 import { SymbolView } from 'expo-symbols';
 
 import { ThemedText } from '@/components/ThemedText';
+import { Box, PressableBox } from '@/components/ui';
 import { useTheme } from '@/theme/ThemeProvider';
 
 type SettingsRowProps = {
@@ -16,6 +17,7 @@ type SettingsRowProps = {
   rightElement?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   disabled?: boolean;
+  testID?: string;
 };
 
 export function SettingsRow({
@@ -30,6 +32,7 @@ export function SettingsRow({
   rightElement,
   style,
   disabled = false,
+  testID,
 }: SettingsRowProps) {
   const theme = useTheme();
 
@@ -38,11 +41,25 @@ export function SettingsRow({
     : theme.colors.text;
 
   const content = (
-    <View style={[styles.row, style, disabled && styles.disabled]}>
+    <Box
+      flexDirection="row"
+      alignItems="center"
+      minHeight={44}
+      paddingHorizontal="md"
+      paddingVertical="sm"
+      gap="md"
+      opacity={disabled ? 0.45 : 1}
+      style={style}
+    >
       {icon ? (
-        <SymbolView name={icon} size={22} tintColor={theme.colors.text} style={styles.icon} />
+        <SymbolView
+          name={icon}
+          size={22}
+          tintColor={theme.colors.text}
+          style={{ width: 28 }}
+        />
       ) : null}
-      <View style={styles.textBlock}>
+      <Box flex={1} gap="xs">
         <ThemedText variant="body" color={titleColor} numberOfLines={2}>
           {title}
         </ThemedText>
@@ -51,7 +68,7 @@ export function SettingsRow({
             {subtitle}
           </ThemedText>
         ) : null}
-      </View>
+      </Box>
       {rightElement}
       {selected ? (
         <SymbolView
@@ -62,11 +79,14 @@ export function SettingsRow({
         />
       ) : null}
       {accessoryOnPress ? (
-        <Pressable
+        <PressableBox
           onPress={accessoryOnPress}
           disabled={disabled}
           hitSlop={8}
-          style={({ pressed }) => [styles.accessory, pressed && styles.pressed]}
+          marginLeft="xs"
+          paddingLeft="sm"
+          paddingVertical="xs"
+          style={({ pressed }) => ({ opacity: pressed ? 0.65 : 1 })}
         >
           <SymbolView
             name="chevron.right"
@@ -74,7 +94,7 @@ export function SettingsRow({
             weight="semibold"
             tintColor={theme.colors.textMuted}
           />
-        </Pressable>
+        </PressableBox>
       ) : showChevron ? (
         <SymbolView
           name="chevron.right"
@@ -83,7 +103,7 @@ export function SettingsRow({
           tintColor={theme.colors.textMuted}
         />
       ) : null}
-    </View>
+    </Box>
   );
 
   if (!onPress) {
@@ -91,41 +111,14 @@ export function SettingsRow({
   }
 
   return (
-    <Pressable
+    <PressableBox
       onPress={onPress}
       disabled={disabled}
-      style={({ pressed }) => [pressed && styles.pressed]}
+      testID={testID}
+      accessibilityRole="button"
+      style={({ pressed }) => ({ opacity: pressed ? 0.65 : 1 })}
     >
       {content}
-    </Pressable>
+    </PressableBox>
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    minHeight: 44,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    gap: 12,
-  },
-  icon: {
-    width: 28,
-  },
-  textBlock: {
-    flex: 1,
-    gap: 2,
-  },
-  pressed: {
-    opacity: 0.65,
-  },
-  disabled: {
-    opacity: 0.45,
-  },
-  accessory: {
-    marginLeft: 4,
-    paddingLeft: 8,
-    paddingVertical: 4,
-  },
-});

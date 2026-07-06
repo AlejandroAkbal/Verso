@@ -35,6 +35,7 @@ async function runMigrations(db: SQLiteDatabase): Promise<void> {
     await db.runAsync(
       'INSERT OR IGNORE INTO user_preferences (id, onboarding_completed) VALUES (1, 0)',
     );
+    await ensureDefaultPublicServers(db);
     return;
   }
 
@@ -108,6 +109,73 @@ async function runMigrations(db: SQLiteDatabase): Promise<void> {
       } catch {
         // Column may already exist on fresh installs.
       }
+    }
+
+    if (versionRow.version < 8) {
+      await db.execAsync(`
+        DROP TABLE IF EXISTS reading_progress;
+        CREATE TABLE reading_progress (
+          book_id TEXT PRIMARY KEY NOT NULL,
+          progression REAL NOT NULL DEFAULT 0,
+          locator_json TEXT NOT NULL DEFAULT '',
+          updated_at INTEGER NOT NULL,
+          FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
+        );
+      `);
+    }
+
+    if (versionRow.version < 9) {
+      // Existing catalogs are the user's baseline library, not new arrivals.
+      await db.runAsync('UPDATE books SET cached_at = 0');
+    }
+
+    if (versionRow.version < 10) {
+      try {
+        await db.runAsync(
+          `ALTER TABLE user_preferences ADD COLUMN koreader_sync_enabled INTEGER NOT NULL DEFAULT 0`,
+        );
+      } catch {
+        // Column may already exist on fresh installs.
+      }
+      try {
+        await db.runAsync(
+          `ALTER TABLE user_preferences ADD COLUMN resume_last_book INTEGER NOT NULL DEFAULT 0`,
+        );
+      } catch {
+        // Column may already exist on fresh installs.
+      }
+      try {
+        await db.runAsync(
+          `ALTER TABLE user_preferences ADD COLUMN last_open_book_id TEXT NOT NULL DEFAULT ''`,
+        );
+      } catch {
+        // Column may already exist on fresh installs.
+      }
+
+      await db.execAsync(`
+        CREATE TABLE IF NOT EXISTS sync_accounts (
+          id TEXT PRIMARY KEY NOT NULL,
+          server_url TEXT NOT NULL,
+          username TEXT NOT NULL,
+          document_id_mode TEXT NOT NULL DEFAULT 'partial_md5',
+          device_id TEXT NOT NULL,
+          enabled INTEGER NOT NULL DEFAULT 0,
+          created_at INTEGER NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS book_sync_state (
+          book_id TEXT PRIMARY KEY NOT NULL,
+          document_id TEXT NOT NULL,
+          document_id_mode TEXT NOT NULL,
+          last_pushed_at INTEGER NOT NULL DEFAULT 0,
+          last_pulled_at INTEGER NOT NULL DEFAULT 0,
+          remote_timestamp INTEGER NOT NULL DEFAULT 0,
+          remote_percentage REAL,
+          remote_progress TEXT NOT NULL DEFAULT '',
+          last_error TEXT NOT NULL DEFAULT '',
+          FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
+        );
+      `);
     }
 
     await db.runAsync('UPDATE schema_version SET version = ?', [SCHEMA_VERSION]);

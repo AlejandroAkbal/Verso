@@ -1,7 +1,7 @@
-import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { ThemedText } from '@/components/ThemedText';
+import { Box } from '@/components/ui';
 import { useTheme } from '@/theme/ThemeProvider';
 
 type LibraryFooterProps = {
@@ -42,7 +42,15 @@ export function LibraryFooter({
   }
 
   return (
-    <View style={[styles.container, { borderTopColor: theme.colors.border }]}>
+    <Box
+      alignItems="center"
+      gap="xs"
+      paddingTop="xl"
+      paddingBottom="md"
+      marginTop="sm"
+      borderTopWidth={0.5}
+      borderTopColor="border"
+    >
       <ThemedText variant="subtitle" color={theme.colors.textSecondary}>
         {primaryLine}
       </ThemedText>
@@ -54,17 +62,6 @@ export function LibraryFooter({
       <ThemedText variant="caption" color={theme.colors.textMuted}>
         {serverTitle}
       </ThemedText>
-    </View>
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    gap: 6,
-    paddingTop: 32,
-    paddingBottom: 16,
-    marginTop: 8,
-    borderTopWidth: StyleSheet.hairlineWidth,
-  },
-});

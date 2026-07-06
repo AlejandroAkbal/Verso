@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="./assets/images/icon.png" alt="Verso" width="96" height="96" />
+  <img src="./assets/images/icon.png" alt="Reader" width="96" height="96" />
 </p>
 
-<h1 align="center">Verso</h1>
+<h1 align="center">OPDS Reader</h1>
 
 <p align="center">
   <strong>A premium, local-first, OPDS-first e-book reader for iOS & Android.</strong><br />
@@ -40,7 +40,7 @@
 
 ## Overview
 
-**Verso** is an open-source mobile e-book reader that treats your library as yours: catalogs are cached locally, downloads survive backgrounding, and network failures degrade gracefully instead of leaving you with an empty screen.
+**OPDS Reader** is an open-source mobile e-book reader that treats your library as yours: catalogs are cached locally, downloads survive backgrounding, and network failures degrade gracefully instead of leaving you with an empty screen.
 
 Connect any [OPDS](https://opds.io/) feed, browse a dense cover grid, download books with a single tap, and read offline with a native-feeling paginated canvas — all wrapped in a pitch-black, distraction-free interface.
 
@@ -88,7 +88,7 @@ flowchart TB
     OPDS[OPDS XML Feed]
   end
 
-  subgraph app [Verso App]
+  subgraph app [Reader App]
     Parser[OPDS Parser]
     RQ[TanStack Query]
     Grid[Catalog Grid]
@@ -151,7 +151,7 @@ eas build --profile development --platform ios
 pnpm start
 ```
 
-Scan the QR code with the **Verso dev app**, not Expo Go.
+Scan the QR code with the **dev client app**, not Expo Go.
 
 ### CocoaPods troubleshooting
 
@@ -163,7 +163,9 @@ pnpm pod-install
 
 ### First launch
 
-Verso opens a short onboarding flow — welcome screen, then connect your OPDS catalog (Calibre-Web, etc.). Credentials are stored on-device only (`expo-secure-store` for passwords).
+The app opens a short onboarding flow — welcome screen, then connect your OPDS catalog (Calibre-Web, etc.). Credentials are stored on-device only (`expo-secure-store` for passwords).
+
+Display name and bundle IDs are defined in `src/config/appIdentity.ts` (currently **Reader** / `dev.akbal.opdsreader`).
 
 For local dev prefills, copy `src/config/dev-secrets.example.ts` → `src/config/dev-secrets.ts` (gitignored).
 
@@ -206,7 +208,7 @@ src/
 
 ## Learning Resources
 
-Want to understand the SQLite patterns Verso builds on? Check out the standalone companion example (not part of this repo):
+Want to understand the SQLite patterns this app builds on? Check out the standalone companion example (not part of this repo):
 
 **[Expo-With-SQLite-Example](https://github.com/expo/examples/tree/master/with-sqlite)** — official Expo todo demo with `SQLiteProvider`, `PRAGMA user_version` migrations, and `withExclusiveTransactionAsync`.
 
