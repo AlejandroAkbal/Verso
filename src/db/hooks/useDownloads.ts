@@ -1,8 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useSQLiteContext } from 'expo-sqlite';
 
+import { subscribeDownloadsChanged } from '@/services/downloads/changes';
+
 import { getAllDownloads, getDownloadByBookId } from '../queries';
 import type { DownloadRow } from '../schema';
+
+const ACTIVE_POLL_MS = 300;
+const IDLE_POLL_MS = 2500;
 
 export function useDownloads() {
   const db = useSQLiteContext();
@@ -21,8 +26,16 @@ export function useDownloads() {
     });
     const interval = setInterval(() => {
       void refresh();
-    }, 2000);
-    return () => clearInterval(interval);
+    }, ACTIVE_POLL_MS);
+
+    const unsubscribe = subscribeDownloadsChanged(() => {
+      void refresh();
+    });
+
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
   }, [refresh]);
 
   return { downloads, loading, refresh };
@@ -33,19 +46,37 @@ export function useDownloadStatus(bookId: string) {
   const [download, setDownload] = useState<DownloadRow | null>(null);
 
   const refresh = useCallback(async () => {
+    if (!bookId) {
+      setDownload(null);
+      return;
+    }
     const row = await getDownloadByBookId(db, bookId);
     setDownload(row);
-  }, [db, bookId]);
+  }, [bookId, db]);
 
   useEffect(() => {
     queueMicrotask(() => {
       void refresh();
     });
+
+    const pollMs =
+      download?.status === 'downloading' || download?.status === 'queued'
+        ? ACTIVE_POLL_MS
+        : IDLE_POLL_MS;
+
     const interval = setInterval(() => {
       void refresh();
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [refresh]);
+    }, pollMs);
+
+    const unsubscribe = subscribeDownloadsChanged(() => {
+      void refresh();
+    });
+
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
+  }, [download?.status, refresh]);
 
   return download;
 }

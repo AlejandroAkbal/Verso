@@ -77,7 +77,8 @@
     "pod-install": "bash ./scripts/ios-pod-install.sh",
     "lint": "NODE_PATH=./node_modules node ./node_modules/expo/bin/cli lint",
     "typecheck": "tsc --noEmit",
-    "e2e:ios": "maestro test .maestro/"
+    "e2e:ios": "maestro test .maestro/",
+    "e2e:android": "maestro test .maestro/"
   },
   "private": true
 }

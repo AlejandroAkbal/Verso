@@ -18,6 +18,7 @@ import {
   isOpdsCatalogReference,
   resolveAcquisitionFromDetail,
 } from '@/services/opds/parser';
+import { notifyDownloadsChanged } from '@/services/downloads/changes';
 import { ensureBookDocumentId } from '@/services/koreader/syncBook';
 
 export const DOWNLOADS_DIR_NAME = 'books';
@@ -89,6 +90,7 @@ export async function enqueueDownload(
 
   await upsertDownload(db, download);
   await acknowledgeBook(db, bookId);
+  notifyDownloadsChanged();
 }
 
 export async function processDownloadQueue(db: SQLiteDatabase): Promise<void> {
@@ -131,6 +133,7 @@ async function downloadBook(db: SQLiteDatabase, bookId: string): Promise<void> {
     await updateDownloadStatus(db, bookId, 'failed', {
       error: 'Missing download URL',
     });
+    notifyDownloadsChanged();
     return;
   }
 
@@ -150,6 +153,7 @@ async function downloadBook(db: SQLiteDatabase, bookId: string): Promise<void> {
     const message =
       error instanceof Error ? error.message : 'Failed to resolve download URL';
     await updateDownloadStatus(db, bookId, 'failed', { error: message });
+    notifyDownloadsChanged();
     return;
   }
 
@@ -204,9 +208,11 @@ async function downloadBook(db: SQLiteDatabase, bookId: string): Promise<void> {
     } catch {
       // KOReader document ID is best-effort; never fail a completed download for sync setup.
     }
+    notifyDownloadsChanged();
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Download failed';
     await updateDownloadStatus(db, bookId, 'failed', { error: message });
+    notifyDownloadsChanged();
   }
 }
 

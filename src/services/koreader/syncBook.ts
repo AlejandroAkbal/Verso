@@ -17,7 +17,7 @@ import type { DocumentIdMode } from '@/db/schema';
 import { resolveDownloadLocalUri } from '@/services/downloads/manage';
 import { showSyncErrorToast } from '@/lib/toast';
 
-import { buildAuthHeaders, setKoreaderPassword } from './credentials';
+import { setKoreaderPassword } from './credentials';
 import {
   fetchRemoteProgress,
   hasSyncConflict,
@@ -27,6 +27,7 @@ import {
 } from './client';
 import { computeDocumentId } from './documentId';
 import { getOrCreateKoreaderDeviceId } from './deviceId';
+import { resolveKosyncProfile } from './profile';
 import {
   CONFLICT_PROGRESS_DELTA,
   KOREADER_ACCEPT,
@@ -112,13 +113,12 @@ export async function pullRemoteProgressForBook(
     return { remote: null, hasConflict: false, documentId: null };
   }
 
-  const auth = await buildAuthHeaders(account.username);
-  if (!auth) {
-    return { remote: null, hasConflict: false, documentId };
-  }
-
   try {
-    const remote = await fetchRemoteProgress(account.server_url, auth, documentId);
+    const remote = await fetchRemoteProgress(
+      account.server_url,
+      account.username,
+      documentId,
+    );
     const local = await getReadingProgress(db, bookId);
     const localProgression = local?.progression ?? 0;
     const localUpdatedAt = local?.updated_at ?? 0;
@@ -181,11 +181,6 @@ export async function pushLocalProgressForBook(
     return;
   }
 
-  const auth = await buildAuthHeaders(account.username);
-  if (!auth) {
-    return;
-  }
-
   const local = await getReadingProgress(db, bookId);
   const progression = local?.progression ?? 0;
   const syncState = await getBookSyncState(db, bookId);
@@ -202,13 +197,17 @@ export async function pushLocalProgressForBook(
   const deviceId = account.device_id || (await getOrCreateKoreaderDeviceId());
 
   try {
-    const response = await pushRemoteProgress(account.server_url, auth, {
-      progress: progressionToProgressString(progression, options.positionCount),
-      percentage: Math.min(1, Math.max(0, progression)),
-      device_id: deviceId,
-      document: documentId,
-      device: appIdentity.displayName,
-    });
+    const response = await pushRemoteProgress(
+      account.server_url,
+      account.username,
+      {
+        progress: progressionToProgressString(progression, options.positionCount),
+        percentage: Math.min(1, Math.max(0, progression)),
+        device_id: deviceId,
+        document: documentId,
+        device: appIdentity.displayName,
+      },
+    );
 
     await upsertBookSyncState(db, {
       book_id: bookId,
@@ -247,7 +246,7 @@ export async function saveDefaultSyncAccount(
 
   await upsertSyncAccount(db, {
     id: DEFAULT_SYNC_ACCOUNT_ID,
-    server_url: input.serverUrl.replace(/\/$/, ''),
+    server_url: resolveKosyncProfile(input.serverUrl).baseUrl,
     username: input.username.trim(),
     document_id_mode: input.documentIdMode,
     device_id: deviceId,

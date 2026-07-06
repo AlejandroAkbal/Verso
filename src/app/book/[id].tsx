@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SymbolView } from 'expo-symbols';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +10,11 @@ import { BlurBackdrop } from '@/components/BlurBackdrop';
 import { BookAboutSection } from '@/components/book/BookAboutSection';
 import { BookDetailPrimaryAction } from '@/components/book/BookDetailPrimaryAction';
 import { BookDetailQuickActions } from '@/components/book/BookDetailQuickActions';
-import { CoverProgressBar } from '@/components/CoverProgressBar';
+import { BookSyncStatus } from '@/components/book/BookSyncStatus';
+import {
+  BookFinishedFooterBand,
+  BookProgressFooterBand,
+} from '@/components/BookProgressFooterBand';
 import { ThemedText } from '@/components/ThemedText';
 import { Box, ImageBox, PressableBox, ScrollBox } from '@/components/ui';
 import { useDownloadStatus } from '@/db/hooks/useDownloads';
@@ -19,15 +23,11 @@ import type { BookRow } from '@/db/schema';
 import { useBackgroundDownload } from '@/hooks/useBackgroundDownload';
 import { useBookReadingProgress } from '@/hooks/useBookReadingProgress';
 import { useDominantColor } from '@/hooks/useDominantColor';
+import { useOpenReaderWithSync } from '@/hooks/useOpenReaderWithSync';
 import { useServerAuthHeaders } from '@/hooks/useServerAuthHeaders';
 import { parseBookCategories } from '@/hooks/useOPDSCatalog';
 import { isFinished, progressPercent } from '@/lib/readingProgress';
-import { promptSyncConflict } from '@/lib/syncPrompt';
 import { isDownloadComplete } from '@/services/downloads/manage';
-import {
-  applyRemotePercentage,
-  pullRemoteProgressForBook,
-} from '@/services/koreader/syncBook';
 import { useTheme } from '@/theme/ThemeProvider';
 
 export default function BookDetailScreen() {
@@ -42,6 +42,7 @@ export default function BookDetailScreen() {
   const download = useDownloadStatus(id ?? '');
   const { progress: readingProgress, refresh: refreshProgress } = useBookReadingProgress(id ?? '');
   const { removeDownload } = useBackgroundDownload(id ?? '');
+  const { openReader, isOpening } = useOpenReaderWithSync(id);
   const isDownloaded = isDownloadComplete(download);
   const authHeaders = useServerAuthHeaders(book?.server_id);
   const [loadedCoverUrl, setLoadedCoverUrl] = useState('');
@@ -49,7 +50,7 @@ export default function BookDetailScreen() {
   const colors = useDominantColor(book?.cover_url, book?.blurhash);
   const percent = progressPercent(readingProgress ?? undefined);
   const finished = isFinished(readingProgress ?? undefined);
-  const showProgress = percent != null && percent > 0;
+  const showProgress = percent != null && percent > 0 && !finished;
 
   useFocusEffect(
     useCallback(() => {
@@ -83,28 +84,6 @@ export default function BookDetailScreen() {
     );
   };
 
-  const handleRead = () => {
-    if (!book) return;
-
-    void (async () => {
-      const pull = await pullRemoteProgressForBook(db, book.id);
-      const navigate = () => router.push(`/reader/${book.id}`);
-
-      if (pull.hasConflict && pull.remote) {
-        promptSyncConflict(
-          t,
-          () => {
-            void applyRemotePercentage(db, book.id, pull.remote!.percentage).then(navigate);
-          },
-          navigate,
-        );
-        return;
-      }
-
-      navigate();
-    })();
-  };
-
   if (loading || !book) {
     return (
       <Box
@@ -120,6 +99,19 @@ export default function BookDetailScreen() {
 
   const categories = parseBookCategories(book);
   const coverLoaded = loadedCoverUrl === book.cover_url;
+  const coverWidth = 168;
+  const coverHeight = 252;
+  const coverRadius = theme.cover.borderRadius;
+  const coverFrameStyle = {
+    borderRadius: coverRadius,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.coverBorder,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 14 },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+    elevation: 14,
+  };
 
   return (
     <BlurBackdrop
@@ -147,42 +139,38 @@ export default function BookDetailScreen() {
         </PressableBox>
 
         <Box alignItems="center" gap="lg">
-          <Box
-            borderRadius="lg"
-            overflow="hidden"
-            shadowColor="background"
-            shadowOffset={{ width: 0, height: 12 }}
-            shadowOpacity={0.45}
-            shadowRadius={24}
-            elevation={12}
-          >
-            {!coverLoaded ? (
-              <Box
-                position="absolute"
-                top={0}
-                right={0}
-                bottom={0}
-                left={0}
-                backgroundColor="surfaceElevated"
-                borderRadius="lg"
+          <Box overflow="hidden" width={coverWidth} style={coverFrameStyle}>
+            <Box width={coverWidth} height={coverHeight} position="relative">
+              {!coverLoaded ? (
+                <Box
+                  position="absolute"
+                  top={0}
+                  right={0}
+                  bottom={0}
+                  left={0}
+                  backgroundColor="surfaceElevated"
+                />
+              ) : null}
+              <ImageBox
+                source={{
+                  uri: book.cover_url,
+                  headers: Object.keys(authHeaders).length > 0 ? authHeaders : undefined,
+                }}
+                width={coverWidth}
+                height={coverHeight}
+                contentFit="cover"
+                transition={300}
+                onLoad={() => setLoadedCoverUrl(book.cover_url)}
+                onError={() => setLoadedCoverUrl(book.cover_url)}
+              />
+            </Box>
+            {showProgress ? (
+              <BookProgressFooterBand
+                percent={percent ?? 0}
+                label={t('progress.continue', { percent: percent ?? 0 })}
               />
             ) : null}
-            <ImageBox
-              source={{
-                uri: book.cover_url,
-                headers: Object.keys(authHeaders).length > 0 ? authHeaders : undefined,
-              }}
-              width={168}
-              height={252}
-              borderRadius="lg"
-              contentFit="cover"
-              transition={300}
-              onLoad={() => setLoadedCoverUrl(book.cover_url)}
-              onError={() => setLoadedCoverUrl(book.cover_url)}
-            />
-            {showProgress && !finished ? (
-              <CoverProgressBar percent={percent ?? 0} />
-            ) : null}
+            {finished ? <BookFinishedFooterBand label={t('progress.finished')} /> : null}
           </Box>
 
           <Box alignItems="center" gap="xs" paddingHorizontal="sm">
@@ -197,18 +185,14 @@ export default function BookDetailScreen() {
                 {book.author}
               </ThemedText>
             ) : null}
-            {showProgress && !finished ? (
-              <ThemedText variant="caption" color={theme.colors.textMuted}>
-                {t('progress.percent', { percent: percent ?? 0 })}
-              </ThemedText>
-            ) : null}
           </Box>
         </Box>
 
         <Box gap="md">
           <BookDetailPrimaryAction
             bookId={book.id}
-            onRead={handleRead}
+            onRead={() => void openReader()}
+            isOpening={isOpening}
             continuePercent={percent}
             isFinished={finished}
           />
@@ -218,6 +202,7 @@ export default function BookDetailScreen() {
             isDownloaded={isDownloaded}
             onRemoveDownload={handleRemoveDownload}
           />
+          <BookSyncStatus bookId={book.id} isDownloaded={isDownloaded} />
         </Box>
 
         <BookAboutSection summary={book.summary} categories={categories} />

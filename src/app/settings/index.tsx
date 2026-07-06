@@ -142,6 +142,13 @@ export default function SettingsIndexScreen() {
 
       <SettingsGroup header={t('settings.readingHeader')}>
         <SettingsRow
+          title={t('reader.settingsTitle')}
+          subtitle={t('reader.settingsRowHint')}
+          showChevron
+          testID="settings-reader"
+          onPress={() => router.push('/settings/reader')}
+        />
+        <SettingsRow
           title={t('settings.resumeLastBook')}
           subtitle={t('settings.resumeLastBookHint')}
           rightElement={

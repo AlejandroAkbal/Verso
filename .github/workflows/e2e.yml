@@ -1,0 +1,113 @@
+name: E2E
+
+# Fast static gate on every PR; heavier iOS Maestro smoke on main / manual runs
+# (a simulator dev-client build takes ~20–40 min and needs an Expo token).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static:
+    name: Typecheck & lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+
+  ios-smoke:
+    name: iOS Maestro smoke
+    runs-on: macos-15
+    needs: static
+    # Skip on PRs (expensive build). Requires the EXPO_TOKEN secret for eas build.
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+    timeout-minutes: 75
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Require EXPO_TOKEN
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::error::EXPO_TOKEN secret is required to build the dev client. Add it under repo Settings → Secrets."
+            exit 1
+          fi
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Install Maestro
+        run: |
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+
+      - name: Build iOS dev client (simulator)
+        # Swap this for downloading a prebuilt artifact once one is published,
+        # to avoid rebuilding the native client on every run.
+        run: |
+          npx eas-cli build --local --non-interactive \
+            --platform ios --profile development-simulator \
+            --output build-sim.tar.gz
+
+      - name: Extract app bundle
+        run: |
+          mkdir -p build-sim
+          tar -xzf build-sim.tar.gz -C build-sim
+          APP_PATH=$(find build-sim -maxdepth 3 -name '*.app' | head -1)
+          echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
+          echo "Built: $APP_PATH"
+
+      - name: Boot simulator
+        run: |
+          UDID=$(xcrun simctl create verso-ci "iPhone 16 Pro")
+          echo "SIM_UDID=$UDID" >> "$GITHUB_ENV"
+          xcrun simctl boot "$UDID"
+
+      - name: Install app
+        run: xcrun simctl install "$SIM_UDID" "$APP_PATH"
+
+      - name: Start Metro
+        run: |
+          pnpm start > metro.log 2>&1 &
+          npx wait-on tcp:127.0.0.1:8081 --timeout 120000
+
+      - name: Run Maestro smoke
+        # Only fresh-install-safe flows run in CI. Download / reader / KOReader
+        # flows need an authenticated server and are run locally (see docs/e2e.md).
+        run: |
+          maestro --device "$SIM_UDID" test \
+            .maestro/library-smoke.yaml \
+            .maestro/settings-smoke.yaml
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-output
+          path: |
+            ${{ github.workspace }}/metro.log
+            ~/.maestro/tests
+          if-no-files-found: ignore

@@ -22,6 +22,9 @@
     "noLibraryHint": "Añade un catálogo OPDS en Ajustes para explorar tus libros.",
     "connectServer": "Conectar servidor OPDS",
     "openSettings": "Ajustes",
+    "refresh": "Actualizar biblioteca",
+    "refreshSyncSuccess": "Progreso sincronizado en {{count}} libros",
+    "refreshSyncPartial": "Sincronizados {{updated}} libros — {{errors}} no se pudieron sincronizar",
     "emptyDownloaded": "Nada descargado aún — toca el icono de nube en un libro.",
     "emptySearch": "Ningún libro coincide con tu búsqueda.",
     "emptyCatalog": "No se encontraron libros en este catálogo",
@@ -188,6 +191,8 @@
     "conflictTitle": "Posición más reciente disponible",
     "conflictMessage": "Otro dispositivo tiene un progreso más reciente. ¿Ir a esa posición o continuar aquí?",
     "jump": "Ir",
-    "keep": "Quedarme aquí"
+    "keep": "Quedarme aquí",
+    "statusSynced": "Sincronizado {{time}}",
+    "statusPending": "Aún no sincronizado"
   }
 }

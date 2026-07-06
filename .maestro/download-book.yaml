@@ -21,6 +21,11 @@ appId: dev.akbal.opdsreader
     timeout: 15000
 - extendedWaitUntil:
     visible:
+      id: "book-detail-download-success"
+    timeout: 60000
+    optional: true
+- extendedWaitUntil:
+    visible:
       id: "book-detail-read"
     timeout: 120000
 - assertVisible:

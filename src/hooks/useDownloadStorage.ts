@@ -5,6 +5,7 @@ import {
   getDownloadStorageStats,
   type DownloadStorageStats,
 } from '@/services/downloads/manage';
+import { subscribeDownloadsChanged } from '@/services/downloads/changes';
 
 export function useDownloadStorageStats() {
   const db = useSQLiteContext();
@@ -22,7 +23,15 @@ export function useDownloadStorageStats() {
     const interval = setInterval(() => {
       void refresh();
     }, 3000);
-    return () => clearInterval(interval);
+
+    const unsubscribe = subscribeDownloadsChanged(() => {
+      void refresh();
+    });
+
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
   }, [refresh]);
 
   return { stats, refresh };

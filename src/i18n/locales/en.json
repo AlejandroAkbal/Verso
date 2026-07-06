@@ -22,6 +22,9 @@
     "noLibraryHint": "Add an OPDS catalog in Settings to browse your books.",
     "connectServer": "Connect OPDS server",
     "openSettings": "Settings",
+    "refresh": "Refresh library",
+    "refreshSyncSuccess": "Synced reading progress for {{count}} books",
+    "refreshSyncPartial": "Synced {{updated}} books — {{errors}} could not sync",
     "emptyDownloaded": "Nothing downloaded yet — tap the cloud icon on a book.",
     "emptySearch": "No books match your search.",
     "emptyCatalog": "No books found in this catalog",
@@ -40,7 +43,8 @@
   },
   "progress": {
     "finished": "Finished",
-    "percent": "{{percent}}%"
+    "percent": "{{percent}}%",
+    "continue": "{{percent}}% read"
   },
   "book": {
     "read": "Read",
@@ -55,6 +59,7 @@
     "showMoreCategories": "Show {{count}} more",
     "continueReading": "Continue · {{percent}}%",
     "downloading": "Downloading… {{percent}}%",
+    "downloadComplete": "Downloaded",
     "downloadFailed": "Download Failed — Tap to Retry",
     "shareFile": "Share File",
     "shareFileError": "Could not share this file",
@@ -90,7 +95,36 @@
     "tableOfContents": "Table of contents",
     "decreaseFontSize": "Decrease font size",
     "increaseFontSize": "Increase font size",
-    "noChapters": "No chapters available"
+    "noChapters": "No chapters available",
+    "settingsTitle": "Reader",
+    "settingsRowHint": "Typography, theme, and layout defaults",
+    "openSettings": "Reader settings",
+    "openFullSettings": "Open full reader settings",
+    "showControls": "Show reader controls",
+    "hideControls": "Hide reader controls",
+    "progress": "{{percent}}% read",
+    "appearanceHeader": "Appearance",
+    "appearanceFooter": "Sepia and light themes follow common e-reader conventions. Dark matches the app shell.",
+    "typographyHeader": "Typography",
+    "fontSize": "Font size",
+    "lineHeight": "Line spacing",
+    "pageMargins": "Page margins",
+    "publisherStyles": "Publisher styles",
+    "publisherStylesHint": "Keep the book's original typography when available",
+    "theme": {
+      "dark": "Dark",
+      "sepia": "Sepia",
+      "light": "Light"
+    },
+    "font": {
+      "serif": "Serif",
+      "sans-serif": "Sans serif",
+      "monospace": "Monospace"
+    },
+    "align": {
+      "justify": "Justified",
+      "start": "Left aligned"
+    }
   },
   "settings": {
     "title": "OPDS Servers",
@@ -162,9 +196,9 @@
   "sync": {
     "title": "KOReader Sync",
     "header": "Sync server",
-    "footer": "For Calibre-Web Automated, use your library host with /kosync (e.g. https://books.example.com/kosync). Partial MD5 keeps progress aligned with KOReader and your Calibre library.",
+    "footer": "For Calibre-Web Automated, use your library host (e.g. https://books.example.com) with the same username and password as OPDS — not /kosync in the URL. For sync.koreader.rocks, use your KOReader account password (MD5 auth).",
     "settingsFooter": "Resume reading across KOReader, Thorium, and this app.",
-    "settingsRowHint": "Calibre-Web /kosync — same progress as KOReader on your library",
+    "settingsRowHint": "Calibre-Web host or sync.koreader.rocks — same progress as KOReader",
     "useLibraryServer": "Use library server",
     "useLibraryServerHint": "Prefill /kosync URL and credentials from your active OPDS library",
     "libraryServerFilled": "Filled from your library server",
@@ -188,6 +222,8 @@
     "conflictTitle": "Newer position available",
     "conflictMessage": "Another device has newer reading progress. Jump to that position or keep reading here?",
     "jump": "Jump",
-    "keep": "Keep here"
+    "keep": "Keep here",
+    "statusSynced": "Synced {{time}}",
+    "statusPending": "Not synced yet"
   }
 }

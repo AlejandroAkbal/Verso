@@ -31,6 +31,12 @@ const rawTheme = {
     /** Reading progress on covers. */
     progress: '#FFFFFF',
     progressTrack: 'rgba(255, 255, 255, 0.2)',
+    /** Book cover chrome — square jackets, spine, bookmark line. */
+    coverSpine: 'rgba(0, 0, 0, 0.42)',
+    coverSpineProgress: 'rgba(255, 255, 255, 0.28)',
+    coverBookmark: 'rgba(255, 255, 255, 0.72)',
+    coverBadge: 'rgba(255, 255, 255, 0.92)',
+    coverBorder: 'rgba(255, 255, 255, 0.08)',
   },
   opacity: {
     dimmed: 0.35,
@@ -137,7 +143,9 @@ const rawTheme = {
   },
   cover: {
     aspectRatio: 2 / 3,
-    borderRadius: 8,
+    /** Physical books — square corners on grid jackets. */
+    borderRadius: 0,
+    spineWidth: 3,
   },
   grid: {
     numColumns: 3,

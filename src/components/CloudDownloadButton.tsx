@@ -1,26 +1,36 @@
 import { SymbolView } from 'expo-symbols';
+import Animated from 'react-native-reanimated';
 
 import { Box, PressableBox } from '@/components/ui';
-import { useBackgroundDownload } from '@/hooks/useBackgroundDownload';
+import { ProgressRing } from '@/components/ProgressRing';
+import type { DownloadRow } from '@/db/schema';
+import { useDownloadPresentation } from '@/hooks/useDownloadPresentation';
 import { lightImpactHaptic } from '@/lib/haptics';
 import { useTheme } from '@/theme/ThemeProvider';
-import { ProgressRing } from './ProgressRing';
 
 type CloudDownloadButtonProps = {
   bookId: string;
   size?: number;
+  download?: DownloadRow | null;
 };
 
-export function CloudDownloadButton({ bookId, size = 28 }: CloudDownloadButtonProps) {
+export function CloudDownloadButton({
+  bookId,
+  size = 28,
+  download = null,
+}: CloudDownloadButtonProps) {
   const theme = useTheme();
-  const { isDownloading, isCompleted, isFailed, progress, startDownload } =
-    useBackgroundDownload(bookId);
+  const {
+    showDownloadButton,
+    showProgressChrome,
+    showSuccessChrome,
+    showFailedUI,
+    animatedProgress,
+    settleStyle,
+    startDownload,
+  } = useDownloadPresentation(bookId, { download });
 
-  if (isCompleted) {
-    return null;
-  }
-
-  if (isDownloading) {
+  if (showProgressChrome) {
     return (
       <Box
         alignItems="center"
@@ -30,12 +40,36 @@ export function CloudDownloadButton({ bookId, size = 28 }: CloudDownloadButtonPr
         width={size}
         height={size}
       >
-        <ProgressRing progress={progress} size={size} />
+        <ProgressRing animatedProgress={animatedProgress} size={size} />
       </Box>
     );
   }
 
-  if (isFailed) {
+  if (showSuccessChrome) {
+    return (
+      <Animated.View style={settleStyle}>
+        <Box
+          alignItems="center"
+          justifyContent="center"
+          borderRadius="full"
+          backgroundColor="overlay"
+          width={size}
+          height={size}
+          testID={`book-download-success-${bookId}`}
+          accessibilityLabel="Downloaded"
+        >
+          <SymbolView
+            name="checkmark"
+            size={size * 0.42}
+            tintColor={theme.colors.text}
+            weight="semibold"
+          />
+        </Box>
+      </Animated.View>
+    );
+  }
+
+  if (showFailedUI) {
     return (
       <PressableBox
         alignItems="center"
@@ -62,27 +96,31 @@ export function CloudDownloadButton({ bookId, size = 28 }: CloudDownloadButtonPr
     );
   }
 
-  return (
-    <PressableBox
-      alignItems="center"
-      justifyContent="center"
-      borderRadius="full"
-      backgroundColor="overlay"
-      width={size}
-      height={size}
-      onPress={(event) => {
-        event.stopPropagation();
-        void lightImpactHaptic();
-        void startDownload();
-      }}
-      hitSlop={8}
-      testID={`book-download-${bookId}`}
-    >
-      <SymbolView
-        name="icloud.and.arrow.down"
-        size={size - 4}
-        tintColor={theme.colors.text}
-      />
-    </PressableBox>
-  );
+  if (showDownloadButton) {
+    return (
+      <PressableBox
+        alignItems="center"
+        justifyContent="center"
+        borderRadius="full"
+        backgroundColor="overlay"
+        width={size}
+        height={size}
+        onPress={(event) => {
+          event.stopPropagation();
+          void lightImpactHaptic();
+          void startDownload();
+        }}
+        hitSlop={8}
+        testID={`book-download-${bookId}`}
+      >
+        <SymbolView
+          name="icloud.and.arrow.down"
+          size={size - 4}
+          tintColor={theme.colors.text}
+        />
+      </PressableBox>
+    );
+  }
+
+  return null;
 }

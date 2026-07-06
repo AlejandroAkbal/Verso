@@ -1,11 +1,7 @@
 import { FlashList } from '@shopify/flash-list';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  RefreshControl,
-  useWindowDimensions,
-} from 'react-native';
+import { ActivityIndicator, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { SymbolView } from 'expo-symbols';
@@ -26,8 +22,9 @@ import {
   useOPDSSearch,
 } from '@/hooks/useOPDSCatalog';
 import { useReadingProgressMap } from '@/hooks/useReadingProgress';
+import { useLibraryRefresh } from '@/hooks/useLibraryRefresh';
 import { isFinished, progressPercent } from '@/lib/readingProgress';
-import type { BookRow } from '@/db/schema';
+import type { BookRow, DownloadRow } from '@/db/schema';
 import { useTheme } from '@/theme/ThemeProvider';
 
 type LibraryFilter = 'all' | 'on-device';
@@ -49,7 +46,7 @@ export default function LibraryScreen() {
   const { width } = useWindowDimensions();
   const { servers, loading: serversLoading } = useServers();
   const { activeServer, loading: activeServerLoading } = useActiveServer();
-  const { downloads } = useDownloads();
+  const { downloads, refresh: refreshDownloads } = useDownloads();
   const { progressByBookId, refresh: refreshProgress } = useReadingProgressMap();
   const [filter, setFilter] = useState<LibraryFilter>('all');
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
@@ -61,6 +58,13 @@ export default function LibraryScreen() {
       activeServer?.url,
       activeServer?.auth_username,
     );
+
+  const { refreshLibrary, isRefreshing } = useLibraryRefresh({
+    refreshCatalog: refresh,
+    refreshProgress,
+  });
+
+  const isLibraryRefreshing = isRefreshing || isRefetching;
 
   const remoteSearch = useOPDSSearch(
     activeServer?.id,
@@ -74,7 +78,8 @@ export default function LibraryScreen() {
     useCallback(() => {
       void refreshProgress();
       void refreshBooks();
-    }, [refreshBooks, refreshProgress]),
+      void refreshDownloads();
+    }, [refreshBooks, refreshDownloads, refreshProgress]),
   );
 
   const downloadedIds = useMemo(
@@ -84,6 +89,14 @@ export default function LibraryScreen() {
       ),
     [downloads],
   );
+
+  const downloadsByBookId = useMemo(() => {
+    const map = new Map<string, DownloadRow>();
+    for (const download of downloads) {
+      map.set(download.book_id, download);
+    }
+    return map;
+  }, [downloads]);
 
   const categoryOptions = useMemo(() => {
     const counts = new Map<string, number>();
@@ -205,6 +218,7 @@ export default function LibraryScreen() {
 
   const renderItem = useCallback(
     ({ item }: { item: BookRow }) => {
+      const download = downloadsByBookId.get(item.id) ?? null;
       const isOnDevice = downloadedIds.has(item.id);
       const dimmed = isOffline && !isOnDevice;
 
@@ -213,13 +227,15 @@ export default function LibraryScreen() {
           <BookCard
             book={item}
             width={cardWidth}
+            isDownloaded={isOnDevice}
+            download={download}
             readingProgress={progressByBookId.get(item.id)}
             dimmed={dimmed}
           />
         </Box>
       );
     },
-    [cardWidth, downloadedIds, isOffline, progressByBookId, theme.grid.gap],
+    [cardWidth, downloadedIds, downloadsByBookId, isOffline, progressByBookId, theme.grid.gap],
   );
 
   const listHeader = useMemo(
@@ -352,27 +368,54 @@ export default function LibraryScreen() {
               {activeServer?.title ?? t('common.catalog')}
             </ThemedText>
           </Box>
-          <PressableBox
-            onPress={() => router.push('/settings')}
-            accessibilityRole="button"
-            accessibilityLabel={t('library.openSettings')}
-            testID="library-settings"
-            alignItems="center"
-            justifyContent="center"
-            width={36}
-            height={36}
-            borderRadius="full"
-            backgroundColor="surfaceElevated"
-            marginTop="xs"
-            hitSlop={8}
-          >
-            <SymbolView
-              name="gearshape"
-              size={18}
-              tintColor={theme.colors.textSecondary}
-              importantForAccessibility="no-hide-descendants"
-            />
-          </PressableBox>
+          <Box flexDirection="row" alignItems="center" gap="sm" marginTop="xs">
+            <PressableBox
+              onPress={() => void refreshLibrary()}
+              disabled={isLibraryRefreshing}
+              accessibilityRole="button"
+              accessibilityLabel={t('library.refresh')}
+              testID="library-refresh"
+              alignItems="center"
+              justifyContent="center"
+              width={36}
+              height={36}
+              borderRadius="full"
+              backgroundColor="surfaceElevated"
+              hitSlop={8}
+              opacity={isLibraryRefreshing ? 0.6 : 1}
+            >
+              {isLibraryRefreshing ? (
+                <ActivityIndicator color={theme.colors.textSecondary} size="small" />
+              ) : (
+                <SymbolView
+                  name="arrow.clockwise"
+                  size={18}
+                  tintColor={theme.colors.textSecondary}
+                  importantForAccessibility="no-hide-descendants"
+                />
+              )}
+            </PressableBox>
+            <PressableBox
+              onPress={() => router.push('/settings')}
+              accessibilityRole="button"
+              accessibilityLabel={t('library.openSettings')}
+              testID="library-settings"
+              alignItems="center"
+              justifyContent="center"
+              width={36}
+              height={36}
+              borderRadius="full"
+              backgroundColor="surfaceElevated"
+              hitSlop={8}
+            >
+              <SymbolView
+                name="gearshape"
+                size={18}
+                tintColor={theme.colors.textSecondary}
+                importantForAccessibility="no-hide-descendants"
+              />
+            </PressableBox>
+          </Box>
         </Box>
 
         <Box position="relative">
@@ -398,6 +441,7 @@ export default function LibraryScreen() {
       ) : (
         <FlashList
           data={visibleBooks}
+          extraData={downloads}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           numColumns={numColumns}
@@ -408,13 +452,6 @@ export default function LibraryScreen() {
             paddingHorizontal: theme.grid.horizontalPadding,
             paddingBottom: insets.bottom + 24,
           }}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefetching}
-              onRefresh={() => void refresh()}
-              tintColor={theme.colors.text}
-            />
-          }
           ListEmptyComponent={
             <Box alignItems="center" paddingVertical="xxl" paddingHorizontal="lg">
               <ThemedText color={theme.colors.textSecondary}>

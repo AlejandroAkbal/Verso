@@ -22,6 +22,9 @@
     "noLibraryHint": "أضف فهرس OPDS من الإعدادات لتصفح كتبك.",
     "connectServer": "ربط خادم OPDS",
     "openSettings": "الإعدادات",
+    "refresh": "تحديث المكتبة",
+    "refreshSyncSuccess": "تمت مزامنة التقدم لـ {{count}} كتاب",
+    "refreshSyncPartial": "تمت مزامنة {{updated}} كتاب — تعذرت مزامنة {{errors}}",
     "emptyDownloaded": "لا تنزيلات بعد — اضغط أيقونة السحابة على الكتاب.",
     "emptySearch": "لا كتب تطابق بحثك.",
     "emptyCatalog": "لم يُعثر على كتب في هذا الفهرس",
@@ -204,6 +207,8 @@
     "conflictTitle": "موضع أحدث متاح",
     "conflictMessage": "جهاز آخر لديه تقدّم أحدث. الانتقال إلى ذلك الموضع أم البقاء هنا؟",
     "jump": "انتقال",
-    "keep": "البقاء هنا"
+    "keep": "البقاء هنا",
+    "statusSynced": "تمت المزامنة {{time}}",
+    "statusPending": "لم تتم المزامنة بعد"
   }
 }

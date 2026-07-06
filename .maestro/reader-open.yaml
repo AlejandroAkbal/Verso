@@ -1,0 +1,46 @@
+appId: dev.akbal.opdsreader
+---
+- openLink: exp+opds-reader://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081
+- tapOn:
+    text: "Reload"
+    optional: true
+- extendedWaitUntil:
+    visible: "Library"
+    timeout: 90000
+# Deep-link to a stable catalog book (same seed as download-book.yaml).
+- openLink: opds-reader://book/c346a37a339d1158bd27def605dcf8e9
+# Download first when the book is not already on device.
+- runFlow:
+    when:
+      visible:
+        id: "book-detail-download"
+    commands:
+      - tapOn:
+          id: "book-detail-download"
+      - extendedWaitUntil:
+          visible:
+            id: "book-detail-read"
+          timeout: 120000
+- extendedWaitUntil:
+    visible:
+      id: "book-detail-read"
+    timeout: 30000
+- tapOn:
+    id: "book-detail-read"
+# A KOReader sync conflict may prompt on open — keep local progress and continue.
+- tapOn:
+    text: "Keep"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "reader-screen"
+    timeout: 60000
+- assertVisible:
+    id: "reader-screen"
+# Best-effort exit: reveal auto-hidden chrome, then tap back.
+- tapOn:
+    point: "50%,45%"
+    optional: true
+- tapOn:
+    id: "reader-back"
+    optional: true

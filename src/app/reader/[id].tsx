@@ -5,16 +5,17 @@ import { ReadiumView } from 'react-native-readium';
 import type {
   Link,
   Locator,
-  Preferences,
   ReadiumFile,
   ReadiumViewRef,
 } from 'react-native-readium';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SymbolView } from 'expo-symbols';
 import { useTranslation } from 'react-i18next';
 import { useSQLiteContext } from 'expo-sqlite';
 
 import { ThemedText } from '@/components/ThemedText';
+import { ReaderChrome } from '@/components/reader/ReaderChrome';
+import { ReaderProgressBar } from '@/components/reader/ReaderProgressBar';
+import { ReaderSettingsSheet } from '@/components/reader/ReaderSettingsSheet';
 import { Box, PressableBox, ScrollBox } from '@/components/ui';
 import {
   acknowledgeBook,
@@ -24,7 +25,8 @@ import {
   setLastOpenBookId,
   upsertReadingProgress,
 } from '@/db/queries';
-import { lightImpactHaptic, selectionHaptic } from '@/lib/haptics';
+import { useReaderPreferences } from '@/hooks/useReaderPreferences';
+import { lightImpactHaptic } from '@/lib/haptics';
 import { promptSyncConflict } from '@/lib/syncPrompt';
 import {
   parseStoredLocator,
@@ -37,18 +39,10 @@ import {
   pullRemoteProgressForBook,
   pushLocalProgressForBook,
 } from '@/services/koreader/syncBook';
+import { toReadiumPreferences } from '@/services/reader/preferences';
 import { useTheme } from '@/theme/ThemeProvider';
 
-const READIUM_BASE_PREFERENCES: Preferences = {
-  theme: 'dark',
-  publisherStyles: true,
-};
-
 const PROGRESS_SAVE_MS = 800;
-const FONT_SIZE_MIN = 1.0;
-const FONT_SIZE_MAX = 3.0;
-const FONT_SIZE_STEP = 0.125;
-const DEFAULT_FONT_SIZE = 1.0;
 
 function isEpubMime(mime: string): boolean {
   const normalized = mime.toLowerCase();
@@ -82,8 +76,8 @@ export default function ReaderScreen() {
   const router = useRouter();
   const db = useSQLiteContext();
   const theme = useTheme();
-  const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const { prefs, updatePrefs } = useReaderPreferences();
 
   const readiumRef = useRef<ReadiumViewRef>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -96,9 +90,10 @@ export default function ReaderScreen() {
   const [title, setTitle] = useState('');
   const [file, setFile] = useState<ReadiumFile | null>(null);
   const [progression, setProgression] = useState(0);
-  const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE);
   const [tableOfContents, setTableOfContents] = useState<Link[]>([]);
   const [tocVisible, setTocVisible] = useState(false);
+  const [settingsVisible, setSettingsVisible] = useState(false);
+  const [chromeVisible, setChromeVisible] = useState(true);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -224,29 +219,8 @@ export default function ReaderScreen() {
     });
   }, [flushProgress, router]);
 
-  const preferences = useMemo(
-    (): Preferences => ({
-      ...READIUM_BASE_PREFERENCES,
-      fontSize,
-    }),
-    [fontSize],
-  );
-
+  const readiumPreferences = useMemo(() => toReadiumPreferences(prefs), [prefs]);
   const tocEntries = useMemo(() => flattenToc(tableOfContents), [tableOfContents]);
-
-  const decreaseFontSize = useCallback(() => {
-    void selectionHaptic();
-    setFontSize((current) =>
-      Math.max(FONT_SIZE_MIN, Math.round((current - FONT_SIZE_STEP) * 1000) / 1000),
-    );
-  }, []);
-
-  const increaseFontSize = useCallback(() => {
-    void selectionHaptic();
-    setFontSize((current) =>
-      Math.min(FONT_SIZE_MAX, Math.round((current + FONT_SIZE_STEP) * 1000) / 1000),
-    );
-  }, []);
 
   const handleTocSelect = useCallback((link: Link) => {
     void lightImpactHaptic();
@@ -301,81 +275,12 @@ export default function ReaderScreen() {
   }
 
   return (
-    <Box flex={1} backgroundColor="background">
-      <Box
-        paddingBottom="sm"
-        gap="sm"
-        style={{ paddingHorizontal: 20, paddingTop: insets.top + 8 }}
-      >
-        <Box flexDirection="row" alignItems="center" gap="md">
-          <PressableBox onPress={handleBack} hitSlop={12}>
-            <SymbolView name="xmark" size={18} tintColor={theme.colors.textSecondary} />
-          </PressableBox>
-          <ThemedText
-            variant="caption"
-            color={theme.colors.textSecondary}
-            numberOfLines={1}
-            style={{ flex: 1 }}
-          >
-            {title}
-          </ThemedText>
-          <ThemedText variant="caption" color={theme.colors.textMuted}>
-            {percent ?? 0}%
-          </ThemedText>
-        </Box>
-        <Box flexDirection="row" alignItems="center" justifyContent="space-between">
-          <PressableBox
-            onPress={() => {
-              void selectionHaptic();
-              setTocVisible(true);
-            }}
-            hitSlop={8}
-            accessibilityLabel={t('reader.tableOfContents')}
-          >
-            <SymbolView name="list.bullet" size={18} tintColor={theme.colors.textSecondary} />
-          </PressableBox>
-          <Box flexDirection="row" alignItems="center" gap="md">
-            <PressableBox
-              onPress={decreaseFontSize}
-              hitSlop={8}
-              disabled={fontSize <= FONT_SIZE_MIN}
-              accessibilityLabel={t('reader.decreaseFontSize')}
-            >
-              <SymbolView
-                name="textformat.size.smaller"
-                size={18}
-                tintColor={
-                  fontSize <= FONT_SIZE_MIN
-                    ? theme.colors.textMuted
-                    : theme.colors.textSecondary
-                  }
-                />
-            </PressableBox>
-            <PressableBox
-              onPress={increaseFontSize}
-              hitSlop={8}
-              disabled={fontSize >= FONT_SIZE_MAX}
-              accessibilityLabel={t('reader.increaseFontSize')}
-            >
-              <SymbolView
-                name="textformat.size.larger"
-                size={18}
-                tintColor={
-                  fontSize >= FONT_SIZE_MAX
-                    ? theme.colors.textMuted
-                    : theme.colors.textSecondary
-                  }
-                />
-            </PressableBox>
-          </Box>
-        </Box>
-      </Box>
-
+    <Box flex={1} backgroundColor="background" testID="reader-screen">
       <Box flex={1}>
         <ReadiumView
           ref={readiumRef}
           file={file}
-          preferences={preferences}
+          preferences={readiumPreferences}
           onLocationChange={persistProgress}
           onPublicationReady={(event) => {
             setTableOfContents(event.tableOfContents);
@@ -384,21 +289,35 @@ export default function ReaderScreen() {
         />
       </Box>
 
+      <ReaderChrome
+        title={title}
+        percent={percent}
+        visible={chromeVisible}
+        onShowChrome={() => setChromeVisible(true)}
+        onHideChrome={() => setChromeVisible(false)}
+        onBack={handleBack}
+        onOpenToc={() => setTocVisible(true)}
+        onOpenSettings={() => setSettingsVisible(true)}
+      />
+
+      <ReaderProgressBar progression={progression} visible={chromeVisible} />
+
+      <ReaderSettingsSheet
+        visible={settingsVisible}
+        prefs={prefs}
+        onClose={() => setSettingsVisible(false)}
+        onChange={(patch) => {
+          void updatePrefs(patch);
+        }}
+      />
+
       <Modal
         visible={tocVisible}
         animationType="slide"
         presentationStyle="pageSheet"
         onRequestClose={() => setTocVisible(false)}
       >
-        <Box
-          flex={1}
-          backgroundColor="background"
-          style={{
-            paddingHorizontal: 20,
-            paddingTop: insets.top + 12,
-            paddingBottom: insets.bottom + 12,
-          }}
-        >
+        <Box flex={1} backgroundColor="background" paddingHorizontal="lg" paddingTop="lg">
           <Box
             flexDirection="row"
             alignItems="center"

@@ -23,8 +23,9 @@ export function normalizeOpdsUrl(url: string): string {
 }
 
 /**
- * Calibre-Web Automated exposes KOSync at `/kosync` beside the OPDS feed.
- * `https://host/opds` → `https://host/kosync`
+ * Calibre-Web Automated exposes KOSync under `/kosync` on the server root.
+ * Return the server base URL (no `/kosync` suffix) — the client adds the prefix.
+ * `https://host/opds` → `https://host`
  */
 export function deriveKosyncUrlFromOpdsUrl(opdsUrl: string): string {
   const trimmed = opdsUrl.trim();
@@ -33,17 +34,21 @@ export function deriveKosyncUrlFromOpdsUrl(opdsUrl: string): string {
   }
 
   const parsed = new URL(trimmed);
-  const path = parsed.pathname.replace(/\/+$/, '');
+  let path = parsed.pathname.replace(/\/+$/, '');
 
   if (path.endsWith('/opds')) {
-    parsed.pathname = `${path.slice(0, -'/opds'.length)}/kosync`;
-  } else if (path === '' || path === '/') {
-    parsed.pathname = '/kosync';
-  } else {
-    parsed.pathname = `${path}/kosync`;
+    path = path.slice(0, -'/opds'.length);
+  }
+  if (path.endsWith('/kosync')) {
+    path = path.slice(0, -'/kosync'.length);
   }
 
-  return parsed.href.replace(/\/+$/, '');
+  parsed.pathname = path || '/';
+  if (parsed.pathname === '/') {
+    return parsed.origin;
+  }
+
+  return `${parsed.origin}${parsed.pathname}`.replace(/\/+$/, '');
 }
 
 /** Display name when the user does not provide one. */

@@ -4,16 +4,12 @@ Living product and engineering backlog. Keep this file current when new durable 
 
 ## Now
 
-- [ ] Dogfood KOReader sync against Calibre-Web Automated `/kosync` on personal library (partial MD5, same credentials as OPDS).
-- [ ] Expand Maestro E2E coverage (reader open, download → read, conflict prompt) — see `docs/e2e.md`.
-- [x] Toast feedback for sync errors + last-error on KOReader settings.
-- [x] Move KOReader sync next to libraries in Settings; “Use library server” prefills CWA `/kosync` URL.
+- [ ] Dogfood KOReader sync during real reading sessions (round-trip verified working; keep an eye on conflict UX across devices).
 
 ## Next
 
-- [ ] Android Maestro E2E on emulator.
-- [ ] CI job: Maestro smoke on macOS + dev client artifact.
-- [ ] Surface sync status per book on detail screen (optional).
+- [ ] Android Maestro E2E: run the shared flows on a booted emulator (tooling/docs ready; needs Android SDK + AVD locally, or an emulator CI runner).
+- [ ] Publish a prebuilt dev-client artifact so CI `ios-smoke` skips the ~30 min native build.
 
 ## Later
 
@@ -22,10 +18,20 @@ Living product and engineering backlog. Keep this file current when new durable 
 
 ## Done (archive)
 
+- [x] Premium fade-out (opacity + bloom) on download success → settle; fixed a settle timer that never fired (unstable `enterSettled` reset by 300ms download polling).
+- [x] KOReader sync verified end-to-end against CWA `/kosync` (auth, pull, push round-trip); fixed a `NOT NULL` crash on `book_sync_state.remote_progress` and surfaced server error bodies (e.g. "KOReader sync is disabled").
+- [x] Per-book sync status on detail screen ("Synced 2m ago", relative time, error state).
+- [x] Maestro `reader-open.yaml` (download → read → reader open → back) + `reader-screen` / `reader-back` testIDs; conflict-prompt handling documented.
+- [x] CI `e2e.yml`: static typecheck/lint + macOS iOS Maestro smoke; `e2e:android` script + Android E2E docs.
 - [x] Restyle migration, cover skeletons, NEW badges, onboarding, haptics.
 - [x] KOReader sync v1 (Settings, push/pull, conflict prompt, Readium locators).
 - [x] Auto-launch/resume last book, OPDS summary links, research docs.
 - [x] Maestro iOS smokes: library, settings, KOReader form, book detail.
+- [x] Toast feedback for sync errors + last-error on KOReader settings.
+- [x] Move KOReader sync next to libraries in Settings; “Use library server” prefills CWA `/kosync` URL.
+- [x] Library refresh button (OPDS catalog + KOReader progress pull).
+- [x] Reading progress below cover with % caption on grid (not overlaid on jacket).
+- [x] Guard against multiple reader opens on rapid Read taps.
 
 ## E2E
 

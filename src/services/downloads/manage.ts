@@ -8,6 +8,9 @@ import {
 } from '@/db/queries';
 import type { DownloadRow } from '@/db/schema';
 
+import { notifyDownloadsChanged } from '@/services/downloads/changes';
+import { clearAllDownloadSessions, clearBookDownloadSession } from '@/services/downloads/presentationSession';
+
 import { getDownloadsDirectory } from './queue';
 
 export type DownloadStorageStats = {
@@ -109,17 +112,20 @@ export async function removeDownloadedBook(
     deleteLocalFile(resolvedLocalUri);
   }
   await deleteDownload(db, bookId);
+  clearBookDownloadSession(bookId);
+  notifyDownloadsChanged();
 }
 
 export async function removeAllDownloads(db: SQLiteDatabase): Promise<number> {
   const downloads = await getAllDownloads(db);
-  const completed = downloads.filter((d) => d.status === 'completed');
 
-  for (const download of completed) {
-    const resolvedLocalUri = resolveDownloadLocalUri(download);
-    deleteLocalFile(download.local_uri);
-    if (resolvedLocalUri !== download.local_uri) {
-      deleteLocalFile(resolvedLocalUri);
+  for (const download of downloads) {
+    if (download.local_uri) {
+      const resolvedLocalUri = resolveDownloadLocalUri(download);
+      deleteLocalFile(download.local_uri);
+      if (resolvedLocalUri !== download.local_uri) {
+        deleteLocalFile(resolvedLocalUri);
+      }
     }
     await deleteDownload(db, download.book_id);
   }
@@ -133,7 +139,10 @@ export async function removeAllDownloads(db: SQLiteDatabase): Promise<number> {
     }
   }
 
-  return completed.length;
+  clearAllDownloadSessions();
+  notifyDownloadsChanged();
+
+  return downloads.length;
 }
 
 export function isDownloadComplete(download: DownloadRow | null | undefined): boolean {

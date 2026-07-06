@@ -2,13 +2,23 @@ import { useCallback } from 'react';
 import { useSQLiteContext } from 'expo-sqlite';
 
 import { useDownloadStatus } from '@/db/hooks/useDownloads';
+import type { DownloadRow } from '@/db/schema';
 import { enqueueDownload } from '@/services/downloads/queue';
 import { isDownloadComplete, removeDownloadedBook } from '@/services/downloads/manage';
 import { triggerDownloadProcessing } from '@/services/downloads/task';
 
-export function useBackgroundDownload(bookId: string) {
+type UseBackgroundDownloadOptions = {
+  /** When provided, skips per-book polling (e.g. grid passes row from useDownloads). */
+  download?: DownloadRow | null;
+};
+
+export function useBackgroundDownload(
+  bookId: string,
+  options: UseBackgroundDownloadOptions = {},
+) {
   const db = useSQLiteContext();
-  const download = useDownloadStatus(bookId);
+  const polledDownload = useDownloadStatus(bookId);
+  const download = options.download ?? polledDownload;
 
   const startDownload = useCallback(async () => {
     if (isDownloadComplete(download)) {

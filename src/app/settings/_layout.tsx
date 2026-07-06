@@ -53,6 +53,13 @@ export default function SettingsLayout() {
           presentation: 'card',
         }}
       />
+      <Stack.Screen
+        name="reader"
+        options={{
+          title: t('reader.settingsTitle'),
+          presentation: 'card',
+        }}
+      />
     </Stack>
     </ToastProvider>
   );

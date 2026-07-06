@@ -22,6 +22,9 @@
     "noLibraryHint": "在设置中添加 OPDS 目录以浏览图书。",
     "connectServer": "连接 OPDS 服务器",
     "openSettings": "设置",
+    "refresh": "刷新书库",
+    "refreshSyncSuccess": "已同步 {{count}} 本书的阅读进度",
+    "refreshSyncPartial": "已同步 {{updated}} 本 — {{errors}} 本同步失败",
     "emptyDownloaded": "尚无下载 — 点击图书上的云图标。",
     "emptySearch": "没有匹配的图书。",
     "emptyCatalog": "此目录中未找到图书",
@@ -184,6 +187,8 @@
     "conflictTitle": "有更新的阅读位置",
     "conflictMessage": "另一台设备有更新的进度。跳转到该位置还是继续在此阅读？",
     "jump": "跳转",
-    "keep": "留在此处"
+    "keep": "留在此处",
+    "statusSynced": "已同步 {{time}}",
+    "statusPending": "尚未同步"
   }
 }

@@ -36,6 +36,20 @@ Pass a device id:
 maestro --device <UDID> test .maestro/
 ```
 
+## Android
+
+The flows are platform-agnostic — they use `appId`, deep-links, `testID`s and accessibility
+labels, so the same YAML runs on Android. To run them:
+
+1. Install the Android SDK + an emulator image; set `ANDROID_HOME` (e.g. `~/Library/Android/sdk`).
+2. Boot an AVD: `emulator -avd <name>` (or launch from Android Studio).
+3. Build + install the Android dev client: `pnpm run:android`.
+4. Start Metro (`pnpm start`) and run: `pnpm e2e:android` (or `maestro --device emulator-5554 test .maestro/`).
+
+`pnpm e2e:android` runs the same flow set as iOS; Maestro targets whichever device is booted.
+Pass `--device` when both an emulator and a simulator are connected. CI for Android (an emulator
+job on a Linux runner) is tracked in `TODO.md`.
+
 ## Flows
 
 | File | Covers |
@@ -45,8 +59,20 @@ maestro --device <UDID> test .maestro/
 | `koreader-settings.yaml` | KOReader sync form fields |
 | `book-detail.yaml` | Grid tap → book detail screen |
 | `download-book.yaml` | Download from detail → Read button |
+| `reader-open.yaml` | Download → Read → Readium reader open (`reader-screen`), then back |
 
 Add a new flow when shipping user-visible behavior. Prefer `testID` and accessibility labels over coordinate taps.
+
+### Sync-conflict prompt
+
+The KOReader conflict prompt (`sync.conflictTitle` → **Keep** / **Jump to page**) is a native
+`Alert`. `reader-open.yaml` taps **Keep** opportunistically (`optional: true`) so a sync-enabled
+run exercises it, but it cannot be triggered deterministically without a KOSync server returning
+remote progress that conflicts with local. To exercise it end to end:
+
+1. Enable KOReader sync on the server — Calibre-Web Automated returns `503 {"error":1000,"message":"KOReader sync is disabled"}` until then.
+2. Push a higher remote position from another device for a downloaded book.
+3. Open that book locally with lower progress — the prompt appears on open.
 
 ## Conventions
 
@@ -55,6 +81,16 @@ Add a new flow when shipping user-visible behavior. Prefer `testID` and accessib
 - Optional `tapOn: Reload` when the dev client may be stale.
 - **No Jest / Vitest / component tests** unless explicitly requested — extend Maestro instead.
 
-## CI (future)
+## CI
 
-Run `maestro test .maestro/` on a macOS runner with iOS simulator + prebuilt dev client artifact. Android flows are tracked in `TODO.md`.
+`.github/workflows/e2e.yml`:
+
+- **`static`** (Ubuntu, every push/PR): `pnpm typecheck` + `pnpm lint`.
+- **`ios-smoke`** (macOS, push to `main` / manual): builds the simulator dev client
+  (`eas build --local --profile development-simulator`), boots a simulator, starts Metro,
+  and runs the fresh-install-safe flows (`library-smoke`, `settings-smoke`).
+
+Requires an **`EXPO_TOKEN`** repo secret for the local EAS build. Download / reader / KOReader
+flows need an authenticated server, so they stay local-only (not in CI). To skip rebuilding the
+native client each run, publish a dev-client artifact and swap the build step for a download.
+Android flows are tracked in `TODO.md`.

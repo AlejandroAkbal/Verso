@@ -16,11 +16,12 @@ import { useUserPreferences } from '@/db/hooks/useUserPreferences';
 import { getLatestSyncError } from '@/db/queries';
 import type { DocumentIdMode } from '@/db/schema';
 import { lightImpactHaptic, notificationErrorHaptic, notificationSuccessHaptic } from '@/lib/haptics';
-import { buildAuthHeaders, getKoreaderPassword } from '@/services/koreader/credentials';
+import { getKoreaderPassword } from '@/services/koreader/credentials';
 import { testKoreaderConnection } from '@/services/koreader/client';
 import { saveDefaultSyncAccount } from '@/services/koreader/syncBook';
 import { getServerPassword } from '@/services/opds/credentials';
 import { deriveKosyncUrlFromOpdsUrl } from '@/services/opds/url';
+import { resolveKosyncProfile } from '@/services/koreader/profile';
 import { useTheme } from '@/theme/ThemeProvider';
 
 type ActionFeedback = {
@@ -69,7 +70,9 @@ export default function KoreaderSettingsScreen() {
           effectivePassword = (await getServerPassword(activeServer.id)) ?? '';
         }
 
-        setServerUrl(syncAccount?.server_url ?? defaultUrl);
+        setServerUrl(
+          resolveKosyncProfile(syncAccount?.server_url ?? defaultUrl).baseUrl,
+        );
         setUsername(syncAccount?.username ?? activeServer?.auth_username ?? '');
         setPassword(effectivePassword);
         setDocumentIdMode(syncAccount?.document_id_mode ?? 'partial_md5');
@@ -85,11 +88,10 @@ export default function KoreaderSettingsScreen() {
     setTestFeedback(null);
 
     try {
-      const auth = await buildAuthHeaders(username.trim(), password);
-      if (!auth) {
+      if (!username.trim() || !password) {
         throw new Error(t('sync.errorCredentials'));
       }
-      await testKoreaderConnection(serverUrl.trim(), auth);
+      await testKoreaderConnection(serverUrl.trim(), username.trim(), password);
       setTestFeedback({ variant: 'success', message: t('sync.testSuccess') });
       void notificationSuccessHaptic();
     } catch (err) {

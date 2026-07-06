@@ -455,14 +455,16 @@ export async function upsertBookSyncState(
       last_error = excluded.last_error`,
     [
       state.book_id,
-      state.document_id,
+      state.document_id ?? '',
       state.document_id_mode,
-      state.last_pushed_at,
-      state.last_pulled_at,
-      state.remote_timestamp,
-      state.remote_percentage,
-      state.remote_progress,
-      state.last_error,
+      // NOT NULL columns: coerce nullish so a server response missing a field
+      // (e.g. CWA's PUT response omits `progress`) can never break the write.
+      state.last_pushed_at ?? 0,
+      state.last_pulled_at ?? 0,
+      state.remote_timestamp ?? 0,
+      state.remote_percentage ?? null,
+      state.remote_progress ?? '',
+      state.last_error ?? '',
     ],
   );
 }
