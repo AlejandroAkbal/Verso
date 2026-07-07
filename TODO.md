@@ -16,7 +16,7 @@ Library-UX features, now sitting on the refactored base (see `docs/superpowers/s
 - [x] Cancel an in-progress download by tapping its control again (stop + revert to cloud).
 - [ ] Design-polish pass (Infuse / Apple Music / Apple Books cues).
 - [ ] Android Maestro E2E: run the shared flows on a booted emulator locally (tooling/docs ready; needs Android SDK + AVD).
-- [ ] Audit application for non-native UI components or custom routing (e.g., custom headers on page sheets) and refactor to use native patterns.
+- [x] Audit application for non-native UI components or custom routing → migrated all custom sheets to native router modals; unified shared native-modal header chrome (`nativeModalHeaderOptions`). No custom sheets/overlays remain.
 
 ## Later
 
