@@ -1,4 +1,11 @@
-import Animated, { FadeInDown, Easing } from 'react-native-reanimated';
+import Animated, {
+  FadeInDown,
+  Easing,
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  useReducedMotion,
+} from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
@@ -13,6 +20,7 @@ import {
   resolveOnDevice,
   shouldShowGridDownloadControl,
 } from '@/lib/downloadVisibility';
+import { lightImpactHaptic } from '@/lib/haptics';
 import { useTheme } from '@/theme/ThemeProvider';
 import { BookBadge } from './BookBadge';
 import {
@@ -63,6 +71,12 @@ export function BookCard({
   const frameStyle = coverFrameStyle(theme);
   const glowStyle = coverGlowStyle(coverColorFromBlurhash(book.blurhash).glow);
 
+  const reduceMotion = useReducedMotion();
+  const pressScale = useSharedValue(1);
+  const pressStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pressScale.value }],
+  }));
+
   // Staggered FadeInDown — clean ease-out, no spring, no bounce.
   // 10px drop, 220ms, cubic ease-out. Cap stagger at 150ms so the grid
   // finishes as a cohesive wave rather than a slow sequence.
@@ -92,21 +106,34 @@ export function BookCard({
             right={0}
             bottom={0}
             left={0}
-            onPress={() => router.push(`/book/${book.id}`)}
+            onPressIn={() => {
+              // eslint-disable-next-line react-hooks/immutability
+              if (!reduceMotion) pressScale.value = withTiming(0.97, { duration: 90 });
+            }}
+            onPressOut={() => {
+              // eslint-disable-next-line react-hooks/immutability
+              pressScale.value = withTiming(1, { duration: 140 });
+            }}
+            onPress={() => {
+              void lightImpactHaptic();
+              router.push(`/book/${book.id}`);
+            }}
           >
-            <ImageBox
-              key={coverKey}
-              source={{
-                uri: book.cover_url,
-                headers: Object.keys(authHeaders).length > 0 ? authHeaders : undefined,
-              }}
-              width="100%"
-              height="100%"
-              backgroundColor="surfaceElevated"
-              contentFit="cover"
-              placeholder={book.blurhash ? { blurhash: book.blurhash } : undefined}
-              transition={200}
-            />
+            <Animated.View style={[{ width: '100%', height: '100%' }, pressStyle]}>
+              <ImageBox
+                key={coverKey}
+                source={{
+                  uri: book.cover_url,
+                  headers: Object.keys(authHeaders).length > 0 ? authHeaders : undefined,
+                }}
+                width="100%"
+                height="100%"
+                backgroundColor="surfaceElevated"
+                contentFit="cover"
+                placeholder={book.blurhash ? { blurhash: book.blurhash } : undefined}
+                transition={200}
+              />
+            </Animated.View>
           </PressableBox>
           {isNew ? <BookBadge label={t('book.new')} /> : null}
           {showDownloadControl ? (
