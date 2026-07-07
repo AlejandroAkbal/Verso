@@ -53,7 +53,16 @@ export function ReaderTocModal({
           marginBottom="md"
         >
           <ThemedText variant="title">{t('reader.tableOfContents')}</ThemedText>
-          <PressableBox onPress={onClose} hitSlop={12}>
+          <PressableBox
+            onPress={onClose}
+            hitSlop={8}
+            alignItems="center"
+            justifyContent="center"
+            width={36}
+            height={36}
+            borderRadius="full"
+            backgroundColor="surfaceElevated"
+          >
             <SymbolView name="xmark" size={18} tintColor={theme.colors.textSecondary} />
           </PressableBox>
         </Box>

@@ -1,4 +1,4 @@
-import Animated, { FadeIn } from 'react-native-reanimated';
+import Animated, { FadeInDown, Easing } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -64,12 +64,19 @@ export function BookCard({
 
   const frameStyle = coverFrameStyle(theme);
 
-  // Pure opacity fade — no Y-slide, no spring bounce. Cap at 40ms so stagger
-  // is barely perceptible: a gentle ripple rather than a mechanical sequence.
-  const entranceDelay = Math.min(index * 6, 40);
+  // Staggered FadeInDown — clean ease-out, no spring, no bounce.
+  // 10px drop, 220ms, cubic ease-out. Cap stagger at 150ms so the grid
+  // finishes as a cohesive wave rather than a slow sequence.
+  const entranceDelay = Math.min(index * 30, 150);
 
   return (
-    <Animated.View entering={FadeIn.delay(entranceDelay).duration(180)}>
+    <Animated.View
+      entering={FadeInDown
+        .delay(entranceDelay)
+        .duration(220)
+        .easing(Easing.out(Easing.cubic))
+      }
+    >
       <Box
         opacity={
           dimmed ? theme.opacity.dimmed : finished ? theme.opacity.finished : 1

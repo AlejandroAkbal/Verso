@@ -62,6 +62,22 @@ Expo Router · Restyle + `theme.ts` (no Tailwind) · TanStack Query · `expo-sql
 
 Minimal diff · `@/` imports · Restyle primitives from `src/components/ui.tsx` · `ThemedText` / `useTheme()` · strict TS · dark-only UI · i18n keys in all 5 locales.
 
+**Design System - Modal Sheets**: Standardize on the 36px circular filled button for modal sheet close buttons to match library header styles:
+```tsx
+<PressableBox
+  onPress={onClose}
+  hitSlop={8}
+  alignItems="center"
+  justifyContent="center"
+  width={36}
+  height={36}
+  borderRadius="full"
+  backgroundColor="surfaceElevated"
+>
+  <SymbolView name="xmark" size={18} tintColor={theme.colors.textSecondary} />
+</PressableBox>
+```
+
 Track durable product/engineering backlog in `TODO.md`.
 
 ---
