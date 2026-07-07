@@ -1,5 +1,6 @@
 import { Stack, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { SymbolView } from 'expo-symbols';
 
 import { ToastProvider } from '@/components/toast/ToastProvider';
 import { PressableBox, Text } from '@/components/ui';
@@ -26,8 +27,17 @@ export default function SettingsLayout() {
           title: t('settings.title'),
           headerLargeTitle: false,
           headerRight: () => (
-            <PressableBox onPress={() => router.back()} hitSlop={12}>
-              <Text style={{ color: theme.colors.interactive, fontSize: 17 }}>{t('common.done')}</Text>
+            <PressableBox
+              onPress={() => router.back()}
+              hitSlop={8}
+              alignItems="center"
+              justifyContent="center"
+              width={36}
+              height={36}
+              borderRadius="full"
+              backgroundColor="surfaceElevated"
+            >
+              <SymbolView name="xmark" size={18} tintColor={theme.colors.textSecondary} />
             </PressableBox>
           ),
         }}

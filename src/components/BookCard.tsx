@@ -1,6 +1,5 @@
 import Animated, { FadeInDown, Easing } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Box, ImageBox, PressableBox } from '@/components/ui';
@@ -51,8 +50,6 @@ export function BookCard({
   const showDownloadControl = shouldShowGridDownloadControl(book.id, isOnDevice, download);
   const coverHeight = width / theme.cover.aspectRatio;
   const coverKey = book.cover_url + JSON.stringify(authHeaders);
-  const [loadedCoverKey, setLoadedCoverKey] = useState(book.cover_url ? '' : coverKey);
-  const coverLoaded = loadedCoverKey === coverKey;
   const percent = progressPercent(readingProgress);
   const finished = isFinished(readingProgress);
   const inProgress = percent != null && percent > 0 && !finished;
@@ -94,16 +91,6 @@ export function BookCard({
             left={0}
             onPress={() => router.push(`/book/${book.id}`)}
           >
-            {!coverLoaded ? (
-              <Box
-                position="absolute"
-                top={0}
-                right={0}
-                bottom={0}
-                left={0}
-                backgroundColor="surfaceElevated"
-              />
-            ) : null}
             <ImageBox
               key={coverKey}
               source={{
@@ -112,12 +99,10 @@ export function BookCard({
               }}
               width="100%"
               height="100%"
-              backgroundColor="surface"
+              backgroundColor="surfaceElevated"
               contentFit="cover"
               placeholder={book.blurhash ? { blurhash: book.blurhash } : undefined}
               transition={200}
-              onLoad={() => setLoadedCoverKey(coverKey)}
-              onError={() => setLoadedCoverKey(coverKey)}
             />
           </PressableBox>
           {isNew ? <BookBadge label={t('book.new')} /> : null}
@@ -133,11 +118,14 @@ export function BookCard({
         </Box>
       </Box>
 
-      {/* Below-cover progress — outside the jacket, Apple Books style */}
-      {inProgress ? (
-        <BookProgressFooterBand percent={percent ?? 0} />
-      ) : null}
-      {finished ? <BookFinishedFooterBand label={t('progress.finished')} /> : null}
+      {/* Below-cover progress — fixed height container ensures grid cells are uniform */}
+      <Box height={19}>
+        {inProgress ? (
+          <BookProgressFooterBand percent={percent ?? 0} />
+        ) : finished ? (
+          <BookFinishedFooterBand label={t('progress.finished')} />
+        ) : null}
+      </Box>
     </Box>
     </Animated.View>
   );
