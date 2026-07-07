@@ -4,7 +4,7 @@ import Animated from 'react-native-reanimated';
 import { Box, PressableBox } from '@/components/ui';
 import { ProgressRing } from '@/components/ProgressRing';
 import type { DownloadRow } from '@/db/schema';
-import { useDownloadPresentation } from '@/hooks/useDownloadPresentation';
+import { useDownloadController } from '@/hooks/useDownloadController';
 import { lightImpactHaptic } from '@/lib/haptics';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -28,7 +28,7 @@ export function CloudDownloadButton({
     animatedProgress,
     settleStyle,
     startDownload,
-  } = useDownloadPresentation(bookId, { download });
+  } = useDownloadController(bookId, { download });
 
   if (showProgressChrome) {
     return (

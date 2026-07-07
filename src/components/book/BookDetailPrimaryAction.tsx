@@ -7,7 +7,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { Box, PressableBox } from '@/components/ui';
 import { ProgressRing } from '@/components/ProgressRing';
 import { DownloadingPercentText } from '@/components/DownloadingPercentText';
-import { useDownloadPresentation } from '@/hooks/useDownloadPresentation';
+import { useDownloadController } from '@/hooks/useDownloadController';
 import { formatDownloadError } from '@/lib/downloadErrors';
 import { lightImpactHaptic } from '@/lib/haptics';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -39,7 +39,7 @@ export function BookDetailPrimaryAction({
     animatedProgress,
     settleStyle,
     startDownload,
-  } = useDownloadPresentation(bookId);
+  } = useDownloadController(bookId);
 
   if (showCompletedUI) {
     const label =

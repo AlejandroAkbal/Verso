@@ -27,9 +27,9 @@ const SUCCESS_HOLD_MS = 1100;
 /** Gentle dissolve of the checkmark once the hold elapses. */
 const SETTLE_FADE_MS = 340;
 
-export type DownloadPresentationPhase = 'idle' | 'progress' | 'success' | 'settled';
+export type DownloadPhase = 'idle' | 'progress' | 'success' | 'settled';
 
-type UseDownloadPresentationOptions = {
+type UseDownloadControllerOptions = {
   onComplete?: () => void;
 };
 
@@ -37,7 +37,7 @@ function initialPhase(
   bookId: string,
   status: string | null,
   isCompleted: boolean,
-): DownloadPresentationPhase {
+): DownloadPhase {
   if (isCompleted) {
     if (isBookDownloadSessionActive(bookId)) {
       return 'success';
@@ -50,9 +50,9 @@ function initialPhase(
   return 'idle';
 }
 
-export function useDownloadPresentation(
+export function useDownloadController(
   bookId: string,
-  options: UseDownloadPresentationOptions & { download?: DownloadRow | null } = {},
+  options: UseDownloadControllerOptions & { download?: DownloadRow | null } = {},
 ) {
   const {
     download,
@@ -65,7 +65,7 @@ export function useDownloadPresentation(
     status,
   } = useBackgroundDownload(bookId, { download: options.download });
 
-  const [phase, setPhase] = useState<DownloadPresentationPhase>(() =>
+  const [phase, setPhase] = useState<DownloadPhase>(() =>
     initialPhase(bookId, status, isCompleted),
   );
 
