@@ -8,6 +8,13 @@ Living product and engineering backlog. Keep this file current when new durable 
 
 ## Next
 
+Library-UX features, now sitting on the refactored base (see `docs/superpowers/specs/2026-07-07-focused-refactor-design.md`):
+
+- [ ] Library sorting (reading progress, recency / "old books") — extend `useLibraryFilters`.
+- [ ] Replace the always-on category chips with a filter menu/sheet; keep All/Downloaded quick toggles.
+- [ ] Collapsing / non-sticky search bar (iOS large-title behavior) that reads well on Android too.
+- [ ] Cancel an in-progress download by tapping its control again (stop + revert to cloud).
+- [ ] Design-polish pass (Infuse / Apple Music / Apple Books cues).
 - [ ] Android Maestro E2E: run the shared flows on a booted emulator (tooling/docs ready; needs Android SDK + AVD locally, or an emulator CI runner).
 - [ ] Publish a prebuilt dev-client artifact so CI `ios-smoke` skips the ~30 min native build.
 
@@ -18,6 +25,7 @@ Living product and engineering backlog. Keep this file current when new durable 
 
 ## Done (archive)
 
+- [x] Focused refactor (W1–W6): displayName → "Verso"; i18n drift fixed (0 across 5 locales) + cover-frame dedupe; broke the queue↔syncBook↔manage require cycle via a leaf `paths.ts`; re-layered download state behind one event-driven store (`useSyncExternalStore`, poll only while in-flight) + renamed `useDownloadController`; split the library screen (470→286) and reader screen (356→168) into focused hooks + components. All verified on-device.
 - [x] Premium fade-out (opacity + bloom) on download success → settle; fixed a settle timer that never fired (unstable `enterSettled` reset by 300ms download polling).
 - [x] KOReader sync verified end-to-end against CWA `/kosync` (auth, pull, push round-trip); fixed a `NOT NULL` crash on `book_sync_state.remote_progress` and surfaced server error bodies (e.g. "KOReader sync is disabled").
 - [x] Per-book sync status on detail screen ("Synced 2m ago", relative time, error state).
