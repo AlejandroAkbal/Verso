@@ -80,7 +80,7 @@ export default function RootLayout() {
                 options={{ headerShown: false, presentation: 'card' }}
               />
               <Stack.Screen
-                name="reader/[id]"
+                name="reader"
                 options={{ headerShown: false, presentation: 'fullScreenModal' }}
               />
               <Stack.Screen
