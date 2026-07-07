@@ -43,7 +43,8 @@
   },
   "progress": {
     "finished": "Terminado",
-    "percent": "{{percent}}%"
+    "percent": "{{percent}}%",
+    "continue": "{{percent}}% leído"
   },
   "book": {
     "read": "Leer",
@@ -61,7 +62,8 @@
     "downloadFailed": "Error al descargar — Toca para reintentar",
     "shareFile": "Compartir archivo",
     "shareFileError": "No se pudo compartir el archivo",
-    "fileDetails": "{{format}} · {{size}}"
+    "fileDetails": "{{format}} · {{size}}",
+    "downloadComplete": "Descargado"
   },
   "downloads": {
     "remove": "Eliminar descarga",
@@ -93,7 +95,36 @@
     "tableOfContents": "Tabla de contenidos",
     "decreaseFontSize": "Reducir tamaño de fuente",
     "increaseFontSize": "Aumentar tamaño de fuente",
-    "noChapters": "No hay capítulos disponibles"
+    "noChapters": "No hay capítulos disponibles",
+    "settingsTitle": "Lector",
+    "settingsRowHint": "Tipografía, tema y diseño predeterminados",
+    "openSettings": "Ajustes del lector",
+    "openFullSettings": "Abrir todos los ajustes del lector",
+    "showControls": "Mostrar controles del lector",
+    "hideControls": "Ocultar controles del lector",
+    "progress": "{{percent}}% leído",
+    "appearanceHeader": "Apariencia",
+    "appearanceFooter": "Los temas sepia y claro siguen las convenciones habituales de los lectores. El oscuro combina con la app.",
+    "typographyHeader": "Tipografía",
+    "fontSize": "Tamaño de fuente",
+    "lineHeight": "Interlineado",
+    "pageMargins": "Márgenes de página",
+    "publisherStyles": "Estilos del editor",
+    "publisherStylesHint": "Mantén la tipografía original del libro cuando esté disponible",
+    "theme": {
+      "dark": "Oscuro",
+      "sepia": "Sepia",
+      "light": "Claro"
+    },
+    "font": {
+      "serif": "Con serifa",
+      "sans-serif": "Sin serifa",
+      "monospace": "Monoespaciada"
+    },
+    "align": {
+      "justify": "Justificado",
+      "start": "Alineado a la izquierda"
+    }
   },
   "settings": {
     "title": "Servidores OPDS",

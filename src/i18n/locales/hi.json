@@ -43,7 +43,8 @@
   },
   "progress": {
     "finished": "पूर्ण",
-    "percent": "{{percent}}%"
+    "percent": "{{percent}}%",
+    "continue": "{{percent}}% पढ़ा गया"
   },
   "book": {
     "read": "पढ़ें",
@@ -61,7 +62,8 @@
     "downloadFailed": "डाउनलोड विफल — पुनः प्रयास करें",
     "shareFile": "फ़ाइल साझा करें",
     "shareFileError": "फ़ाइल साझा नहीं हो सकी",
-    "fileDetails": "{{format}} · {{size}}"
+    "fileDetails": "{{format}} · {{size}}",
+    "downloadComplete": "डाउनलोड किया गया"
   },
   "downloads": {
     "remove": "डाउनलोड हटाएँ",
@@ -93,7 +95,36 @@
     "tableOfContents": "विषय सूची",
     "decreaseFontSize": "फ़ॉन्ट छोटा करें",
     "increaseFontSize": "फ़ॉन्ट बड़ा करें",
-    "noChapters": "कोई अध्याय उपलब्ध नहीं"
+    "noChapters": "कोई अध्याय उपलब्ध नहीं",
+    "settingsTitle": "रीडर",
+    "settingsRowHint": "टाइपोग्राफ़ी, थीम और लेआउट डिफ़ॉल्ट",
+    "openSettings": "रीडर सेटिंग्स",
+    "openFullSettings": "पूर्ण रीडर सेटिंग्स खोलें",
+    "showControls": "रीडर नियंत्रण दिखाएँ",
+    "hideControls": "रीडर नियंत्रण छिपाएँ",
+    "progress": "{{percent}}% पढ़ा गया",
+    "appearanceHeader": "रूप",
+    "appearanceFooter": "सेपिया और लाइट थीम सामान्य ई-रीडर परंपराओं का पालन करती हैं। डार्क ऐप के अनुरूप है।",
+    "typographyHeader": "टाइपोग्राफ़ी",
+    "fontSize": "फ़ॉन्ट आकार",
+    "lineHeight": "पंक्ति अंतराल",
+    "pageMargins": "पृष्ठ हाशिये",
+    "publisherStyles": "प्रकाशक शैलियाँ",
+    "publisherStylesHint": "उपलब्ध होने पर पुस्तक की मूल टाइपोग्राफ़ी रखें",
+    "theme": {
+      "dark": "डार्क",
+      "sepia": "सेपिया",
+      "light": "लाइट"
+    },
+    "font": {
+      "serif": "सेरिफ़",
+      "sans-serif": "सैन्स सेरिफ़",
+      "monospace": "मोनोस्पेस"
+    },
+    "align": {
+      "justify": "जस्टिफ़ाइड",
+      "start": "बाएँ संरेखित"
+    }
   },
   "settings": {
     "title": "OPDS सर्वर",

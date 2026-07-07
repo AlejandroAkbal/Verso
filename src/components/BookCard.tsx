@@ -1,9 +1,9 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet } from 'react-native';
 
 import { Box, ImageBox, PressableBox } from '@/components/ui';
+import { coverFrameStyle } from '@/lib/coverStyle';
 import type { BookRow, DownloadRow, ReadingProgressRow } from '@/db/schema';
 import { useServerAuthHeaders } from '@/hooks/useServerAuthHeaders';
 import { isFinished, progressPercent } from '@/lib/readingProgress';
@@ -58,12 +58,7 @@ export function BookCard({
     downloadStatus: download?.status,
   });
 
-  const coverRadius = theme.cover.borderRadius;
-  const frameStyle = {
-    borderRadius: coverRadius,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.coverBorder,
-  };
+  const frameStyle = coverFrameStyle(theme);
 
   return (
     <Box

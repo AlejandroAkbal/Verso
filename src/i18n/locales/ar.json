@@ -59,7 +59,8 @@
   },
   "progress": {
     "finished": "مكتمل",
-    "percent": "{{percent}}٪"
+    "percent": "{{percent}}٪",
+    "continue": "تمت قراءة {{percent}}%"
   },
   "book": {
     "read": "اقرأ",
@@ -77,7 +78,8 @@
     "downloadFailed": "فشل التنزيل — اضغط لإعادة المحاولة",
     "shareFile": "مشاركة الملف",
     "shareFileError": "تعذّرت مشاركة الملف",
-    "fileDetails": "{{format}} · {{size}}"
+    "fileDetails": "{{format}} · {{size}}",
+    "downloadComplete": "تم التنزيل"
   },
   "downloads": {
     "remove": "إزالة التنزيل",
@@ -109,7 +111,36 @@
     "tableOfContents": "جدول المحتويات",
     "decreaseFontSize": "تصغير حجم الخط",
     "increaseFontSize": "تكبير حجم الخط",
-    "noChapters": "لا توجد فصول"
+    "noChapters": "لا توجد فصول",
+    "settingsTitle": "القارئ",
+    "settingsRowHint": "إعدادات الطباعة والسمة والتخطيط الافتراضية",
+    "openSettings": "إعدادات القارئ",
+    "openFullSettings": "فتح جميع إعدادات القارئ",
+    "showControls": "إظهار عناصر التحكم",
+    "hideControls": "إخفاء عناصر التحكم",
+    "progress": "تمت قراءة {{percent}}%",
+    "appearanceHeader": "المظهر",
+    "appearanceFooter": "تتبع سمتا البُني الفاتح والفاتح أعراف القارئ الإلكتروني الشائعة. الداكن يطابق واجهة التطبيق.",
+    "typographyHeader": "الطباعة",
+    "fontSize": "حجم الخط",
+    "lineHeight": "تباعد الأسطر",
+    "pageMargins": "هوامش الصفحة",
+    "publisherStyles": "أنماط الناشر",
+    "publisherStylesHint": "احتفظ بالطباعة الأصلية للكتاب عند توفرها",
+    "theme": {
+      "dark": "داكن",
+      "sepia": "بُني فاتح",
+      "light": "فاتح"
+    },
+    "font": {
+      "serif": "بحروف مذيّلة",
+      "sans-serif": "بدون تذييل",
+      "monospace": "أحادي المسافة"
+    },
+    "align": {
+      "justify": "ضبط",
+      "start": "محاذاة لليسار"
+    }
   },
   "settings": {
     "title": "خوادم OPDS",

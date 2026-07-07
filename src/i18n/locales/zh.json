@@ -39,7 +39,8 @@
   },
   "progress": {
     "finished": "已读完",
-    "percent": "{{percent}}%"
+    "percent": "{{percent}}%",
+    "continue": "已读 {{percent}}%"
   },
   "book": {
     "read": "阅读",
@@ -57,7 +58,8 @@
     "downloadFailed": "下载失败 — 点击重试",
     "shareFile": "分享文件",
     "shareFileError": "无法分享此文件",
-    "fileDetails": "{{format}} · {{size}}"
+    "fileDetails": "{{format}} · {{size}}",
+    "downloadComplete": "已下载"
   },
   "downloads": {
     "remove": "移除下载",
@@ -89,7 +91,36 @@
     "tableOfContents": "目录",
     "decreaseFontSize": "减小字号",
     "increaseFontSize": "增大字号",
-    "noChapters": "暂无章节"
+    "noChapters": "暂无章节",
+    "settingsTitle": "阅读器",
+    "settingsRowHint": "排版、主题和布局默认设置",
+    "openSettings": "阅读器设置",
+    "openFullSettings": "打开完整阅读器设置",
+    "showControls": "显示阅读器控件",
+    "hideControls": "隐藏阅读器控件",
+    "progress": "已读 {{percent}}%",
+    "appearanceHeader": "外观",
+    "appearanceFooter": "棕褐色和浅色主题遵循常见的电子阅读器惯例。深色与应用界面一致。",
+    "typographyHeader": "排版",
+    "fontSize": "字号",
+    "lineHeight": "行距",
+    "pageMargins": "页边距",
+    "publisherStyles": "出版商样式",
+    "publisherStylesHint": "尽可能保留图书的原始排版",
+    "theme": {
+      "dark": "深色",
+      "sepia": "棕褐色",
+      "light": "浅色"
+    },
+    "font": {
+      "serif": "衬线",
+      "sans-serif": "无衬线",
+      "monospace": "等宽"
+    },
+    "align": {
+      "justify": "两端对齐",
+      "start": "左对齐"
+    }
   },
   "settings": {
     "title": "OPDS 服务器",

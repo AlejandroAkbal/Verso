@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet } from 'react-native';
+import { ActivityIndicator, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SymbolView } from 'expo-symbols';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +26,7 @@ import { useDominantColor } from '@/hooks/useDominantColor';
 import { useOpenReaderWithSync } from '@/hooks/useOpenReaderWithSync';
 import { useServerAuthHeaders } from '@/hooks/useServerAuthHeaders';
 import { parseBookCategories } from '@/hooks/useOPDSCatalog';
+import { coverFrameStyle, coverShadowStyle } from '@/lib/coverStyle';
 import { isFinished, progressPercent } from '@/lib/readingProgress';
 import { isDownloadComplete } from '@/services/downloads/manage';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -101,17 +102,7 @@ export default function BookDetailScreen() {
   const coverLoaded = loadedCoverUrl === book.cover_url;
   const coverWidth = 168;
   const coverHeight = 252;
-  const coverRadius = theme.cover.borderRadius;
-  const coverFrameStyle = {
-    borderRadius: coverRadius,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.coverBorder,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 14 },
-    shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation: 14,
-  };
+  const frameStyle = { ...coverFrameStyle(theme), ...coverShadowStyle };
 
   return (
     <BlurBackdrop
@@ -139,7 +130,7 @@ export default function BookDetailScreen() {
         </PressableBox>
 
         <Box alignItems="center" gap="lg">
-          <Box overflow="hidden" width={coverWidth} style={coverFrameStyle}>
+          <Box overflow="hidden" width={coverWidth} style={frameStyle}>
             <Box width={coverWidth} height={coverHeight} position="relative">
               {!coverLoaded ? (
                 <Box
