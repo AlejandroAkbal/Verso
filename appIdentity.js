@@ -1,7 +1,7 @@
 /** Shared app identity — imported by app.config.ts (Node) and src/config/appIdentity.ts (app). */
 /** @type {const} */
 const appIdentity = {
-  displayName: 'Reader',
+  displayName: 'Verso',
   slug: 'opds-reader',
   scheme: 'opds-reader',
   bundleId: 'dev.akbal.opdsreader',
