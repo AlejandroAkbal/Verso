@@ -3,11 +3,12 @@ import { Alert, KeyboardAvoidingView, Platform, Switch } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSQLiteContext } from 'expo-sqlite';
+import { SymbolView } from 'expo-symbols';
 
 import { SettingsGroup } from '@/components/settings/SettingsGroup';
 import { SettingsRow } from '@/components/settings/SettingsRow';
 import { ThemedText } from '@/components/ThemedText';
-import { Box, ScrollBox } from '@/components/ui';
+import { Box, ScrollBox, PressableBox } from '@/components/ui';
 import { useUserPreferences } from '@/db/hooks/useUserPreferences';
 import { useServers } from '@/db/hooks/useServers';
 import { useActiveServer } from '@/db/hooks/useActiveServer';
@@ -102,6 +103,27 @@ export default function SettingsIndexScreen() {
         automaticallyAdjustKeyboardInsets
         keyboardShouldPersistTaps="handled"
       >
+        <Box
+          flexDirection="row"
+          alignItems="center"
+          justifyContent="space-between"
+          marginBottom="lg"
+        >
+          <ThemedText variant="title">{t('settings.title')}</ThemedText>
+          <PressableBox
+            onPress={() => router.back()}
+            hitSlop={8}
+            alignItems="center"
+            justifyContent="center"
+            width={36}
+            height={36}
+            borderRadius="full"
+            backgroundColor="surfaceElevated"
+          >
+            <SymbolView name="xmark" size={18} tintColor={theme.colors.textSecondary} />
+          </PressableBox>
+        </Box>
+
       <SettingsGroup
         header={t('settings.configuredServers')}
         footer={t('settings.listFooter')}
