@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 import Animated, {
   Easing,
@@ -45,6 +45,12 @@ export default function ReaderScreen() {
     // eslint-disable-next-line react-hooks/immutability
     washOpacity.value = withTiming(0, { duration: 520, easing: Easing.out(Easing.cubic) });
   }, [washOpacity]);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    const t = setTimeout(startWashFade, 1500);
+    return () => clearTimeout(t);
+  }, [reduceMotion, startWashFade]);
 
   const { persistProgress, flushProgress, setPositionCount } = useReaderProgress(
     id,
