@@ -111,8 +111,11 @@ Each animation must justify itself in one sentence:
 - No book-detail restyle this pass (separate follow-up).
 - No schema migration required (`books.dominant_color` cache is an optional
   stretch only).
-- No new dependencies — `react-native-reanimated`, `expo-image`, `expo-blur`,
-  dominant-color hook, and `BlurBackdrop` already exist.
+- No new dependencies are required — `react-native-reanimated`, `expo-image`,
+  `expo-blur`, the dominant-color hook, and `BlurBackdrop` already exist. Adding
+  one is allowed when it clearly earns its place and won't burden the project
+  later (prefer first-party Expo modules); e.g. `expo-linear-gradient` is a
+  sanctioned option for the ambient fade if the blurred-cover approach looks off.
 - No changes to data flow, routing, or the download/sync/reader engines.
 
 ## 9. Components & files (anticipated)
