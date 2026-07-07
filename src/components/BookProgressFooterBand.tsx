@@ -6,13 +6,14 @@ import { RawBox } from '@/components/ui';
 import { useSmoothProgress } from '@/hooks/useSmoothProgress';
 import { useTheme } from '@/theme/ThemeProvider';
 
-const OVERLAY_HEIGHT = 22;
-
 type BookProgressFooterBandProps = {
   percent: number;
 };
 
-/** Translucent overlay pinned to the bottom-inside of the cover image. */
+/**
+ * Below-cover progress bar — sits outside the jacket image, Apple Books style.
+ * Thin track + animated fill + small percentage label.
+ */
 export function BookProgressFooterBand({ percent }: BookProgressFooterBandProps) {
   const theme = useTheme();
   const clamped = Math.min(100, Math.max(0, percent));
@@ -26,25 +27,20 @@ export function BookProgressFooterBand({ percent }: BookProgressFooterBandProps)
   return (
     <RawBox
       style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: OVERLAY_HEIGHT,
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
-        paddingHorizontal: 6,
-        backgroundColor: 'rgba(0,0,0,0.58)',
+        paddingHorizontal: 2,
+        marginTop: 5,
       }}
     >
       <RawBox
         style={{
           flex: 1,
-          height: 2.5,
+          height: 2,
           borderRadius: 999,
           overflow: 'hidden',
-          backgroundColor: 'rgba(255,255,255,0.22)',
+          backgroundColor: theme.colors.progressTrack,
         }}
         onLayout={(event) => {
           setTrackWidth(event.nativeEvent.layout.width);
@@ -61,18 +57,18 @@ export function BookProgressFooterBand({ percent }: BookProgressFooterBandProps)
           ]}
         />
       </RawBox>
-      <RawBox style={{ minWidth: 26, alignItems: 'flex-end' }}>
-        <Animated.Text
-          style={{
-            color: 'rgba(255,255,255,0.72)',
-            fontSize: 9,
-            fontWeight: '600',
-            lineHeight: 12,
-          }}
-        >
-          {`${Math.round(clamped)}%`}
-        </Animated.Text>
-      </RawBox>
+      <Animated.Text
+        style={{
+          color: theme.colors.textMuted,
+          fontSize: 9,
+          fontWeight: '500',
+          lineHeight: 12,
+          minWidth: 22,
+          textAlign: 'right',
+        }}
+      >
+        {`${Math.round(clamped)}%`}
+      </Animated.Text>
     </RawBox>
   );
 }
@@ -87,25 +83,19 @@ export function BookFinishedFooterBand({ label: _label }: BookFinishedFooterBand
   return (
     <RawBox
       style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: OVERLAY_HEIGHT,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'rgba(0,0,0,0.58)',
+        marginTop: 5,
+        height: 14,
       }}
     >
       <SymbolView
-        name="checkmark"
-        size={11}
-        tintColor={theme.colors.success}
-        weight="semibold"
+        name="checkmark.circle.fill"
+        size={12}
+        tintColor={theme.colors.textMuted}
       />
     </RawBox>
   );
 }
 
-/** @deprecated No longer used — overlay is inside the cover Box */
 export const BOOK_PROGRESS_FOOTER_HEIGHT = 0;
