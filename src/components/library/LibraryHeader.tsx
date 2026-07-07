@@ -2,7 +2,6 @@ import { SymbolView } from 'expo-symbols';
 import { ActivityIndicator } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { SearchField } from '@/components/SearchField';
 import { ThemedText } from '@/components/ThemedText';
 import { Box, PressableBox } from '@/components/ui';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -12,9 +11,8 @@ type LibraryHeaderProps = {
   isRefreshing: boolean;
   onRefresh: () => void;
   onOpenSettings: () => void;
-  searchQuery: string;
-  onSearchChange: (value: string) => void;
-  isSearching: boolean;
+  onOpenFilter: () => void;
+  isFiltered: boolean;
   topInset: number;
 };
 
@@ -23,9 +21,8 @@ export function LibraryHeader({
   isRefreshing,
   onRefresh,
   onOpenSettings,
-  searchQuery,
-  onSearchChange,
-  isSearching,
+  onOpenFilter,
+  isFiltered,
   topInset,
 }: LibraryHeaderProps) {
   const theme = useTheme();
@@ -75,6 +72,26 @@ export function LibraryHeader({
             )}
           </PressableBox>
           <PressableBox
+            onPress={onOpenFilter}
+            accessibilityRole="button"
+            accessibilityLabel={t('library.sortAndFilter', 'Sort & Filter')}
+            testID="library-filter"
+            alignItems="center"
+            justifyContent="center"
+            width={36}
+            height={36}
+            borderRadius="full"
+            backgroundColor={isFiltered ? 'groupedBackground' : 'surfaceElevated'}
+            hitSlop={8}
+          >
+            <SymbolView
+              name="line.3.horizontal.decrease"
+              size={18}
+              tintColor={isFiltered ? theme.colors.primary : theme.colors.textSecondary}
+              importantForAccessibility="no-hide-descendants"
+            />
+          </PressableBox>
+          <PressableBox
             onPress={onOpenSettings}
             accessibilityRole="button"
             accessibilityLabel={t('library.openSettings')}
@@ -95,21 +112,6 @@ export function LibraryHeader({
             />
           </PressableBox>
         </Box>
-      </Box>
-
-      <Box position="relative">
-        <SearchField
-          value={searchQuery}
-          onChangeText={onSearchChange}
-          placeholder={t('library.searchPlaceholder')}
-        />
-        {isSearching ? (
-          <ActivityIndicator
-            color={theme.colors.textSecondary}
-            size="small"
-            style={{ position: 'absolute', right: 14, top: 14 }}
-          />
-        ) : null}
       </Box>
     </Box>
   );

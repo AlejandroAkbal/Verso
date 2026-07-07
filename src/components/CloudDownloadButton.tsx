@@ -28,20 +28,37 @@ export function CloudDownloadButton({
     animatedProgress,
     settleStyle,
     startDownload,
+    cancelDownload,
   } = useDownloadController(bookId, { download });
 
   if (showProgressChrome) {
     return (
-      <Box
+      <PressableBox
         alignItems="center"
         justifyContent="center"
         borderRadius="full"
         backgroundColor="overlay"
         width={size}
         height={size}
+        onPress={(event) => {
+          event.stopPropagation();
+          void lightImpactHaptic();
+          void cancelDownload();
+        }}
+        hitSlop={8}
+        testID={`book-download-cancel-${bookId}`}
+        accessibilityLabel="Cancel download"
       >
         <ProgressRing animatedProgress={animatedProgress} size={size} />
-      </Box>
+        {/* Stop icon overlay to indicate it's cancellable */}
+        <Box position="absolute" alignItems="center" justifyContent="center">
+          <SymbolView
+            name="square.fill"
+            size={size * 0.3}
+            tintColor={theme.colors.textSecondary}
+          />
+        </Box>
+      </PressableBox>
     );
   }
 

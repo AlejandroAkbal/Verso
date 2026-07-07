@@ -3,7 +3,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 
 import { useDownloadStatus } from '@/db/hooks/useDownloads';
 import type { DownloadRow } from '@/db/schema';
-import { enqueueDownload } from '@/services/downloads/queue';
+import { enqueueDownload, cancelDownload as cancelDownloadQueue } from '@/services/downloads/queue';
 import { isDownloadComplete, removeDownloadedBook } from '@/services/downloads/manage';
 import { triggerDownloadProcessing } from '@/services/downloads/task';
 
@@ -32,6 +32,10 @@ export function useBackgroundDownload(
     await removeDownloadedBook(db, bookId);
   }, [db, bookId]);
 
+  const cancelDownload = useCallback(async () => {
+    await cancelDownloadQueue(db, bookId);
+  }, [db, bookId]);
+
   const status = download?.status ?? null;
   const progress = download?.progress ?? 0;
   const isDownloading = status === 'queued' || status === 'downloading';
@@ -47,5 +51,6 @@ export function useBackgroundDownload(
     isFailed,
     startDownload,
     removeDownload,
+    cancelDownload,
   };
 }

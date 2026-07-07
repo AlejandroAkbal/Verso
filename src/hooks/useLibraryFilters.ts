@@ -1,9 +1,12 @@
 import { useMemo, useState } from 'react';
 
-import type { BookRow } from '@/db/schema';
+import type { BookRow, ReadingProgressRow } from '@/db/schema';
 import { parseBookCategories } from '@/hooks/useOPDSCatalog';
 
+import { isFinished, progressPercent } from '@/lib/readingProgress';
+
 export type LibraryFilter = 'all' | 'on-device';
+export type LibrarySort = 'recent' | 'progress' | 'oldest';
 
 const MAX_CATEGORY_CHIPS = 12;
 
@@ -27,6 +30,8 @@ type UseLibraryFiltersArgs = {
    * derives from it before this hook runs.
    */
   searchQuery: string;
+  /** Reading progress by book ID for sorting. */
+  progressByBookId?: Map<string, ReadingProgressRow>;
 };
 
 /**
@@ -40,9 +45,11 @@ export function useLibraryFilters({
   remoteSearchData,
   downloadedIds,
   searchQuery,
+  progressByBookId = new Map(),
 }: UseLibraryFiltersArgs) {
   const [filter, setFilter] = useState<LibraryFilter>('all');
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [sort, setSort] = useState<LibrarySort>('recent');
 
   const categoryOptions = useMemo(() => {
     const counts = new Map<string, number>();
@@ -89,8 +96,38 @@ export function useLibraryFilters({
       list = list.filter((book) => matchesSearch(book, trimmed));
     }
 
+    list = [...list].sort((a, b) => {
+      if (sort === 'progress') {
+        const progA = progressByBookId.get(a.id);
+        const progB = progressByBookId.get(b.id);
+        const pA = progressPercent(progA) ?? 0;
+        const pB = progressPercent(progB) ?? 0;
+        const inProgA = pA > 0 && !isFinished(progA) ? 1 : 0;
+        const inProgB = pB > 0 && !isFinished(progB) ? 1 : 0;
+        
+        if (inProgA !== inProgB) {
+          return inProgB - inProgA;
+        }
+        
+        if (inProgA === 1 && inProgB === 1) {
+          const timeA = progA?.updated_at ?? 0;
+          const timeB = progB?.updated_at ?? 0;
+          if (timeA !== timeB) return timeB - timeA;
+        }
+      }
+      
+      const timeA = a.cached_at ?? 0;
+      const timeB = b.cached_at ?? 0;
+      
+      if (sort === 'oldest') {
+        return timeA - timeB;
+      }
+      
+      return timeB - timeA;
+    });
+
     return list;
-  }, [sourceBooks, filter, categoryFilter, downloadedIds, searchQuery, remoteSearchData]);
+  }, [sourceBooks, filter, categoryFilter, downloadedIds, searchQuery, remoteSearchData, sort, progressByBookId]);
 
   const isFiltered = useMemo(
     () =>
@@ -103,6 +140,8 @@ export function useLibraryFilters({
     setFilter,
     categoryFilter,
     setCategoryFilter,
+    sort,
+    setSort,
     categoryOptions,
     visibleBooks,
     isFiltered,

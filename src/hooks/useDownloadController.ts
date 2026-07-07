@@ -62,6 +62,7 @@ export function useDownloadController(
     isFailed,
     startDownload,
     removeDownload,
+    cancelDownload,
     status,
   } = useBackgroundDownload(bookId, { download: options.download });
 
@@ -288,6 +289,7 @@ export function useDownloadController(
     isFailed,
     startDownload: handleStartDownload,
     removeDownload,
+    cancelDownload,
     animatedProgress,
     settleStyle,
     showDownloadButton,

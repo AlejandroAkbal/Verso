@@ -6,7 +6,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { BookCard } from '@/components/BookCard';
+import { SearchField } from '@/components/SearchField';
 import { LibraryFilterBar } from '@/components/library/LibraryFilterBar';
+import { LibrarySortFilterSheet } from '@/components/library/LibrarySortFilterSheet';
 import { LibraryFooter } from '@/components/LibraryFooter';
 import { LibraryHeader } from '@/components/library/LibraryHeader';
 import { ThemedText } from '@/components/ThemedText';
@@ -33,6 +35,7 @@ export default function LibraryScreen() {
   const { downloads, refresh: refreshDownloads } = useDownloads();
   const { progressByBookId, refresh: refreshProgress } = useReadingProgressMap();
   const [searchQuery, setSearchQuery] = useState('');
+  const [isFilterSheetVisible, setFilterSheetVisible] = useState(false);
 
   const {
     books,
@@ -89,6 +92,8 @@ export default function LibraryScreen() {
     setFilter,
     categoryFilter,
     setCategoryFilter,
+    sort,
+    setSort,
     categoryOptions,
     visibleBooks,
     isFiltered,
@@ -97,6 +102,7 @@ export default function LibraryScreen() {
     remoteSearchData: remoteSearch.data,
     downloadedIds,
     searchQuery,
+    progressByBookId,
   });
 
   const numColumns = theme.grid.numColumns;
@@ -164,7 +170,7 @@ export default function LibraryScreen() {
       const dimmed = isOffline && !isOnDevice;
 
       return (
-        <Box style={{ marginBottom: theme.grid.gap }}>
+        <Box style={{ marginBottom: theme.grid.gap, paddingHorizontal: theme.grid.horizontalPadding }}>
           <BookCard
             book={item}
             width={cardWidth}
@@ -176,21 +182,34 @@ export default function LibraryScreen() {
         </Box>
       );
     },
-    [cardWidth, downloadedIds, downloadsByBookId, isOffline, progressByBookId, theme.grid.gap],
+    [cardWidth, downloadedIds, downloadsByBookId, isOffline, progressByBookId, theme.grid.gap, theme.grid.horizontalPadding],
   );
 
   const listHeader = useMemo(
     () => (
-      <LibraryFilterBar
-        filter={filter}
-        setFilter={setFilter}
-        categoryFilter={categoryFilter}
-        setCategoryFilter={setCategoryFilter}
-        categoryOptions={categoryOptions}
-        isOffline={isOffline}
-      />
+      <Box gap="md" style={{ paddingHorizontal: 20, paddingBottom: 12 }}>
+        <Box position="relative">
+          <SearchField
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder={t('library.searchPlaceholder')}
+          />
+          {searchQuery.trim().length >= 2 && remoteSearch.isFetching ? (
+            <ActivityIndicator
+              color={theme.colors.textSecondary}
+              size="small"
+              style={{ position: 'absolute', right: 14, top: 14 }}
+            />
+          ) : null}
+        </Box>
+        <LibraryFilterBar
+          filter={filter}
+          setFilter={setFilter}
+          isOffline={isOffline}
+        />
+      </Box>
     ),
-    [filter, setFilter, categoryFilter, setCategoryFilter, categoryOptions, isOffline],
+    [searchQuery, remoteSearch.isFetching, theme.colors.textSecondary, t, filter, setFilter, isOffline],
   );
 
   if (serversLoading || activeServerLoading) {
@@ -235,8 +254,6 @@ export default function LibraryScreen() {
     );
   }
 
-  const isSearching = searchQuery.trim().length >= 2 && remoteSearch.isFetching;
-
   return (
     <Box flex={1} backgroundColor="background">
       <LibraryHeader
@@ -244,10 +261,19 @@ export default function LibraryScreen() {
         isRefreshing={isLibraryRefreshing}
         onRefresh={() => void refreshLibrary()}
         onOpenSettings={() => router.push('/settings')}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        isSearching={isSearching}
+        onOpenFilter={() => setFilterSheetVisible(true)}
+        isFiltered={isFiltered}
         topInset={insets.top}
+      />
+
+      <LibrarySortFilterSheet
+        visible={isFilterSheetVisible}
+        onClose={() => setFilterSheetVisible(false)}
+        sort={sort}
+        setSort={setSort}
+        categoryFilter={categoryFilter}
+        setCategoryFilter={setCategoryFilter}
+        categoryOptions={categoryOptions}
       />
 
       {isLoading ? (
@@ -265,7 +291,6 @@ export default function LibraryScreen() {
           ListHeaderComponent={listHeader}
           ListFooterComponent={visibleBooks.length > 0 ? listFooter : null}
           contentContainerStyle={{
-            paddingHorizontal: theme.grid.horizontalPadding,
             paddingBottom: insets.bottom + 24,
           }}
           ListEmptyComponent={

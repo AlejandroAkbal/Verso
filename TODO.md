@@ -10,10 +10,10 @@ Living product and engineering backlog. Keep this file current when new durable 
 
 Library-UX features, now sitting on the refactored base (see `docs/superpowers/specs/2026-07-07-focused-refactor-design.md`):
 
-- [ ] Library sorting (reading progress, recency / "old books") — extend `useLibraryFilters`.
-- [ ] Replace the always-on category chips with a filter menu/sheet; keep All/Downloaded quick toggles.
-- [ ] Collapsing / non-sticky search bar (iOS large-title behavior) that reads well on Android too.
-- [ ] Cancel an in-progress download by tapping its control again (stop + revert to cloud).
+- [x] Library sorting (reading progress, recency / "old books") — extend `useLibraryFilters`.
+- [x] Replace the always-on category chips with a filter menu/sheet; keep All/Downloaded quick toggles.
+- [x] Collapsing / non-sticky search bar (iOS large-title behavior) that reads well on Android too.
+- [x] Cancel an in-progress download by tapping its control again (stop + revert to cloud).
 - [ ] Design-polish pass (Infuse / Apple Music / Apple Books cues).
 - [ ] Android Maestro E2E: run the shared flows on a booted emulator (tooling/docs ready; needs Android SDK + AVD locally, or an emulator CI runner).
 - [ ] Publish a prebuilt dev-client artifact so CI `ios-smoke` skips the ~30 min native build.
