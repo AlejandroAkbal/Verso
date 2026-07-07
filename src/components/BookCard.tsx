@@ -3,7 +3,8 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { Box, ImageBox, PressableBox } from '@/components/ui';
-import { coverFrameStyle } from '@/lib/coverStyle';
+import { coverFrameStyle, coverGlowStyle } from '@/lib/coverStyle';
+import { coverColorFromBlurhash } from '@/hooks/useCoverColor';
 import type { BookRow, DownloadRow, ReadingProgressRow } from '@/db/schema';
 import { useServerAuthHeaders } from '@/hooks/useServerAuthHeaders';
 import { isFinished, progressPercent } from '@/lib/readingProgress';
@@ -60,6 +61,7 @@ export function BookCard({
   });
 
   const frameStyle = coverFrameStyle(theme);
+  const glowStyle = coverGlowStyle(coverColorFromBlurhash(book.blurhash).glow);
 
   // Staggered FadeInDown — clean ease-out, no spring, no bounce.
   // 10px drop, 220ms, cubic ease-out. Cap stagger at 150ms so the grid
@@ -80,7 +82,8 @@ export function BookCard({
         }
         width={width}
       >
-      {/* Jacket image */}
+      {/* Jacket image — outer wrapper carries the color glow (no overflow clip) */}
+      <Box width={width} style={glowStyle}>
       <Box overflow="hidden" width={width} style={frameStyle}>
         <Box position="relative" width={width} height={coverHeight}>
           <PressableBox
@@ -116,6 +119,7 @@ export function BookCard({
             </Box>
           ) : null}
         </Box>
+      </Box>
       </Box>
 
       {/* Below-cover progress — fixed height container ensures grid cells are uniform */}
