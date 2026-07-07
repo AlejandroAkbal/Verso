@@ -11,6 +11,7 @@ import { ReaderProgressBar } from '@/components/reader/ReaderProgressBar';
 import { Box, PressableBox } from '@/components/ui';
 import { useReaderContext } from '@/context/ReaderContext';
 import { useReaderProgress } from '@/hooks/useReaderProgress';
+import { useCoverColor } from '@/hooks/useCoverColor';
 import { useReaderSession } from '@/hooks/useReaderSession';
 import { progressPercent } from '@/lib/readingProgress';
 import { toReadiumPreferences } from '@/services/reader/preferences';
@@ -25,14 +26,9 @@ export default function ReaderScreen() {
   const { readiumRef, prefs, setTableOfContents } = useReaderContext();
   const [chromeVisible, setChromeVisible] = useState(true);
 
-  const {
-    loading,
-    error,
-    title,
-    file,
-    progression,
-    setProgression,
-  } = useReaderSession(id);
+  const { loading, error, title, coverUrl, blurhash, file, progression, setProgression } = useReaderSession(id);
+
+  const chromeColors = useCoverColor(coverUrl, blurhash);
 
   const { persistProgress, flushProgress, setPositionCount } = useReaderProgress(
     id,
@@ -117,6 +113,7 @@ export default function ReaderScreen() {
       <ReaderChrome
         title={title}
         percent={percent}
+        tintColor={chromeColors.ambient}
         visible={chromeVisible}
         onShowChrome={() => setChromeVisible(true)}
         onHideChrome={() => setChromeVisible(false)}

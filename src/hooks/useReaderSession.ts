@@ -37,6 +37,8 @@ export function useReaderSession(id: string | undefined) {
   const [file, setFile] = useState<ReadiumFile | null>(null);
   const [progression, setProgression] = useState(0);
   const [tableOfContents, setTableOfContents] = useState<Link[]>([]);
+  const [coverUrl, setCoverUrl] = useState<string | undefined>(undefined);
+  const [blurhash, setBlurhash] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -64,6 +66,8 @@ export function useReaderSession(id: string | undefined) {
           const localUri = resolveDownloadLocalUri(download);
 
           setTitle(book.title);
+          setCoverUrl(book.cover_url || undefined);
+          setBlurhash(book.blurhash || undefined);
           setFile({ url: localUri, initialLocation });
           setProgression(saved?.progression ?? 0);
           setLoading(false);
@@ -101,6 +105,8 @@ export function useReaderSession(id: string | undefined) {
     loading,
     error,
     title,
+    coverUrl,
+    blurhash,
     file,
     progression,
     setProgression,
