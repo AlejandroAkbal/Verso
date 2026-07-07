@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { useLibraryFilterContext } from '@/context/LibraryFilterContext';
 
 import type { BookRow, ReadingProgressRow } from '@/db/schema';
 import { parseBookCategories } from '@/hooks/useOPDSCatalog';
@@ -48,10 +49,9 @@ export function useLibraryFilters({
   progressByBookId = new Map(),
 }: UseLibraryFiltersArgs) {
   const [filter, setFilter] = useState<LibraryFilter>('all');
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
-  const [sort, setSort] = useState<LibrarySort>('recent');
+  const { sort, categoryFilter, setCategoryOptions } = useLibraryFilterContext();
 
-  const categoryOptions = useMemo(() => {
+  const categoryOptionsLocal = useMemo(() => {
     const counts = new Map<string, number>();
     for (const book of books) {
       for (const category of parseBookCategories(book)) {
@@ -63,6 +63,10 @@ export function useLibraryFilters({
       .slice(0, MAX_CATEGORY_CHIPS)
       .map(([name]) => name);
   }, [books]);
+
+  useEffect(() => {
+    setCategoryOptions(categoryOptionsLocal);
+  }, [categoryOptionsLocal, setCategoryOptions]);
 
   const sourceBooks = useMemo(() => {
     const trimmed = searchQuery.trim();
@@ -139,10 +143,7 @@ export function useLibraryFilters({
     filter,
     setFilter,
     categoryFilter,
-    setCategoryFilter,
     sort,
-    setSort,
-    categoryOptions,
     visibleBooks,
     isFiltered,
   };

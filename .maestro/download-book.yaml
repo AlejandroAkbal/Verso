@@ -7,8 +7,17 @@ appId: dev.akbal.opdsreader
 - extendedWaitUntil:
     visible: "Library"
     timeout: 90000
+- extendedWaitUntil:
+    visible: "Search your library"
+    timeout: 30000
 # Deep-link to a catalog book that is not on device (stable first-row seed title).
-- openLink: opds-reader://book/c346a37a339d1158bd27def605dcf8e9
+- openLink: opds-reader://book/af521524347c2af8cf57c1147ae6645d
+- runFlow:
+    when:
+      visible: "Remove Download"
+    commands:
+      - tapOn: "Remove Download"
+      - tapOn: "Remove Download"
 - extendedWaitUntil:
     visible:
       id: "book-detail-download"

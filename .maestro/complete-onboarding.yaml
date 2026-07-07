@@ -1,0 +1,15 @@
+appId: dev.akbal.opdsreader
+---
+- openLink: exp+opds-reader://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081
+- tapOn:
+    text: "Continue"
+    optional: true
+- tapOn:
+    text: "Reload"
+    optional: true
+- tapOn:
+    text: "Explore public library"
+    optional: true
+- extendedWaitUntil:
+    visible: "Library"
+    timeout: 30000

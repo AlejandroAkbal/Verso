@@ -7,8 +7,11 @@ appId: dev.akbal.opdsreader
 - extendedWaitUntil:
     visible: "Library"
     timeout: 90000
+- extendedWaitUntil:
+    visible: "Search your library"
+    timeout: 30000
 # Deep-link to a stable catalog book (same seed as download-book.yaml).
-- openLink: opds-reader://book/c346a37a339d1158bd27def605dcf8e9
+- openLink: opds-reader://book/af521524347c2af8cf57c1147ae6645d
 # Download first when the book is not already on device.
 - runFlow:
     when:

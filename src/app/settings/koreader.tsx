@@ -163,6 +163,7 @@ export default function KoreaderSettingsScreen() {
           paddingBottom: insets.bottom + 48,
         }}
         keyboardShouldPersistTaps="handled"
+        contentInsetAdjustmentBehavior="automatic"
       >
         <SettingsGroup header={t('sync.header')} footer={t('sync.footer')}>
           <SettingsRow

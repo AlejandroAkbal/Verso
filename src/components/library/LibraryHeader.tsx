@@ -32,6 +32,11 @@ export function LibraryHeader({
       style={[
         styles.blur,
         {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 10,
           paddingTop: topInset + 4,
           paddingBottom: 12,
           borderBottomWidth: StyleSheet.hairlineWidth,

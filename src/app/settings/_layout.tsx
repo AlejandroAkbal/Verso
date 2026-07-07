@@ -1,5 +1,6 @@
 import { Stack, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { Platform } from 'react-native';
 
 import { ToastProvider } from '@/components/toast/ToastProvider';
 import { PressableBox, Text } from '@/components/ui';
@@ -13,7 +14,12 @@ export default function SettingsLayout() {
     <ToastProvider>
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: theme.colors.background },
+        headerTransparent: Platform.OS === 'ios',
+        headerBlurEffect: 'dark',
+        headerStyle: Platform.select({
+          ios: { backgroundColor: 'transparent' },
+          android: { backgroundColor: theme.colors.background },
+        }),
         headerTintColor: theme.colors.text,
         headerShadowVisible: false,
         contentStyle: { backgroundColor: theme.colors.background, flex: 1 },

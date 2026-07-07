@@ -4,7 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { SQLiteProvider } from 'expo-sqlite';
 import { Stack } from 'expo-router';
 import { Suspense, useEffect } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import 'react-native-reanimated';
 
@@ -17,6 +17,7 @@ import { appIdentity } from '@/config/appIdentity';
 import { migrateDatabase } from '@/db/migrations';
 import { queryClient } from '@/lib/queryClient';
 import { registerBackgroundDownloadTask } from '@/services/downloads/task';
+import { LibraryFilterProvider } from '@/context/LibraryFilterContext';
 import { AppThemeProvider } from '@/theme/ThemeProvider';
 import { theme } from '@/theme/theme';
 
@@ -59,9 +60,10 @@ export default function RootLayout() {
         >
           <QueryClientProvider client={queryClient}>
             <ToastProvider>
-              <DownloadFeedbackListener />
-              <SyncForegroundListener />
-              <Stack
+              <LibraryFilterProvider>
+                <DownloadFeedbackListener />
+                <SyncForegroundListener />
+                <Stack
               screenOptions={{
                 headerStyle: { backgroundColor: theme.colors.background },
                 headerTintColor: theme.colors.text,
@@ -81,10 +83,23 @@ export default function RootLayout() {
                 options={{ headerShown: false, presentation: 'fullScreenModal' }}
               />
               <Stack.Screen
+                name="library-filter"
+                options={{
+                  presentation: 'modal',
+                  headerTransparent: Platform.OS === 'ios',
+                  headerBlurEffect: 'dark',
+                  headerStyle: Platform.select({
+                    ios: { backgroundColor: 'transparent' },
+                    android: { backgroundColor: theme.colors.background },
+                  }),
+                }}
+              />
+              <Stack.Screen
                 name="settings"
                 options={{ headerShown: false, presentation: 'modal' }}
               />
             </Stack>
+            </LibraryFilterProvider>
             </ToastProvider>
           </QueryClientProvider>
         </SQLiteProvider>

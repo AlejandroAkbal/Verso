@@ -52,7 +52,7 @@ export function useOPDSCatalog(
   authUsername = '',
 ) {
   const db = useSQLiteContext();
-  const { books: cachedBooks, refresh: refreshCache } = useBooksCache(serverId);
+  const { books: cachedBooks, refresh: refreshCache, loading: cacheLoading } = useBooksCache(serverId);
 
   const query = useQuery({
     queryKey: ['opds-catalog', serverId, serverUrl, authUsername],
@@ -133,9 +133,11 @@ export function useOPDSCatalog(
     cachedBooks,
   ]);
 
+  const isQueryEnabled = Boolean(serverId && serverUrl);
+
   return {
     ...result,
-    isLoading: query.isLoading && cachedBooks.length === 0,
+    isLoading: cacheLoading || (isQueryEnabled && query.isLoading && cachedBooks.length === 0),
     isRefetching: query.isRefetching,
     refresh,
     refreshBooks,

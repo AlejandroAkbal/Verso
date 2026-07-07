@@ -26,6 +26,7 @@ export default function ReaderSettingsScreen() {
         paddingTop: 16,
         paddingBottom: insets.bottom + 48,
       }}
+      contentInsetAdjustmentBehavior="automatic"
     >
       <ReaderSettingsPanel
         prefs={prefs}

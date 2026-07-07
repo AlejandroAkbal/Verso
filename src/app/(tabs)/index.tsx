@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 import { BookCard } from '@/components/BookCard';
 import { SearchField } from '@/components/SearchField';
 import { LibraryFilterBar } from '@/components/library/LibraryFilterBar';
-import { LibrarySortFilterSheet } from '@/components/library/LibrarySortFilterSheet';
 import { LibraryFooter } from '@/components/LibraryFooter';
 import { LibraryHeader } from '@/components/library/LibraryHeader';
 import { ThemedText } from '@/components/ThemedText';
@@ -33,9 +32,8 @@ export default function LibraryScreen() {
   const { servers, loading: serversLoading } = useServers();
   const { activeServer, loading: activeServerLoading } = useActiveServer();
   const { downloads, refresh: refreshDownloads } = useDownloads();
-  const { progressByBookId, refresh: refreshProgress } = useReadingProgressMap();
+  const { progressByBookId, refresh: refreshProgress, loading: progressLoading } = useReadingProgressMap();
   const [searchQuery, setSearchQuery] = useState('');
-  const [isFilterSheetVisible, setFilterSheetVisible] = useState(false);
 
   const {
     books,
@@ -90,11 +88,6 @@ export default function LibraryScreen() {
   const {
     filter,
     setFilter,
-    categoryFilter,
-    setCategoryFilter,
-    sort,
-    setSort,
-    categoryOptions,
     visibleBooks,
     isFiltered,
   } = useLibraryFilters({
@@ -189,7 +182,7 @@ export default function LibraryScreen() {
   const listHeader = useMemo(
     () => (
       <Box style={{ paddingHorizontal: 20, paddingBottom: 8 }}>
-        <Box position="relative" marginBottom="md">
+        <Box position="relative" marginBottom="lg">
           <SearchField
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -208,11 +201,11 @@ export default function LibraryScreen() {
           setFilter={setFilter}
           isOffline={isOffline}
           isFiltered={isFiltered}
-          onOpenFilter={() => setFilterSheetVisible(true)}
+          onOpenFilter={() => router.push('/library-filter')}
         />
       </Box>
     ),
-    [searchQuery, remoteSearch.isFetching, theme.colors.textSecondary, t, filter, setFilter, isOffline, isFiltered],
+    [searchQuery, remoteSearch.isFetching, theme.colors.textSecondary, t, filter, setFilter, isOffline, isFiltered, router],
   );
 
   if (serversLoading || activeServerLoading) {
@@ -267,17 +260,7 @@ export default function LibraryScreen() {
         topInset={insets.top}
       />
 
-      <LibrarySortFilterSheet
-        visible={isFilterSheetVisible}
-        onClose={() => setFilterSheetVisible(false)}
-        sort={sort}
-        setSort={setSort}
-        categoryFilter={categoryFilter}
-        setCategoryFilter={setCategoryFilter}
-        categoryOptions={categoryOptions}
-      />
-
-      {isLoading ? (
+      {isLoading || progressLoading ? (
         <Box flex={1} alignItems="center" justifyContent="center" padding="lg" gap="md">
           <ActivityIndicator color={theme.colors.text} />
         </Box>
@@ -292,8 +275,10 @@ export default function LibraryScreen() {
           ListHeaderComponent={listHeader}
           ListFooterComponent={visibleBooks.length > 0 ? listFooter : null}
           contentContainerStyle={{
+            paddingTop: insets.top + 78,
             paddingBottom: insets.bottom + 24,
           }}
+          scrollIndicatorInsets={{ top: insets.top + 78 }}
           ListEmptyComponent={
             <Box alignItems="center" paddingVertical="xxl" paddingHorizontal="lg">
               <ThemedText color={theme.colors.textSecondary}>

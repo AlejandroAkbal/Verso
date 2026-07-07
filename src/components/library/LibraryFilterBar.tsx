@@ -46,8 +46,8 @@ export function LibraryFilterBar({
           testID="library-filter"
           alignItems="center"
           justifyContent="center"
-          width={36}
-          height={36}
+          width={34}
+          height={34}
           borderRadius="full"
           backgroundColor={isFiltered ? 'groupedBackground' : 'surfaceElevated'}
           hitSlop={8}

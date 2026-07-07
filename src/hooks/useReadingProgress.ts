@@ -9,10 +9,17 @@ export function useReadingProgressMap() {
   const [progressByBookId, setProgressByBookId] = useState<
     Map<string, ReadingProgressRow>
   >(new Map());
+  const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    const rows = await getAllReadingProgress(db);
-    setProgressByBookId(new Map(rows.map((row) => [row.book_id, row])));
+    try {
+      const rows = await getAllReadingProgress(db);
+      setProgressByBookId(new Map(rows.map((row) => [row.book_id, row])));
+    } catch (e) {
+      console.error('Failed to load reading progress:', e);
+    } finally {
+      setLoading(false);
+    }
   }, [db]);
 
   useEffect(() => {
@@ -25,5 +32,5 @@ export function useReadingProgressMap() {
     return () => clearInterval(interval);
   }, [refresh]);
 
-  return { progressByBookId, refresh };
+  return { progressByBookId, loading, refresh };
 }

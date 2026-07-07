@@ -10,11 +10,16 @@ export function useBooksCache(serverId?: string) {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    const rows = serverId
-      ? await getBooksByServerId(db, serverId)
-      : await getAllCachedBooks(db);
-    setBooks(rows);
-    setLoading(false);
+    try {
+      const rows = serverId
+        ? await getBooksByServerId(db, serverId)
+        : await getAllCachedBooks(db);
+      setBooks(rows);
+    } catch (e) {
+      console.error('Failed to load books cache:', e);
+    } finally {
+      setLoading(false);
+    }
   }, [db, serverId]);
 
   useEffect(() => {

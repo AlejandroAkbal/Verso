@@ -10,6 +10,10 @@ appId: dev.akbal.opdsreader
 - extendedWaitUntil:
     visible: "Library"
     timeout: 90000
+- swipe:
+    start: "364, 88"
+    end: "200, 88"
+    duration: 1000
 - tapOn:
     id: "library-settings"
 - extendedWaitUntil:
