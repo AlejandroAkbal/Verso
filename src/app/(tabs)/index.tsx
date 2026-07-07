@@ -164,7 +164,7 @@ export default function LibraryScreen() {
   );
 
   const renderItem = useCallback(
-    ({ item }: { item: BookRow }) => {
+    ({ item, index }: { item: BookRow; index: number }) => {
       const download = downloadsByBookId.get(item.id) ?? null;
       const isOnDevice = downloadedIds.has(item.id);
       const dimmed = isOffline && !isOnDevice;
@@ -178,6 +178,7 @@ export default function LibraryScreen() {
             download={download}
             readingProgress={progressByBookId.get(item.id)}
             dimmed={dimmed}
+            index={index}
           />
         </Box>
       );
@@ -187,8 +188,8 @@ export default function LibraryScreen() {
 
   const listHeader = useMemo(
     () => (
-      <Box gap="md" style={{ paddingHorizontal: 20, paddingBottom: 12 }}>
-        <Box position="relative">
+      <Box style={{ paddingHorizontal: 20, paddingBottom: 8 }}>
+        <Box position="relative" marginBottom="sm">
           <SearchField
             value={searchQuery}
             onChangeText={setSearchQuery}

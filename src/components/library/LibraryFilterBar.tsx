@@ -19,7 +19,7 @@ export function LibraryFilterBar({
   const { t } = useTranslation();
 
   return (
-    <Box paddingTop="xs" style={{ paddingBottom: 12 }} gap="sm">
+    <Box style={{ paddingBottom: 8 }}>
       <ScrollBox
         horizontal
         showsHorizontalScrollIndicator={false}

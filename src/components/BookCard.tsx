@@ -1,3 +1,4 @@
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +30,8 @@ type BookCardProps = {
   readingProgress?: ReadingProgressRow;
   /** Reduced opacity when the book is unavailable offline. */
   dimmed?: boolean;
+  /** List index used for stagger entrance animation. */
+  index?: number;
 };
 
 export function BookCard({
@@ -38,6 +41,7 @@ export function BookCard({
   download = null,
   readingProgress,
   dimmed = false,
+  index = 0,
 }: BookCardProps) {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -60,68 +64,73 @@ export function BookCard({
 
   const frameStyle = coverFrameStyle(theme);
 
+  // Stagger entrance: cap delay at 200ms so deep-list items don't wait
+  const entranceDelay = Math.min(index * 18, 200);
+
   return (
-    <Box
-      opacity={
-        dimmed ? theme.opacity.dimmed : finished ? theme.opacity.finished : 1
-      }
-      width={width}
+    <Animated.View
+      entering={FadeInDown.delay(entranceDelay).duration(220).springify().damping(16)}
     >
-      <Box overflow="hidden" width={width} style={frameStyle}>
-        <Box position="relative" width={width} height={coverHeight}>
-          <PressableBox
-            position="absolute"
-            top={0}
-            right={0}
-            bottom={0}
-            left={0}
-            onPress={() => router.push(`/book/${book.id}`)}
-          >
-            {!coverLoaded ? (
-              <Box
-                position="absolute"
-                top={0}
-                right={0}
-                bottom={0}
-                left={0}
-                backgroundColor="surfaceElevated"
+      <Box
+        opacity={
+          dimmed ? theme.opacity.dimmed : finished ? theme.opacity.finished : 1
+        }
+        width={width}
+      >
+        <Box overflow="hidden" width={width} style={frameStyle}>
+          <Box position="relative" width={width} height={coverHeight}>
+            <PressableBox
+              position="absolute"
+              top={0}
+              right={0}
+              bottom={0}
+              left={0}
+              onPress={() => router.push(`/book/${book.id}`)}
+            >
+              {!coverLoaded ? (
+                <Box
+                  position="absolute"
+                  top={0}
+                  right={0}
+                  bottom={0}
+                  left={0}
+                  backgroundColor="surfaceElevated"
+                />
+              ) : null}
+              <ImageBox
+                key={coverKey}
+                source={{
+                  uri: book.cover_url,
+                  headers: Object.keys(authHeaders).length > 0 ? authHeaders : undefined,
+                }}
+                width="100%"
+                height="100%"
+                backgroundColor="surface"
+                contentFit="cover"
+                placeholder={book.blurhash ? { blurhash: book.blurhash } : undefined}
+                transition={200}
+                onLoad={() => setLoadedCoverKey(coverKey)}
+                onError={() => setLoadedCoverKey(coverKey)}
               />
+            </PressableBox>
+            {isNew ? <BookBadge label={t('book.new')} /> : null}
+            {showDownloadControl ? (
+              <Box position="absolute" right={6} bottom={inProgress ? 28 : 6}>
+                <CloudDownloadButton
+                  key={book.id}
+                  bookId={book.id}
+                  download={download}
+                />
+              </Box>
             ) : null}
-            <ImageBox
-              key={coverKey}
-              source={{
-                uri: book.cover_url,
-                headers: Object.keys(authHeaders).length > 0 ? authHeaders : undefined,
-              }}
-              width="100%"
-              height="100%"
-              backgroundColor="surface"
-              contentFit="cover"
-              placeholder={book.blurhash ? { blurhash: book.blurhash } : undefined}
-              transition={200}
-              onLoad={() => setLoadedCoverKey(coverKey)}
-              onError={() => setLoadedCoverKey(coverKey)}
-            />
-          </PressableBox>
-          {isNew ? <BookBadge label={t('book.new')} /> : null}
-          {showDownloadControl ? (
-            <Box position="absolute" right={6} bottom={6}>
-              <CloudDownloadButton
-                key={book.id}
-                bookId={book.id}
-                download={download}
-              />
-            </Box>
-          ) : null}
+            {/* Progress / finished overlays are inside the cover, not below it */}
+            {inProgress ? (
+              <BookProgressFooterBand percent={percent ?? 0} />
+            ) : null}
+            {finished ? <BookFinishedFooterBand label={t('progress.finished')} /> : null}
+          </Box>
         </Box>
-        {inProgress ? (
-          <BookProgressFooterBand
-            percent={percent ?? 0}
-            label={t('progress.percent', { percent: percent ?? 0 })}
-          />
-        ) : null}
-        {finished ? <BookFinishedFooterBand label={t('progress.finished')} /> : null}
       </Box>
-    </Box>
+    </Animated.View>
   );
 }

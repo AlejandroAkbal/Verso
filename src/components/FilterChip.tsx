@@ -25,13 +25,12 @@ export function FilterChip({ label, selected, onPress, style }: FilterChipProps)
         {
           alignSelf: 'flex-start',
           flexShrink: 0,
+          height: 34,
           paddingHorizontal: 14,
-          paddingVertical: 8,
           borderRadius: 999,
-          borderWidth: 0.5,
           overflow: 'hidden',
-          backgroundColor: selected ? theme.colors.secondary : 'transparent',
-          borderColor: theme.colors.border,
+          justifyContent: 'center',
+          backgroundColor: selected ? theme.colors.accentMuted : theme.colors.surfaceElevated,
           opacity: pressed ? 0.75 : 1,
         },
         style,
@@ -39,6 +38,7 @@ export function FilterChip({ label, selected, onPress, style }: FilterChipProps)
     >
       <ThemedText
         variant="caption"
+        style={{ fontWeight: selected ? '600' : '400' }}
         color={selected ? theme.colors.text : theme.colors.textSecondary}
         numberOfLines={1}
       >

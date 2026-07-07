@@ -158,7 +158,6 @@ export default function BookDetailScreen() {
             {showProgress ? (
               <BookProgressFooterBand
                 percent={percent ?? 0}
-                label={t('progress.continue', { percent: percent ?? 0 })}
               />
             ) : null}
             {finished ? <BookFinishedFooterBand label={t('progress.finished')} /> : null}

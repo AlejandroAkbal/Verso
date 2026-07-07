@@ -78,22 +78,44 @@ export function LibrarySortFilterSheet({
                     flexDirection="row"
                     alignItems="center"
                     justifyContent="space-between"
-                    padding="md"
-                    backgroundColor={sort === opt.value ? 'surfaceElevated' : undefined}
                     style={{
-                      borderBottomWidth: index < sortOptions.length - 1 ? 1 : 0,
-                      borderBottomColor: theme.colors.border,
+                      paddingVertical: 14,
+                      paddingHorizontal: 16,
+                      borderBottomWidth: index < sortOptions.length - 1 ? 0.5 : 0,
+                      borderBottomColor: theme.colors.separator,
+                      position: 'relative',
                     }}
                     onPress={() => setSort(opt.value)}
                   >
-                    <Box flexDirection="row" alignItems="center" gap="md">
-                      <SymbolView name={opt.icon as any} size={20} tintColor={sort === opt.value ? theme.colors.primary : theme.colors.textSecondary} />
-                      <ThemedText style={{ fontWeight: sort === opt.value ? '600' : '400' }} color={sort === opt.value ? theme.colors.primary : theme.colors.text}>
+                    {/* Left accent bar for selected row */}
+                    {sort === opt.value ? (
+                      <Box
+                        style={{
+                          position: 'absolute',
+                          left: 0,
+                          top: 8,
+                          bottom: 8,
+                          width: 3,
+                          borderRadius: 2,
+                          backgroundColor: theme.colors.primary,
+                        }}
+                      />
+                    ) : null}
+                    <Box flexDirection="row" alignItems="center" gap="md" style={{ paddingLeft: sort === opt.value ? 8 : 0 }}>
+                      <SymbolView
+                        name={opt.icon as any}
+                        size={20}
+                        tintColor={sort === opt.value ? theme.colors.primary : theme.colors.textSecondary}
+                      />
+                      <ThemedText
+                        style={{ fontWeight: sort === opt.value ? '600' : '400' }}
+                        color={sort === opt.value ? theme.colors.primary : theme.colors.text}
+                      >
                         {opt.label}
                       </ThemedText>
                     </Box>
                     {sort === opt.value ? (
-                      <SymbolView name="checkmark" size={16} tintColor={theme.colors.primary} />
+                      <SymbolView name="checkmark" size={14} tintColor={theme.colors.primary} />
                     ) : null}
                   </PressableBox>
                 ))}
