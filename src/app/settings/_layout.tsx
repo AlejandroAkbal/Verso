@@ -1,11 +1,13 @@
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { ToastProvider } from '@/components/toast/ToastProvider';
+import { PressableBox, Text } from '@/components/ui';
 import { theme } from '@/theme/theme';
 
 export default function SettingsLayout() {
   const { t } = useTranslation();
+  const router = useRouter();
 
   return (
     <ToastProvider>
@@ -21,7 +23,13 @@ export default function SettingsLayout() {
       <Stack.Screen
         name="index"
         options={{
-          headerShown: false,
+          title: t('settings.title'),
+          headerLargeTitle: false,
+          headerRight: () => (
+            <PressableBox onPress={() => router.back()} hitSlop={12}>
+              <Text style={{ color: theme.colors.interactive, fontSize: 17, fontWeight: '600' }}>{t('common.done')}</Text>
+            </PressableBox>
+          ),
         }}
       />
       <Stack.Screen

@@ -1,5 +1,5 @@
-import { Modal } from 'react-native';
 import { SymbolView } from 'expo-symbols';
+import { Modal } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -60,18 +60,12 @@ export function LibrarySortFilterSheet({
           marginBottom="md"
         >
           <ThemedText variant="title">{t('library.sortAndFilter', 'Sort & Filter')}</ThemedText>
-          <PressableBox
-            onPress={onClose}
-            hitSlop={8}
-            testID="close-filter-sheet"
-            alignItems="center"
-            justifyContent="center"
-            width={36}
-            height={36}
-            borderRadius="full"
-            backgroundColor="surfaceElevated"
-          >
-            <SymbolView name="xmark" size={18} tintColor={theme.colors.textSecondary} />
+          <PressableBox onPress={onClose} hitSlop={12} testID="close-filter-sheet">
+            <ThemedText
+              style={{ color: theme.colors.interactive, fontSize: 17, fontWeight: '600' }}
+            >
+              {t('common.done')}
+            </ThemedText>
           </PressableBox>
         </Box>
 

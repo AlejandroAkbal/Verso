@@ -12,8 +12,6 @@ type LibraryHeaderProps = {
   isRefreshing: boolean;
   onRefresh: () => void;
   onOpenSettings: () => void;
-  onOpenFilter: () => void;
-  isFiltered: boolean;
   topInset: number;
 };
 
@@ -22,8 +20,6 @@ export function LibraryHeader({
   isRefreshing,
   onRefresh,
   onOpenSettings,
-  onOpenFilter,
-  isFiltered,
   topInset,
 }: LibraryHeaderProps) {
   const theme = useTheme();
@@ -84,26 +80,6 @@ export function LibraryHeader({
                   importantForAccessibility="no-hide-descendants"
                 />
               )}
-            </PressableBox>
-            <PressableBox
-              onPress={onOpenFilter}
-              accessibilityRole="button"
-              accessibilityLabel={t('library.sortAndFilter', 'Sort & Filter')}
-              testID="library-filter"
-              alignItems="center"
-              justifyContent="center"
-              width={36}
-              height={36}
-              borderRadius="full"
-              backgroundColor={isFiltered ? 'groupedBackground' : 'surfaceElevated'}
-              hitSlop={8}
-            >
-              <SymbolView
-                name="line.3.horizontal.decrease"
-                size={18}
-                tintColor={isFiltered ? theme.colors.primary : theme.colors.textSecondary}
-                importantForAccessibility="no-hide-descendants"
-              />
             </PressableBox>
             <PressableBox
               onPress={onOpenSettings}

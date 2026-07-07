@@ -17,6 +17,7 @@ Library-UX features, now sitting on the refactored base (see `docs/superpowers/s
 - [ ] Design-polish pass (Infuse / Apple Music / Apple Books cues).
 - [ ] Android Maestro E2E: run the shared flows on a booted emulator (tooling/docs ready; needs Android SDK + AVD locally, or an emulator CI runner).
 - [ ] Publish a prebuilt dev-client artifact so CI `ios-smoke` skips the ~30 min native build.
+- [ ] Audit application for non-native UI components or custom routing (e.g., custom headers on page sheets) and refactor to use native patterns.
 
 ## Later
 

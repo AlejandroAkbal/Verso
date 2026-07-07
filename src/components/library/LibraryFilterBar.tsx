@@ -2,21 +2,28 @@ import { useTranslation } from 'react-i18next';
 
 import { FilterChip } from '@/components/FilterChip';
 import { OfflineBanner } from '@/components/OfflineBanner';
-import { Box, ScrollBox } from '@/components/ui';
+import { Box, ScrollBox, PressableBox } from '@/components/ui';
 import type { LibraryFilter } from '@/hooks/useLibraryFilters';
+import { SymbolView } from 'expo-symbols';
+import { useTheme } from '@/theme/ThemeProvider';
 
 type LibraryFilterBarProps = {
   filter: LibraryFilter;
   setFilter: (filter: LibraryFilter) => void;
   isOffline: boolean;
+  isFiltered: boolean;
+  onOpenFilter: () => void;
 };
 
 export function LibraryFilterBar({
   filter,
   setFilter,
   isOffline,
+  isFiltered,
+  onOpenFilter,
 }: LibraryFilterBarProps) {
   const { t } = useTranslation();
+  const theme = useTheme();
 
   return (
     <Box style={{ paddingBottom: 8 }}>
@@ -32,6 +39,26 @@ export function LibraryFilterBar({
           paddingVertical: 2,
         }}
       >
+        <PressableBox
+          onPress={onOpenFilter}
+          accessibilityRole="button"
+          accessibilityLabel={t('library.sortAndFilter', 'Sort & Filter')}
+          testID="library-filter"
+          alignItems="center"
+          justifyContent="center"
+          width={36}
+          height={36}
+          borderRadius="full"
+          backgroundColor={isFiltered ? 'groupedBackground' : 'surfaceElevated'}
+          hitSlop={8}
+        >
+          <SymbolView
+            name="line.3.horizontal.decrease"
+            size={18}
+            tintColor={isFiltered ? theme.colors.primary : theme.colors.textSecondary}
+            importantForAccessibility="no-hide-descendants"
+          />
+        </PressableBox>
         <FilterChip
           label={t('library.filterAll')}
           selected={filter === 'all'}

@@ -1,5 +1,4 @@
 import { Modal } from 'react-native';
-import { SymbolView } from 'expo-symbols';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -49,17 +48,12 @@ export function ReaderSettingsSheet({
           marginBottom="md"
         >
           <ThemedText variant="title">{t('reader.settingsTitle')}</ThemedText>
-          <PressableBox
-            onPress={onClose}
-            hitSlop={8}
-            alignItems="center"
-            justifyContent="center"
-            width={36}
-            height={36}
-            borderRadius="full"
-            backgroundColor="surfaceElevated"
-          >
-            <SymbolView name="xmark" size={18} tintColor={theme.colors.textSecondary} />
+          <PressableBox onPress={onClose} hitSlop={12}>
+            <ThemedText
+              style={{ color: theme.colors.interactive, fontSize: 17, fontWeight: '600' }}
+            >
+              {t('common.done')}
+            </ThemedText>
           </PressableBox>
         </Box>
 

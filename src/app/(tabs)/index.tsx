@@ -189,7 +189,7 @@ export default function LibraryScreen() {
   const listHeader = useMemo(
     () => (
       <Box style={{ paddingHorizontal: 20, paddingBottom: 8 }}>
-        <Box position="relative" marginBottom="sm">
+        <Box position="relative" marginBottom="md">
           <SearchField
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -207,10 +207,12 @@ export default function LibraryScreen() {
           filter={filter}
           setFilter={setFilter}
           isOffline={isOffline}
+          isFiltered={isFiltered}
+          onOpenFilter={() => setFilterSheetVisible(true)}
         />
       </Box>
     ),
-    [searchQuery, remoteSearch.isFetching, theme.colors.textSecondary, t, filter, setFilter, isOffline],
+    [searchQuery, remoteSearch.isFetching, theme.colors.textSecondary, t, filter, setFilter, isOffline, isFiltered],
   );
 
   if (serversLoading || activeServerLoading) {
@@ -262,8 +264,6 @@ export default function LibraryScreen() {
         isRefreshing={isLibraryRefreshing}
         onRefresh={() => void refreshLibrary()}
         onOpenSettings={() => router.push('/settings')}
-        onOpenFilter={() => setFilterSheetVisible(true)}
-        isFiltered={isFiltered}
         topInset={insets.top}
       />
 

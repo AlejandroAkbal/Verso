@@ -1,4 +1,3 @@
-import { SymbolView } from 'expo-symbols';
 import { useMemo } from 'react';
 import { Modal } from 'react-native';
 import type { Link } from 'react-native-readium';
@@ -53,17 +52,12 @@ export function ReaderTocModal({
           marginBottom="md"
         >
           <ThemedText variant="title">{t('reader.tableOfContents')}</ThemedText>
-          <PressableBox
-            onPress={onClose}
-            hitSlop={8}
-            alignItems="center"
-            justifyContent="center"
-            width={36}
-            height={36}
-            borderRadius="full"
-            backgroundColor="surfaceElevated"
-          >
-            <SymbolView name="xmark" size={18} tintColor={theme.colors.textSecondary} />
+          <PressableBox onPress={onClose} hitSlop={12}>
+            <ThemedText
+              style={{ color: theme.colors.interactive, fontSize: 17, fontWeight: '600' }}
+            >
+              {t('common.done')}
+            </ThemedText>
           </PressableBox>
         </Box>
         {entries.length === 0 ? (
