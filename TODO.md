@@ -15,8 +15,7 @@ Library-UX features, now sitting on the refactored base (see `docs/superpowers/s
 - [x] Collapsing / non-sticky search bar (iOS large-title behavior) that reads well on Android too.
 - [x] Cancel an in-progress download by tapping its control again (stop + revert to cloud).
 - [ ] Design-polish pass (Infuse / Apple Music / Apple Books cues).
-- [ ] Android Maestro E2E: run the shared flows on a booted emulator (tooling/docs ready; needs Android SDK + AVD locally, or an emulator CI runner).
-- [ ] Publish a prebuilt dev-client artifact so CI `ios-smoke` skips the ~30 min native build.
+- [ ] Android Maestro E2E: run the shared flows on a booted emulator locally (tooling/docs ready; needs Android SDK + AVD).
 - [ ] Audit application for non-native UI components or custom routing (e.g., custom headers on page sheets) and refactor to use native patterns.
 
 ## Later
@@ -31,7 +30,7 @@ Library-UX features, now sitting on the refactored base (see `docs/superpowers/s
 - [x] KOReader sync verified end-to-end against CWA `/kosync` (auth, pull, push round-trip); fixed a `NOT NULL` crash on `book_sync_state.remote_progress` and surfaced server error bodies (e.g. "KOReader sync is disabled").
 - [x] Per-book sync status on detail screen ("Synced 2m ago", relative time, error state).
 - [x] Maestro `reader-open.yaml` (download → read → reader open → back) + `reader-screen` / `reader-back` testIDs; conflict-prompt handling documented.
-- [x] CI `e2e.yml`: static typecheck/lint + macOS iOS Maestro smoke; `e2e:android` script + Android E2E docs.
+- [x] Local E2E harness: Maestro flows + `e2e:ios`/`e2e:android` scripts + docs. (No GitHub Actions pipeline — testing is local-only on our own devices; the old `e2e.yml` workflow was removed.)
 - [x] Restyle migration, cover skeletons, NEW badges, onboarding, haptics.
 - [x] KOReader sync v1 (Settings, push/pull, conflict prompt, Readium locators).
 - [x] Auto-launch/resume last book, OPDS summary links, research docs.

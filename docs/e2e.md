@@ -47,8 +47,7 @@ labels, so the same YAML runs on Android. To run them:
 4. Start Metro (`pnpm start`) and run: `pnpm e2e:android` (or `maestro --device emulator-5554 test .maestro/`).
 
 `pnpm e2e:android` runs the same flow set as iOS; Maestro targets whichever device is booted.
-Pass `--device` when both an emulator and a simulator are connected. CI for Android (an emulator
-job on a Linux runner) is tracked in `TODO.md`.
+Pass `--device` when both an emulator and a simulator are connected.
 
 ## Flows
 
@@ -81,16 +80,8 @@ remote progress that conflicts with local. To exercise it end to end:
 - Optional `tapOn: Reload` when the dev client may be stale.
 - **No Jest / Vitest / component tests** unless explicitly requested — extend Maestro instead.
 
-## CI
+## Where tests run
 
-`.github/workflows/e2e.yml`:
-
-- **`static`** (Ubuntu, every push/PR): `pnpm typecheck` + `pnpm lint`.
-- **`ios-smoke`** (macOS, push to `main` / manual): builds the simulator dev client
-  (`eas build --local --profile development-simulator`), boots a simulator, starts Metro,
-  and runs the fresh-install-safe flows (`library-smoke`, `settings-smoke`).
-
-Requires an **`EXPO_TOKEN`** repo secret for the local EAS build. Download / reader / KOReader
-flows need an authenticated server, so they stay local-only (not in CI). To skip rebuilding the
-native client each run, publish a dev-client artifact and swap the build step for a download.
-Android flows are tracked in `TODO.md`.
+Local only, on our own simulators/emulators — there is no GitHub Actions pipeline. Run
+`pnpm typecheck` + `pnpm lint` and the Maestro flows on a booted device before shipping
+user-visible changes.
