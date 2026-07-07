@@ -4,7 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { SQLiteProvider } from 'expo-sqlite';
 import { Stack } from 'expo-router';
 import { Suspense, useEffect } from 'react';
-import { ActivityIndicator, Platform } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import 'react-native-reanimated';
 
@@ -19,6 +19,7 @@ import { queryClient } from '@/lib/queryClient';
 import { registerBackgroundDownloadTask } from '@/services/downloads/task';
 import { LibraryFilterProvider } from '@/context/LibraryFilterContext';
 import { AppThemeProvider } from '@/theme/ThemeProvider';
+import { nativeModalHeaderOptions } from '@/theme/nativeModal';
 import { theme } from '@/theme/theme';
 
 export { ErrorBoundary } from 'expo-router';
@@ -84,15 +85,7 @@ export default function RootLayout() {
               />
               <Stack.Screen
                 name="library-filter"
-                options={{
-                  presentation: 'modal',
-                  headerTransparent: Platform.OS === 'ios',
-                  headerBlurEffect: 'dark',
-                  headerStyle: Platform.select({
-                    ios: { backgroundColor: 'transparent' },
-                    android: { backgroundColor: theme.colors.background },
-                  }),
-                }}
+                options={{ presentation: 'modal', ...nativeModalHeaderOptions(theme) }}
               />
               <Stack.Screen
                 name="settings"

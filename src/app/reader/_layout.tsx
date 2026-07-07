@@ -1,11 +1,11 @@
 import { Stack, useRouter } from 'expo-router';
-import { Platform } from 'react-native';
 import { useRef, useCallback, useState } from 'react';
 import type { Link, ReadiumViewRef, Locator } from 'react-native-readium';
 
 import { ReaderContext } from '@/context/ReaderContext';
 import { useReaderPreferences } from '@/hooks/useReaderPreferences';
 import { lightImpactHaptic } from '@/lib/haptics';
+import { nativeModalHeaderOptions } from '@/theme/nativeModal';
 import { useTheme } from '@/theme/ThemeProvider';
 
 function linkToLocator(link: Link): Locator {
@@ -43,14 +43,7 @@ export default function ReaderLayout() {
     >
       <Stack
         screenOptions={{
-          headerTransparent: Platform.OS === 'ios',
-          headerBlurEffect: 'dark',
-          headerStyle: Platform.select({
-            ios: { backgroundColor: 'transparent' },
-            android: { backgroundColor: theme.colors.background },
-          }),
-          headerTintColor: theme.colors.text,
-          headerShadowVisible: false,
+          ...nativeModalHeaderOptions(theme),
           contentStyle: { backgroundColor: theme.colors.background },
         }}
       >
