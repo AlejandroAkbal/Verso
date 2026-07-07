@@ -5,10 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { ThemedText } from '@/components/ThemedText';
 import { Box, PressableBox } from '@/components/ui';
 import type { BookRow, DownloadRow } from '@/db/schema';
-import {
-  formatStorageSize,
-  resolveDownloadLocalUri,
-} from '@/services/downloads/manage';
+import { formatStorageSize } from '@/services/downloads/manage';
+import { resolveDownloadLocalUri } from '@/services/downloads/paths';
 import { formatLabelFromMime, shareDownloadedBookFile } from '@/services/downloads/share';
 import { useTheme } from '@/theme/ThemeProvider';
 

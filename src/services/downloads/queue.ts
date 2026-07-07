@@ -1,4 +1,4 @@
-import { Directory, File, Paths } from 'expo-file-system';
+import { File } from 'expo-file-system';
 import * as LegacyFS from 'expo-file-system/legacy';
 import type { SQLiteDatabase } from 'expo-sqlite';
 
@@ -20,22 +20,10 @@ import {
 } from '@/services/opds/parser';
 import { notifyDownloadsChanged } from '@/services/downloads/changes';
 import { ensureBookDocumentId } from '@/services/koreader/syncBook';
-
-export const DOWNLOADS_DIR_NAME = 'books';
+import { ensureDownloadsDirectory, getDownloadsDirectory } from './paths';
 
 const MAX_CONCURRENT = 2;
 const PROGRESS_WRITE_MS = 400;
-
-export function getDownloadsDirectory(): Directory {
-  return new Directory(Paths.document, DOWNLOADS_DIR_NAME);
-}
-
-export function ensureDownloadsDirectory(): void {
-  const dir = getDownloadsDirectory();
-  if (!dir.exists) {
-    dir.create({ intermediates: true });
-  }
-}
 
 function getExtensionFromMime(mime: string, url: string): string {
   if (mime.includes('epub') || url.endsWith('.epub')) return '.epub';

@@ -33,7 +33,7 @@ import {
   progressionFromLocator,
   progressPercent,
 } from '@/lib/readingProgress';
-import { resolveDownloadLocalUri } from '@/services/downloads/manage';
+import { resolveDownloadLocalUri } from '@/services/downloads/paths';
 import {
   applyRemotePercentage,
   pullRemoteProgressForBook,

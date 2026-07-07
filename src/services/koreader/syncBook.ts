@@ -14,7 +14,7 @@ import {
   upsertSyncAccount,
 } from '@/db/queries';
 import type { DocumentIdMode } from '@/db/schema';
-import { resolveDownloadLocalUri } from '@/services/downloads/manage';
+import { resolveDownloadLocalUri } from '@/services/downloads/paths';
 import { showSyncErrorToast } from '@/lib/toast';
 
 import { setKoreaderPassword } from './credentials';
