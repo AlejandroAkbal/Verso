@@ -1,0 +1,116 @@
+import { SymbolView } from 'expo-symbols';
+import { ActivityIndicator } from 'react-native';
+import { useTranslation } from 'react-i18next';
+
+import { SearchField } from '@/components/SearchField';
+import { ThemedText } from '@/components/ThemedText';
+import { Box, PressableBox } from '@/components/ui';
+import { useTheme } from '@/theme/ThemeProvider';
+
+type LibraryHeaderProps = {
+  subtitle: string;
+  isRefreshing: boolean;
+  onRefresh: () => void;
+  onOpenSettings: () => void;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
+  isSearching: boolean;
+  topInset: number;
+};
+
+export function LibraryHeader({
+  subtitle,
+  isRefreshing,
+  onRefresh,
+  onOpenSettings,
+  searchQuery,
+  onSearchChange,
+  isSearching,
+  topInset,
+}: LibraryHeaderProps) {
+  const theme = useTheme();
+  const { t } = useTranslation();
+
+  return (
+    <Box
+      gap="md"
+      style={{ paddingHorizontal: 20, paddingBottom: 12, paddingTop: topInset + 4 }}
+    >
+      <Box flexDirection="row" alignItems="flex-start" justifyContent="space-between">
+        <Box flex={1} gap="xs" style={{ paddingRight: 12 }}>
+          <ThemedText
+            style={{ fontSize: 34, fontWeight: '700', letterSpacing: -0.4, lineHeight: 40 }}
+          >
+            {t('library.title')}
+          </ThemedText>
+          <ThemedText variant="caption" color={theme.colors.textMuted}>
+            {subtitle}
+          </ThemedText>
+        </Box>
+        <Box flexDirection="row" alignItems="center" gap="sm" marginTop="xs">
+          <PressableBox
+            onPress={onRefresh}
+            disabled={isRefreshing}
+            accessibilityRole="button"
+            accessibilityLabel={t('library.refresh')}
+            testID="library-refresh"
+            alignItems="center"
+            justifyContent="center"
+            width={36}
+            height={36}
+            borderRadius="full"
+            backgroundColor="surfaceElevated"
+            hitSlop={8}
+            opacity={isRefreshing ? 0.6 : 1}
+          >
+            {isRefreshing ? (
+              <ActivityIndicator color={theme.colors.textSecondary} size="small" />
+            ) : (
+              <SymbolView
+                name="arrow.clockwise"
+                size={18}
+                tintColor={theme.colors.textSecondary}
+                importantForAccessibility="no-hide-descendants"
+              />
+            )}
+          </PressableBox>
+          <PressableBox
+            onPress={onOpenSettings}
+            accessibilityRole="button"
+            accessibilityLabel={t('library.openSettings')}
+            testID="library-settings"
+            alignItems="center"
+            justifyContent="center"
+            width={36}
+            height={36}
+            borderRadius="full"
+            backgroundColor="surfaceElevated"
+            hitSlop={8}
+          >
+            <SymbolView
+              name="gearshape"
+              size={18}
+              tintColor={theme.colors.textSecondary}
+              importantForAccessibility="no-hide-descendants"
+            />
+          </PressableBox>
+        </Box>
+      </Box>
+
+      <Box position="relative">
+        <SearchField
+          value={searchQuery}
+          onChangeText={onSearchChange}
+          placeholder={t('library.searchPlaceholder')}
+        />
+        {isSearching ? (
+          <ActivityIndicator
+            color={theme.colors.textSecondary}
+            size="small"
+            style={{ position: 'absolute', right: 14, top: 14 }}
+          />
+        ) : null}
+      </Box>
+    </Box>
+  );
+}

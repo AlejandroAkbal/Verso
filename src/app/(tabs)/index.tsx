@@ -4,39 +4,23 @@ import { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { SymbolView } from 'expo-symbols';
 
 import { BookCard } from '@/components/BookCard';
-import { FilterChip } from '@/components/FilterChip';
+import { LibraryFilterBar } from '@/components/library/LibraryFilterBar';
 import { LibraryFooter } from '@/components/LibraryFooter';
-import { OfflineBanner } from '@/components/OfflineBanner';
-import { SearchField } from '@/components/SearchField';
+import { LibraryHeader } from '@/components/library/LibraryHeader';
 import { ThemedText } from '@/components/ThemedText';
-import { Box, PressableBox, ScrollBox } from '@/components/ui';
+import { Box, PressableBox } from '@/components/ui';
 import { useDownloads } from '@/db/hooks/useDownloads';
 import { useActiveServer } from '@/db/hooks/useActiveServer';
 import { useServers } from '@/db/hooks/useServers';
-import {
-  parseBookCategories,
-  useOPDSCatalog,
-  useOPDSSearch,
-} from '@/hooks/useOPDSCatalog';
+import { useOPDSCatalog, useOPDSSearch } from '@/hooks/useOPDSCatalog';
 import { useReadingProgressMap } from '@/hooks/useReadingProgress';
+import { useLibraryFilters } from '@/hooks/useLibraryFilters';
 import { useLibraryRefresh } from '@/hooks/useLibraryRefresh';
 import { isFinished, progressPercent } from '@/lib/readingProgress';
 import type { BookRow, DownloadRow } from '@/db/schema';
 import { useTheme } from '@/theme/ThemeProvider';
-
-type LibraryFilter = 'all' | 'on-device';
-
-function matchesSearch(book: BookRow, query: string): boolean {
-  const normalized = query.trim().toLowerCase();
-  if (!normalized) return true;
-  return (
-    book.title.toLowerCase().includes(normalized) ||
-    book.author.toLowerCase().includes(normalized)
-  );
-}
 
 export default function LibraryScreen() {
   const theme = useTheme();
@@ -48,16 +32,18 @@ export default function LibraryScreen() {
   const { activeServer, loading: activeServerLoading } = useActiveServer();
   const { downloads, refresh: refreshDownloads } = useDownloads();
   const { progressByBookId, refresh: refreshProgress } = useReadingProgressMap();
-  const [filter, setFilter] = useState<LibraryFilter>('all');
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { books, isOffline, isLoading, isRefetching, refresh, refreshBooks, error, searchUrl } =
-    useOPDSCatalog(
-      activeServer?.id,
-      activeServer?.url,
-      activeServer?.auth_username,
-    );
+  const {
+    books,
+    isOffline,
+    isLoading,
+    isRefetching,
+    refresh,
+    refreshBooks,
+    error,
+    searchUrl,
+  } = useOPDSCatalog(activeServer?.id, activeServer?.url, activeServer?.auth_username);
 
   const { refreshLibrary, isRefreshing } = useLibraryRefresh({
     refreshCatalog: refresh,
@@ -98,57 +84,20 @@ export default function LibraryScreen() {
     return map;
   }, [downloads]);
 
-  const categoryOptions = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const book of books) {
-      for (const category of parseBookCategories(book)) {
-        counts.set(category, (counts.get(category) ?? 0) + 1);
-      }
-    }
-    return [...counts.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 12)
-      .map(([name]) => name);
-  }, [books]);
-
-  const sourceBooks = useMemo(() => {
-    const trimmed = searchQuery.trim();
-    const candidates =
-      trimmed.length >= 2 && remoteSearch.data && remoteSearch.data.length > 0
-        ? remoteSearch.data
-        : books;
-    return candidates.filter((book) => book.download_url.length > 0);
-  }, [books, remoteSearch.data, searchQuery]);
-
-  const visibleBooks = useMemo(() => {
-    let list = sourceBooks;
-
-    if (filter === 'on-device') {
-      list = list.filter((book) => downloadedIds.has(book.id));
-    }
-
-    if (categoryFilter) {
-      list = list.filter((book) =>
-        parseBookCategories(book).includes(categoryFilter),
-      );
-    }
-
-    const trimmed = searchQuery.trim();
-    if (trimmed.length > 0 && trimmed.length < 2) {
-      list = list.filter((book) => matchesSearch(book, trimmed));
-    } else if (trimmed.length >= 2 && (!remoteSearch.data || remoteSearch.data.length === 0)) {
-      list = list.filter((book) => matchesSearch(book, trimmed));
-    }
-
-    return list;
-  }, [
-    sourceBooks,
+  const {
     filter,
+    setFilter,
     categoryFilter,
+    setCategoryFilter,
+    categoryOptions,
+    visibleBooks,
+    isFiltered,
+  } = useLibraryFilters({
+    books,
+    remoteSearchData: remoteSearch.data,
     downloadedIds,
     searchQuery,
-    remoteSearch.data,
-  ]);
+  });
 
   const numColumns = theme.grid.numColumns;
   const cardWidth = useMemo(() => {
@@ -160,14 +109,6 @@ export default function LibraryScreen() {
   const catalogBooks = useMemo(
     () => books.filter((book) => book.download_url.length > 0),
     [books],
-  );
-
-  const isFiltered = useMemo(
-    () =>
-      filter !== 'all' ||
-      categoryFilter != null ||
-      searchQuery.trim().length > 0,
-    [filter, categoryFilter, searchQuery],
   );
 
   const libraryStats = useMemo(() => {
@@ -240,64 +181,16 @@ export default function LibraryScreen() {
 
   const listHeader = useMemo(
     () => (
-      <Box paddingTop="xs" style={{ paddingBottom: 12 }} gap="sm">
-        <ScrollBox
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{
-            flexGrow: 0,
-            flexShrink: 0,
-            maxHeight: 44,
-            marginHorizontal: -4,
-          }}
-          contentContainerStyle={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 8,
-            paddingHorizontal: 4,
-            paddingVertical: 2,
-          }}
-        >
-          <FilterChip
-            label={t('library.filterAll')}
-            selected={filter === 'all' && !categoryFilter}
-            onPress={() => {
-              setFilter('all');
-              setCategoryFilter(null);
-            }}
-          />
-          <FilterChip
-            label={t('library.filterDownloaded')}
-            selected={filter === 'on-device'}
-            onPress={() => {
-              setFilter('on-device');
-              setCategoryFilter(null);
-            }}
-          />
-          {categoryOptions.length > 0 ? (
-            <Box
-              width={0.5}
-              height={20}
-              backgroundColor="border"
-              style={{ marginHorizontal: 2 }}
-            />
-          ) : null}
-          {categoryOptions.map((category) => (
-            <FilterChip
-              key={category}
-              label={category}
-              selected={categoryFilter === category}
-              onPress={() => {
-                setFilter('all');
-                setCategoryFilter(categoryFilter === category ? null : category);
-              }}
-            />
-          ))}
-        </ScrollBox>
-        <OfflineBanner visible={isOffline} />
-      </Box>
+      <LibraryFilterBar
+        filter={filter}
+        setFilter={setFilter}
+        categoryFilter={categoryFilter}
+        setCategoryFilter={setCategoryFilter}
+        categoryOptions={categoryOptions}
+        isOffline={isOffline}
+      />
     ),
-    [categoryFilter, categoryOptions, filter, isOffline, t],
+    [filter, setFilter, categoryFilter, setCategoryFilter, categoryOptions, isOffline],
   );
 
   if (serversLoading || activeServerLoading) {
@@ -334,7 +227,9 @@ export default function LibraryScreen() {
           {t('library.noLibraryHint')}
         </ThemedText>
         <PressableBox onPress={() => router.push('/settings')} padding="sm">
-          <ThemedText color={theme.colors.textSecondary}>{t('library.connectServer')}</ThemedText>
+          <ThemedText color={theme.colors.textSecondary}>
+            {t('library.connectServer')}
+          </ThemedText>
         </PressableBox>
       </Box>
     );
@@ -344,95 +239,16 @@ export default function LibraryScreen() {
 
   return (
     <Box flex={1} backgroundColor="background">
-      <Box
-        gap="md"
-        style={{ paddingHorizontal: 20, paddingBottom: 12, paddingTop: insets.top + 4 }}
-      >
-        <Box
-          flexDirection="row"
-          alignItems="flex-start"
-          justifyContent="space-between"
-        >
-          <Box flex={1} gap="xs" style={{ paddingRight: 12 }}>
-            <ThemedText
-              style={{
-                fontSize: 34,
-                fontWeight: '700',
-                letterSpacing: -0.4,
-                lineHeight: 40,
-              }}
-            >
-              {t('library.title')}
-            </ThemedText>
-            <ThemedText variant="caption" color={theme.colors.textMuted}>
-              {activeServer?.title ?? t('common.catalog')}
-            </ThemedText>
-          </Box>
-          <Box flexDirection="row" alignItems="center" gap="sm" marginTop="xs">
-            <PressableBox
-              onPress={() => void refreshLibrary()}
-              disabled={isLibraryRefreshing}
-              accessibilityRole="button"
-              accessibilityLabel={t('library.refresh')}
-              testID="library-refresh"
-              alignItems="center"
-              justifyContent="center"
-              width={36}
-              height={36}
-              borderRadius="full"
-              backgroundColor="surfaceElevated"
-              hitSlop={8}
-              opacity={isLibraryRefreshing ? 0.6 : 1}
-            >
-              {isLibraryRefreshing ? (
-                <ActivityIndicator color={theme.colors.textSecondary} size="small" />
-              ) : (
-                <SymbolView
-                  name="arrow.clockwise"
-                  size={18}
-                  tintColor={theme.colors.textSecondary}
-                  importantForAccessibility="no-hide-descendants"
-                />
-              )}
-            </PressableBox>
-            <PressableBox
-              onPress={() => router.push('/settings')}
-              accessibilityRole="button"
-              accessibilityLabel={t('library.openSettings')}
-              testID="library-settings"
-              alignItems="center"
-              justifyContent="center"
-              width={36}
-              height={36}
-              borderRadius="full"
-              backgroundColor="surfaceElevated"
-              hitSlop={8}
-            >
-              <SymbolView
-                name="gearshape"
-                size={18}
-                tintColor={theme.colors.textSecondary}
-                importantForAccessibility="no-hide-descendants"
-              />
-            </PressableBox>
-          </Box>
-        </Box>
-
-        <Box position="relative">
-          <SearchField
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder={t('library.searchPlaceholder')}
-          />
-          {isSearching ? (
-            <ActivityIndicator
-              color={theme.colors.textSecondary}
-              size="small"
-              style={{ position: 'absolute', right: 14, top: 14 }}
-            />
-          ) : null}
-        </Box>
-      </Box>
+      <LibraryHeader
+        subtitle={activeServer?.title ?? t('common.catalog')}
+        isRefreshing={isLibraryRefreshing}
+        onRefresh={() => void refreshLibrary()}
+        onOpenSettings={() => router.push('/settings')}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        isSearching={isSearching}
+        topInset={insets.top}
+      />
 
       {isLoading ? (
         <Box flex={1} alignItems="center" justifyContent="center" padding="lg" gap="md">
