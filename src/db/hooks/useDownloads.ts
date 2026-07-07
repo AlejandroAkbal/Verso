@@ -1,82 +1,41 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useSyncExternalStore } from 'react';
 import { useSQLiteContext } from 'expo-sqlite';
 
-import { subscribeDownloadsChanged } from '@/services/downloads/changes';
+import {
+  getDownloadsSnapshot,
+  initDownloadStore,
+  refreshDownloadStore,
+  subscribeDownloads,
+} from '@/services/downloads/store';
 
-import { getAllDownloads, getDownloadByBookId } from '../queries';
 import type { DownloadRow } from '../schema';
 
-const ACTIVE_POLL_MS = 300;
-const IDLE_POLL_MS = 2500;
-
+/**
+ * All download rows, backed by the shared event-driven store. A single store
+ * polls only while a download is in-flight — no per-hook polling loops.
+ */
 export function useDownloads() {
   const db = useSQLiteContext();
-  const [downloads, setDownloads] = useState<DownloadRow[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const refresh = useCallback(async () => {
-    const rows = await getAllDownloads(db);
-    setDownloads(rows);
-    setLoading(false);
+  useEffect(() => {
+    initDownloadStore(db);
   }, [db]);
 
-  useEffect(() => {
-    queueMicrotask(() => {
-      void refresh();
-    });
-    const interval = setInterval(() => {
-      void refresh();
-    }, ACTIVE_POLL_MS);
+  const downloads = useSyncExternalStore(subscribeDownloads, getDownloadsSnapshot);
+  const refresh = useCallback(() => refreshDownloadStore(), []);
 
-    const unsubscribe = subscribeDownloadsChanged(() => {
-      void refresh();
-    });
-
-    return () => {
-      clearInterval(interval);
-      unsubscribe();
-    };
-  }, [refresh]);
-
-  return { downloads, loading, refresh };
+  return { downloads, loading: false, refresh };
 }
 
-export function useDownloadStatus(bookId: string) {
+/** A single book's download row, derived from the shared store. */
+export function useDownloadStatus(bookId: string): DownloadRow | null {
   const db = useSQLiteContext();
-  const [download, setDownload] = useState<DownloadRow | null>(null);
-
-  const refresh = useCallback(async () => {
-    if (!bookId) {
-      setDownload(null);
-      return;
-    }
-    const row = await getDownloadByBookId(db, bookId);
-    setDownload(row);
-  }, [bookId, db]);
-
   useEffect(() => {
-    queueMicrotask(() => {
-      void refresh();
-    });
+    initDownloadStore(db);
+  }, [db]);
 
-    const pollMs =
-      download?.status === 'downloading' || download?.status === 'queued'
-        ? ACTIVE_POLL_MS
-        : IDLE_POLL_MS;
-
-    const interval = setInterval(() => {
-      void refresh();
-    }, pollMs);
-
-    const unsubscribe = subscribeDownloadsChanged(() => {
-      void refresh();
-    });
-
-    return () => {
-      clearInterval(interval);
-      unsubscribe();
-    };
-  }, [download?.status, refresh]);
-
-  return download;
+  const downloads = useSyncExternalStore(subscribeDownloads, getDownloadsSnapshot);
+  return useMemo(
+    () => downloads.find((d) => d.book_id === bookId) ?? null,
+    [downloads, bookId],
+  );
 }
