@@ -22,6 +22,9 @@ import { useLibraryRefresh } from '@/hooks/useLibraryRefresh';
 import { isFinished, progressPercent } from '@/lib/readingProgress';
 import type { BookRow, DownloadRow } from '@/db/schema';
 import { useTheme } from '@/theme/ThemeProvider';
+import { CoverAmbiance } from '@/components/CoverAmbiance';
+import { useCoverColor } from '@/hooks/useCoverColor';
+import { useServerAuthHeaders } from '@/hooks/useServerAuthHeaders';
 
 export default function LibraryScreen() {
   const theme = useTheme();
@@ -133,6 +136,22 @@ export default function LibraryScreen() {
 
     return { downloadedCount, inProgressCount, finishedCount };
   }, [catalogBooks, downloadedIds, progressByBookId]);
+
+  const ambientBook = useMemo(() => {
+    let latest: BookRow | undefined;
+    let latestAt = 0;
+    for (const book of catalogBooks) {
+      const at = progressByBookId.get(book.id)?.updated_at ?? 0;
+      if (at > latestAt) {
+        latestAt = at;
+        latest = book;
+      }
+    }
+    return latest ?? catalogBooks[0];
+  }, [catalogBooks, progressByBookId]);
+
+  const ambientHeaders = useServerAuthHeaders(ambientBook?.server_id);
+  const ambientColors = useCoverColor(ambientBook?.cover_url, ambientBook?.blurhash);
 
   const listFooter = useMemo(
     () => (
@@ -252,6 +271,16 @@ export default function LibraryScreen() {
 
   return (
     <Box flex={1} backgroundColor="background">
+      {ambientBook ? (
+        <CoverAmbiance
+          color={ambientColors.ambient}
+          imageUrl={ambientBook.cover_url}
+          imageHeaders={
+            Object.keys(ambientHeaders).length > 0 ? ambientHeaders : undefined
+          }
+        />
+      ) : null}
+
       <LibraryHeader
         subtitle={activeServer?.title ?? t('common.catalog')}
         isRefreshing={isLibraryRefreshing}
@@ -271,7 +300,7 @@ export default function LibraryScreen() {
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           numColumns={numColumns}
-          style={{ flex: 1 }}
+          style={{ flex: 1, backgroundColor: 'transparent' }}
           ListHeaderComponent={listHeader}
           ListFooterComponent={visibleBooks.length > 0 ? listFooter : null}
           contentContainerStyle={{

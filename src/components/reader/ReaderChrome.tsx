@@ -21,6 +21,7 @@ const AUTO_HIDE_MS = 4000;
 type ReaderChromeProps = {
   title: string;
   percent: number | null;
+  tintColor?: string;
   visible: boolean;
   onShowChrome: () => void;
   onHideChrome: () => void;
@@ -32,6 +33,7 @@ type ReaderChromeProps = {
 export function ReaderChrome({
   title,
   percent,
+  tintColor,
   visible,
   onShowChrome,
   onHideChrome,
@@ -63,7 +65,12 @@ export function ReaderChrome({
 
   const chromeBackground =
     Platform.OS === 'ios' ? (
-      <BlurView intensity={48} tint="dark" style={StyleSheet.absoluteFill} />
+      <>
+        <BlurView intensity={48} tint="dark" style={StyleSheet.absoluteFill} />
+        {tintColor ? (
+          <Box style={[StyleSheet.absoluteFill, { backgroundColor: tintColor, opacity: 0.22 }]} />
+        ) : null}
+      </>
     ) : (
       <Box
         position="absolute"
@@ -71,7 +78,8 @@ export function ReaderChrome({
         right={0}
         bottom={0}
         left={0}
-        backgroundColor="overlay"
+        style={tintColor ? { backgroundColor: tintColor, opacity: 0.4 } : undefined}
+        backgroundColor={tintColor ? undefined : 'overlay'}
       />
     );
 

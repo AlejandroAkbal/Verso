@@ -1,6 +1,13 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, StyleSheet } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { ReadiumView } from 'react-native-readium';
 
 import { useTranslation } from 'react-i18next';
@@ -11,6 +18,7 @@ import { ReaderProgressBar } from '@/components/reader/ReaderProgressBar';
 import { Box, PressableBox } from '@/components/ui';
 import { useReaderContext } from '@/context/ReaderContext';
 import { useReaderProgress } from '@/hooks/useReaderProgress';
+import { useCoverColor } from '@/hooks/useCoverColor';
 import { useReaderSession } from '@/hooks/useReaderSession';
 import { progressPercent } from '@/lib/readingProgress';
 import { toReadiumPreferences } from '@/services/reader/preferences';
@@ -25,14 +33,24 @@ export default function ReaderScreen() {
   const { readiumRef, prefs, setTableOfContents } = useReaderContext();
   const [chromeVisible, setChromeVisible] = useState(true);
 
-  const {
-    loading,
-    error,
-    title,
-    file,
-    progression,
-    setProgression,
-  } = useReaderSession(id);
+  const { loading, error, title, coverUrl, blurhash, file, progression, setProgression } = useReaderSession(id);
+
+  const chromeColors = useCoverColor(coverUrl, blurhash);
+
+  const reduceMotion = useReducedMotion();
+  const washOpacity = useSharedValue(reduceMotion ? 0 : 1);
+  const washStyle = useAnimatedStyle(() => ({ opacity: washOpacity.value }));
+
+  const startWashFade = useCallback(() => {
+    // eslint-disable-next-line react-hooks/immutability
+    washOpacity.value = withTiming(0, { duration: 520, easing: Easing.out(Easing.cubic) });
+  }, [washOpacity]);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    const t = setTimeout(startWashFade, 1500);
+    return () => clearTimeout(t);
+  }, [reduceMotion, startWashFade]);
 
   const { persistProgress, flushProgress, setPositionCount } = useReaderProgress(
     id,
@@ -110,6 +128,7 @@ export default function ReaderScreen() {
           onPublicationReady={(event) => {
             setTableOfContents(event.tableOfContents);
             setPositionCount(event.positions.length);
+            startWashFade();
           }}
         />
       </Box>
@@ -117,6 +136,7 @@ export default function ReaderScreen() {
       <ReaderChrome
         title={title}
         percent={percent}
+        tintColor={chromeColors.ambient}
         visible={chromeVisible}
         onShowChrome={() => setChromeVisible(true)}
         onHideChrome={() => setChromeVisible(false)}
@@ -126,6 +146,15 @@ export default function ReaderScreen() {
       />
 
       <ReaderProgressBar progression={progression} visible={chromeVisible} />
+
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          StyleSheet.absoluteFill,
+          { backgroundColor: chromeColors.ambient },
+          washStyle,
+        ]}
+      />
     </Box>
   );
 }
