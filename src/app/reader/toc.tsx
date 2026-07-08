@@ -47,7 +47,7 @@ export default function ReaderTocScreen() {
       />
       <Box
         flex={1}
-        backgroundColor="background"
+        backgroundColor="surface"
         style={{
           paddingBottom: insets.bottom,
         }}

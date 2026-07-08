@@ -44,7 +44,7 @@ export default function ReaderLayout() {
       <Stack
         screenOptions={{
           ...nativeModalHeaderOptions(theme),
-          contentStyle: { backgroundColor: theme.colors.background },
+          contentStyle: { backgroundColor: theme.colors.surface },
         }}
       >
         <Stack.Screen name="[id]" options={{ headerShown: false }} />

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useSQLiteContext } from 'expo-sqlite';
+import { useSQLiteContext, type SQLiteDatabase } from 'expo-sqlite';
 
 import {
   deleteServer,
@@ -12,8 +12,14 @@ import {
   deleteServerPassword,
   setServerPassword,
 } from '@/services/opds/credentials';
+import { testKoreaderConnection } from '@/services/koreader/client';
+import { saveDefaultSyncAccount } from '@/services/koreader/syncBook';
 import { testOpdsConnection } from '@/services/opds/connection';
-import { deriveServerTitle, normalizeOpdsUrl } from '@/services/opds/url';
+import {
+  deriveKosyncUrlFromOpdsUrl,
+  deriveServerTitle,
+  normalizeOpdsUrl,
+} from '@/services/opds/url';
 import i18n from '@/i18n';
 
 export type ServerInput = {
@@ -21,6 +27,27 @@ export type ServerInput = {
   username: string;
   password: string;
 };
+
+async function enableKoreaderSyncForServer(
+  db: SQLiteDatabase,
+  server: ServerRow,
+  password: string,
+) {
+  const username = server.auth_username.trim();
+  if (!username || !password) {
+    return;
+  }
+
+  const serverUrl = deriveKosyncUrlFromOpdsUrl(server.url);
+  await testKoreaderConnection(serverUrl, username, password);
+  await saveDefaultSyncAccount(db, {
+    serverUrl,
+    username,
+    password,
+    documentIdMode: 'partial_md5',
+    enabled: true,
+  });
+}
 
 export function useServers() {
   const db = useSQLiteContext();
@@ -62,6 +89,9 @@ export function useServers() {
       await insertServer(db, server);
       if (input.password) {
         await setServerPassword(server.id, input.password);
+        await enableKoreaderSyncForServer(db, server, input.password).catch(
+          () => undefined,
+        );
       }
       await refresh();
       return server;

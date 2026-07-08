@@ -145,7 +145,7 @@ export default function KoreaderSettingsScreen() {
 
   if (loading || !initialized) {
     return (
-      <Box flex={1} alignItems="center" justifyContent="center" backgroundColor="background">
+      <Box flex={1} alignItems="center" justifyContent="center" backgroundColor="surface">
         <ActivityIndicator color={theme.colors.text} />
       </Box>
     );
@@ -153,7 +153,7 @@ export default function KoreaderSettingsScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
+      style={{ flex: 1, backgroundColor: theme.colors.surface }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollBox

@@ -15,7 +15,6 @@ Library-UX features, now sitting on the refactored base (see `docs/superpowers/s
 - [x] Collapsing / non-sticky search bar (iOS large-title behavior) that reads well on Android too.
 - [x] Cancel an in-progress download by tapping its control again (stop + revert to cloud).
 - [x] Design-polish pass (Cover Ambiance restyle): per-book dominant-color depth across Library + Reader — cover glows, single ambient backdrop, tinted reader chrome, color-continuity open, cover press feedback. Reduce-motion/transparency honored. (Spec + plan under `docs/superpowers/`.)
-- [ ] Android Maestro E2E: run the shared flows on a booted emulator locally (tooling/docs ready; needs Android SDK + AVD).
 - [x] Audit application for non-native UI components or custom routing → migrated all custom sheets to native router modals; unified shared native-modal header chrome (`nativeModalHeaderOptions`). No custom sheets/overlays remain.
 
 ## Later
@@ -30,7 +29,7 @@ Library-UX features, now sitting on the refactored base (see `docs/superpowers/s
 - [x] KOReader sync verified end-to-end against CWA `/kosync` (auth, pull, push round-trip); fixed a `NOT NULL` crash on `book_sync_state.remote_progress` and surfaced server error bodies (e.g. "KOReader sync is disabled").
 - [x] Per-book sync status on detail screen ("Synced 2m ago", relative time, error state).
 - [x] Maestro `reader-open.yaml` (download → read → reader open → back) + `reader-screen` / `reader-back` testIDs; conflict-prompt handling documented.
-- [x] Local E2E harness: Maestro flows + `e2e:ios`/`e2e:android` scripts + docs. (No GitHub Actions pipeline — testing is local-only on our own devices; the old `e2e.yml` workflow was removed.)
+- [x] Local iOS E2E harness: Maestro flows + `e2e:ios` script + docs. (No GitHub Actions pipeline — testing is local-only on our own devices; the old `e2e.yml` workflow was removed.)
 - [x] Restyle migration, cover skeletons, NEW badges, onboarding, haptics.
 - [x] KOReader sync v1 (Settings, push/pull, conflict prompt, Readium locators).
 - [x] Auto-launch/resume last book, OPDS summary links, research docs.

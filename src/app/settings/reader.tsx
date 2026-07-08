@@ -13,7 +13,7 @@ export default function ReaderSettingsScreen() {
 
   if (loading) {
     return (
-      <Box flex={1} alignItems="center" justifyContent="center" backgroundColor="background">
+      <Box flex={1} alignItems="center" justifyContent="center" backgroundColor="surface">
         <ActivityIndicator color={theme.colors.text} />
       </Box>
     );

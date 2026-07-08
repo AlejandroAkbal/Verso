@@ -45,11 +45,8 @@ export function LibraryFooter({
     <Box
       alignItems="center"
       gap="xs"
-      paddingTop="xl"
+      paddingTop="lg"
       paddingBottom="md"
-      marginTop="sm"
-      borderTopWidth={0.5}
-      borderTopColor="border"
     >
       <ThemedText variant="subtitle" color={theme.colors.textSecondary}>
         {primaryLine}

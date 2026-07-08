@@ -36,19 +36,6 @@ Pass a device id:
 maestro --device <UDID> test .maestro/
 ```
 
-## Android
-
-The flows are platform-agnostic — they use `appId`, deep-links, `testID`s and accessibility
-labels, so the same YAML runs on Android. To run them:
-
-1. Install the Android SDK + an emulator image; set `ANDROID_HOME` (e.g. `~/Library/Android/sdk`).
-2. Boot an AVD: `emulator -avd <name>` (or launch from Android Studio).
-3. Build + install the Android dev client: `pnpm run:android`.
-4. Start Metro (`pnpm start`) and run: `pnpm e2e:android` (or `maestro --device emulator-5554 test .maestro/`).
-
-`pnpm e2e:android` runs the same flow set as iOS; Maestro targets whichever device is booted.
-Pass `--device` when both an emulator and a simulator are connected.
-
 ## Flows
 
 | File | Covers |

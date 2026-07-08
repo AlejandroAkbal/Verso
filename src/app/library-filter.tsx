@@ -40,7 +40,7 @@ export default function LibraryFilterScreen() {
       />
       <Box
         flex={1}
-        backgroundColor="background"
+        backgroundColor="surface"
         style={{
           paddingTop: 16,
           paddingBottom: insets.bottom + 12,

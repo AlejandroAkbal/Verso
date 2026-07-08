@@ -89,7 +89,11 @@ export default function RootLayout() {
               />
               <Stack.Screen
                 name="settings"
-                options={{ headerShown: false, presentation: 'modal' }}
+                options={{
+                  headerShown: false,
+                  presentation: 'modal',
+                  ...nativeModalHeaderOptions(theme),
+                }}
               />
             </Stack>
             </LibraryFilterProvider>

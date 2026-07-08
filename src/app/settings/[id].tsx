@@ -68,7 +68,7 @@ export default function EditServerScreen() {
         flex={1}
         alignItems="center"
         justifyContent="center"
-        backgroundColor="background"
+        backgroundColor="surface"
       >
         <ActivityIndicator color={theme.colors.text} />
       </Box>
@@ -81,7 +81,7 @@ export default function EditServerScreen() {
         flex={1}
         alignItems="center"
         justifyContent="center"
-        backgroundColor="background"
+        backgroundColor="surface"
       >
         <ActivityIndicator color={theme.colors.text} />
       </Box>
