@@ -215,6 +215,7 @@ export default function SettingsIndexScreen() {
         <SettingsRow
           title={t('settings.resetAllData')}
           destructive
+          testID="settings-reset-all"
           onPress={handleResetAllData}
         />
       </SettingsGroup>

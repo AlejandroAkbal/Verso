@@ -14,3 +14,7 @@ export async function getOrCreateKoreaderDeviceId(): Promise<string> {
   await AsyncStorage.setItem(appIdentity.koreaderDeviceIdStorageKey, deviceId);
   return deviceId;
 }
+
+export async function deleteKoreaderDeviceId(): Promise<void> {
+  await AsyncStorage.removeItem(appIdentity.koreaderDeviceIdStorageKey);
+}

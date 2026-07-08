@@ -1,0 +1,37 @@
+appId: dev.akbal.opdsreader
+---
+- openLink: exp+opds-reader://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081
+- tapOn:
+    text: "Open"
+    optional: true
+- tapOn:
+    text: "Reload"
+    optional: true
+- extendedWaitUntil:
+    visible: "Library"
+    timeout: 90000
+- swipe:
+    start: "364, 88"
+    end: "200, 88"
+    duration: 1000
+- tapOn:
+    id: "library-settings"
+- extendedWaitUntil:
+    visible: "OPDS Servers"
+    timeout: 15000
+- scrollUntilVisible:
+    element:
+      id: "settings-reset-all"
+    direction: DOWN
+    timeout: 15000
+- tapOn:
+    id: "settings-reset-all"
+- extendedWaitUntil:
+    visible: "Reset all app data?"
+    timeout: 10000
+- tapOn:
+    text: "Reset App"
+- extendedWaitUntil:
+    visible: "Your books. Your server. Offline."
+    timeout: 30000
+- assertVisible: "Connect my library"

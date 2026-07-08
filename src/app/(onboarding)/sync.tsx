@@ -1,26 +1,43 @@
+import { useState } from 'react';
+import { ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
+import { useSQLiteContext } from 'expo-sqlite';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
 import { Box, PressableBox } from '@/components/ui';
 import { useOnboarding } from '@/db/hooks/useOnboarding';
+import { verifyExistingOrActiveLibrarySync } from '@/services/koreader/onboarding';
 import { useTheme } from '@/theme/ThemeProvider';
 
 export default function OnboardingSyncScreen() {
   const router = useRouter();
+  const db = useSQLiteContext();
   const insets = useSafeAreaInsets();
   const theme = useTheme();
   const { t } = useTranslation();
   const { completeOnboarding } = useOnboarding();
+  const [checkingSync, setCheckingSync] = useState(false);
 
   const finish = async () => {
     await completeOnboarding();
     router.replace('/(tabs)');
   };
 
-  const openSyncSettings = async () => {
+  const enableSync = async () => {
+    setCheckingSync(true);
+    try {
+      if (await verifyExistingOrActiveLibrarySync(db)) {
+        await finish();
+        return;
+      }
+    } catch {
+    } finally {
+      setCheckingSync(false);
+    }
+
     await completeOnboarding();
     router.replace('/(tabs)');
     requestAnimationFrame(() => router.push('/settings/koreader'));
@@ -76,11 +93,16 @@ export default function OnboardingSyncScreen() {
           borderRadius="full"
           width="100%"
           backgroundColor="primary"
-          onPress={() => void openSyncSettings()}
+          onPress={() => void enableSync()}
+          disabled={checkingSync}
         >
-          <ThemedText variant="subtitle" color={theme.colors.onPrimary}>
-            {t('onboarding.syncEnable')}
-          </ThemedText>
+          {checkingSync ? (
+            <ActivityIndicator color={theme.colors.onPrimary} />
+          ) : (
+            <ThemedText variant="subtitle" color={theme.colors.onPrimary}>
+              {t('onboarding.syncEnable')}
+            </ThemedText>
+          )}
         </PressableBox>
         <PressableBox onPress={() => void finish()} hitSlop={8}>
           <ThemedText variant="body" color={theme.colors.textSecondary}>

@@ -1,9 +1,11 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-import { getAllServers, setActiveServerId, setOnboardingCompleted } from '@/db/queries';
+import { getAllServers } from '@/db/queries';
 import { removeAllDownloads } from '@/services/downloads/manage';
-import { deleteServerPassword } from '@/services/opds/credentials';
 import { deleteKoreaderPassword } from '@/services/koreader/credentials';
+import { deleteKoreaderDeviceId } from '@/services/koreader/deviceId';
+import { deleteServerPassword } from '@/services/opds/credentials';
+import { deleteReaderPreferences } from '@/services/reader/preferences';
 
 export async function clearAllAppData(db: SQLiteDatabase): Promise<void> {
   const servers = await getAllServers(db);
@@ -12,7 +14,11 @@ export async function clearAllAppData(db: SQLiteDatabase): Promise<void> {
     await deleteServerPassword(server.id);
   }
 
-  await deleteKoreaderPassword();
+  await Promise.all([
+    deleteKoreaderPassword(),
+    deleteKoreaderDeviceId(),
+    deleteReaderPreferences(),
+  ]);
   await removeAllDownloads(db);
 
   await db.execAsync(`
@@ -22,11 +28,17 @@ export async function clearAllAppData(db: SQLiteDatabase): Promise<void> {
     DELETE FROM books;
     DELETE FROM servers;
     DELETE FROM sync_accounts;
+    DELETE FROM user_preferences;
+    INSERT INTO user_preferences (
+      id,
+      onboarding_completed,
+      active_server_id,
+      koreader_sync_enabled,
+      resume_last_book,
+      last_open_book_id,
+      library_sort,
+      library_filter,
+      library_category_filter
+    ) VALUES (1, 0, '', 0, 0, '', 'recent', 'all', '');
   `);
-
-  await setOnboardingCompleted(db, false);
-  await setActiveServerId(db, '');
-  await db.runAsync(
-    `UPDATE user_preferences SET koreader_sync_enabled = 0, resume_last_book = 0, last_open_book_id = '' WHERE id = 1`,
-  );
 }

@@ -61,3 +61,7 @@ export async function saveReaderPreferences(
 ): Promise<void> {
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
 }
+
+export async function deleteReaderPreferences(): Promise<void> {
+  await AsyncStorage.removeItem(STORAGE_KEY);
+}
