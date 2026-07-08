@@ -1,7 +1,7 @@
 import { FlashList } from '@shopify/flash-list';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, RefreshControl, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -272,6 +272,14 @@ export default function LibraryScreen() {
           keyExtractor={(item) => item.id}
           numColumns={numColumns}
           style={{ flex: 1, backgroundColor: 'transparent' }}
+          refreshControl={
+            <RefreshControl
+              refreshing={isLibraryRefreshing}
+              onRefresh={() => void refreshLibrary()}
+              tintColor={theme.colors.textSecondary}
+              progressViewOffset={insets.top + 78}
+            />
+          }
           ListHeaderComponent={listHeader}
           ListFooterComponent={visibleBooks.length > 0 ? listFooter : null}
           contentContainerStyle={{
