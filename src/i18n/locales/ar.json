@@ -201,7 +201,17 @@
     "connectButton": "ربط مكتبتي",
     "connectTitle": "ربط OPDS",
     "connectStep": "الخطوة ٢ من ٢ — اربط خادم Calibre-Web أو OPDS.",
-    "backToLibrary": "العودة إلى المكتبة"
+    "backToLibrary": "العودة إلى المكتبة",
+    "syncTitle": "مزامنة تقدم القراءة",
+    "syncBody": "اقرأ على القارئ الإلكتروني وتابع من هاتفك. يتزامن Verso بسلاسة مع KOReader وCalibre-Web Automated.",
+    "syncPoint1Title": "نفس المكان في كل مكان",
+    "syncPoint1Body": "حافظ على موقعك الحالي متزامناً بين Verso وKOReader.",
+    "syncPoint2Title": "يعمل مع مكتبتك",
+    "syncPoint2Body": "يمكن لـ Calibre-Web Automated استخدام حساب المكتبة الذي قمت بربطه للتو.",
+    "syncPoint3Title": "اختياري وخاص",
+    "syncPoint3Body": "يمكنك تخطيه الآن وتفعيل المزامنة لاحقاً من الإعدادات.",
+    "syncEnable": "تفعيل مزامنة KOReader",
+    "syncSkip": "ليس الآن"
   },
   "errors": {
     "authFailed": "فشلت المصادقة. تحقق من اسم المستخدم وكلمة المرور.",

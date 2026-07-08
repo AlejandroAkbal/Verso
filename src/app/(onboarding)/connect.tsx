@@ -7,7 +7,6 @@ import { ServerForm } from '@/components/settings/ServerForm';
 import { ThemedText } from '@/components/ThemedText';
 import { Box, PressableBox } from '@/components/ui';
 import { useActiveServer } from '@/db/hooks/useActiveServer';
-import { useOnboarding } from '@/db/hooks/useOnboarding';
 import { useServers } from '@/db/hooks/useServers';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -33,7 +32,6 @@ export default function OnboardingConnectScreen() {
   const { t } = useTranslation();
   const { addServer } = useServers();
   const { setActive } = useActiveServer();
-  const { completeOnboarding } = useOnboarding();
 
   return (
     <Box flex={1} backgroundColor="background">
@@ -68,8 +66,7 @@ export default function OnboardingConnectScreen() {
         onSubmit={async (input) => {
           const server = await addServer(input);
           await setActive(server.id);
-          await completeOnboarding();
-          router.replace('/(tabs)');
+          router.push('/(onboarding)/sync');
         }}
       />
     </Box>

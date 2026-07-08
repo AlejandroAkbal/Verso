@@ -185,7 +185,17 @@
     "connectButton": "Conectar mi biblioteca",
     "connectTitle": "Conectar OPDS",
     "connectStep": "Paso 2 de 2 — vincula tu servidor Calibre-Web u OPDS.",
-    "backToLibrary": "Volver a la biblioteca"
+    "backToLibrary": "Volver a la biblioteca",
+    "syncTitle": "Sincroniza tu lectura",
+    "syncBody": "Lee en tu e-reader, sigue en tu móvil. Verso se sincroniza perfectamente con KOReader y Calibre-Web Automated.",
+    "syncPoint1Title": "El mismo punto en todas partes",
+    "syncPoint1Body": "Mantén tu ubicación actual alineada entre Verso y KOReader.",
+    "syncPoint2Title": "Funciona con tu biblioteca",
+    "syncPoint2Body": "Calibre-Web Automated puede usar la cuenta que acabas de conectar.",
+    "syncPoint3Title": "Opcional y privado",
+    "syncPoint3Body": "Sáltalo ahora y actívalo más tarde en Ajustes.",
+    "syncEnable": "Activar sincronización",
+    "syncSkip": "Ahora no"
   },
   "errors": {
     "authFailed": "Autenticación fallida. Comprueba usuario y contraseña.",

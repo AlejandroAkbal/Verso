@@ -185,7 +185,17 @@
     "connectButton": "मेरी लाइब्रेरी कनेक्ट करें",
     "connectTitle": "OPDS कनेक्ट करें",
     "connectStep": "चरण 2 / 2 — Calibre-Web या OPDS सर्वर लिंक करें।",
-    "backToLibrary": "लाइब्रेरी पर वापस"
+    "backToLibrary": "लाइब्रेरी पर वापस",
+    "syncTitle": "अपनी पढ़ने की प्रगति सिंक करें",
+    "syncBody": "ई-रीडर पर पढ़ें, फ़ोन पर वहीं से शुरू करें। Verso KOReader और Calibre-Web Automated के साथ सहजता से सिंक होता है।",
+    "syncPoint1Title": "हर जगह एक ही स्थान",
+    "syncPoint1Body": "Verso और KOReader के बीच अपनी वर्तमान स्थिति संरेखित रखें।",
+    "syncPoint2Title": "आपकी लाइब्रेरी के साथ काम करता है",
+    "syncPoint2Body": "Calibre-Web Automated उसी लाइब्रेरी खाते का उपयोग कर सकता है जिसे आपने अभी कनेक्ट किया है।",
+    "syncPoint3Title": "वैकल्पिक और निजी",
+    "syncPoint3Body": "इसे अभी छोड़ें और बाद में सेटिंग्स से सिंक सक्षम करें।",
+    "syncEnable": "KOReader सिंक सक्षम करें",
+    "syncSkip": "अभी नहीं"
   },
   "errors": {
     "authFailed": "प्रमाणीकरण विफल। उपयोगकर्ता नाम और पासवर्ड जाँचें।",

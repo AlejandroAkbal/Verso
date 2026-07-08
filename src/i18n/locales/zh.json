@@ -181,7 +181,17 @@
     "connectButton": "连接我的书库",
     "connectTitle": "连接 OPDS",
     "connectStep": "第 2 步，共 2 步 — 链接 Calibre-Web 或 OPDS 服务器。",
-    "backToLibrary": "返回书库"
+    "backToLibrary": "返回书库",
+    "syncTitle": "同步阅读进度",
+    "syncBody": "在电纸书上阅读，在手机上继续。Verso 与 KOReader 及 Calibre-Web Automated 无缝同步。",
+    "syncPoint1Title": "进度随时一致",
+    "syncPoint1Body": "在 Verso 和 KOReader 之间保持阅读进度同步。",
+    "syncPoint2Title": "支持现有书库",
+    "syncPoint2Body": "Calibre-Web Automated 可使用您刚连接的书库账号。",
+    "syncPoint3Title": "可选且私密",
+    "syncPoint3Body": "现在可跳过，稍后在设置中启用。",
+    "syncEnable": "启用 KOReader 同步",
+    "syncSkip": "暂不启用"
   },
   "errors": {
     "authFailed": "身份验证失败。请检查用户名和密码。",

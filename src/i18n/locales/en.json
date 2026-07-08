@@ -185,7 +185,17 @@
     "connectButton": "Connect my library",
     "connectTitle": "Connect OPDS",
     "connectStep": "Step 2 of 2 — link your Calibre-Web or OPDS server.",
-    "backToLibrary": "Back to Library"
+    "backToLibrary": "Back to Library",
+    "syncTitle": "Sync your reading progress",
+    "syncBody": "Read on your e-reader, pick up where you left off on your phone. Verso syncs seamlessly with KOReader and Calibre-Web Automated.",
+    "syncPoint1Title": "Same place everywhere",
+    "syncPoint1Body": "Keep your current location aligned between Verso and KOReader.",
+    "syncPoint2Title": "Works with your library",
+    "syncPoint2Body": "Calibre-Web Automated can use the same library account you just connected.",
+    "syncPoint3Title": "Optional and private",
+    "syncPoint3Body": "Skip it now and enable sync later from Settings.",
+    "syncEnable": "Enable KOReader Sync",
+    "syncSkip": "Not now"
   },
   "errors": {
     "authFailed": "Authentication failed. Check username and password.",
