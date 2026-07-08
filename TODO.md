@@ -40,11 +40,12 @@ Library-UX features, now sitting on the refactored base (see `docs/superpowers/s
 - [x] Reading progress below cover with % caption on grid (not overlaid on jacket).
 - [x] Guard against multiple reader opens on rapid Read taps.
 
-## E2E
+## Testing
 
-**Policy:** E2E only — no unit/component tests. See `docs/e2e.md`.
+**Policy:** Maestro for UI/data-flow coverage; Vitest only for data-layer characterization tests. No component tests unless explicitly requested. See `docs/e2e.md`.
 
 ```bash
-pnpm start      # Metro on 127.0.0.1:8081
-pnpm e2e:ios    # all flows in .maestro/
+pnpm verify:preflight  # typecheck + lint
+pnpm start             # Metro on 127.0.0.1:8081
+pnpm verify:e2e        # all flows in .maestro/
 ```
