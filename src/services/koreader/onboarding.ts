@@ -1,42 +1,67 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-import { getAllServers, getSyncAccount, getUserPreferences, setKoreaderSyncEnabled } from '@/db/queries';
-import { getServerPassword } from '@/services/opds/credentials';
-import { deriveKosyncUrlFromOpdsUrl } from '@/services/opds/url';
+import { getAllServers, getUserPreferences, setKoreaderSyncEnabled, upsertBooks } from '@/db/queries';
+import {
+  chooseSyncAccountSource,
+  getActiveLibrarySyncSetupCandidate,
+  getSavedSyncAccountCandidate,
+} from '@/services/koreader/account';
+import { syncCwaCatalogProgress } from '@/services/koreader/cwaProgress';
+import { getServerAuth, getServerPassword } from '@/services/opds/credentials';
+import { resolveBookListingUrl } from '@/services/opds/catalog';
+import { entriesToBookRows, fetchAllOPDSEntries } from '@/services/opds/parser';
 
 import { testKoreaderConnection } from './client';
 import { getKoreaderPassword } from './credentials';
 import { saveDefaultSyncAccount } from './syncBook';
 
-export async function verifyExistingOrActiveLibrarySync(db: SQLiteDatabase): Promise<boolean> {
-  const account = await getSyncAccount(db);
-  const password = await getKoreaderPassword();
+const ONBOARDING_CATALOG_MAX_PAGES = 50;
 
-  if (account?.server_url && account.username && password) {
-    await testKoreaderConnection(account.server_url, account.username, password);
-    await setKoreaderSyncEnabled(db, true);
-    return true;
-  }
-
+export async function syncActiveLibraryCatalogProgress(db: SQLiteDatabase): Promise<void> {
   const [servers, prefs] = await Promise.all([getAllServers(db), getUserPreferences(db)]);
   const activeServer = servers.find((server) => server.id === prefs.active_server_id) ?? servers[0];
-  if (!activeServer?.auth_username) {
-    return false;
+  if (!activeServer) {
+    return;
   }
 
-  const serverPassword = await getServerPassword(activeServer.id);
-  if (!serverPassword) {
-    return false;
-  }
+  const auth = await getServerAuth(activeServer.id, activeServer.auth_username);
+  const listingUrl = await resolveBookListingUrl(activeServer.url, auth);
+  const { entries } = await fetchAllOPDSEntries(
+    listingUrl,
+    ONBOARDING_CATALOG_MAX_PAGES,
+    auth,
+  );
+  const rows = await entriesToBookRows(entries, activeServer.id);
+  await upsertBooks(db, rows.map((book) => ({ ...book, cached_at: 0 })));
+  await syncCwaCatalogProgress(db, activeServer, rows);
+}
 
-  const serverUrl = deriveKosyncUrlFromOpdsUrl(activeServer.url);
-  await testKoreaderConnection(serverUrl, activeServer.auth_username, serverPassword);
-  await saveDefaultSyncAccount(db, {
-    serverUrl,
-    username: activeServer.auth_username,
-    password: serverPassword,
-    documentIdMode: 'partial_md5',
-    enabled: true,
-  });
+export async function verifyExistingOrActiveLibrarySync(db: SQLiteDatabase): Promise<boolean> {
+  const saved = await getSavedSyncAccountCandidate(db);
+  const setupShortcut = await getActiveLibrarySyncSetupCandidate(db);
+  const source = chooseSyncAccountSource(saved, setupShortcut);
+
+  if (!source) return false;
+
+  const password =
+    source.kind === 'saved'
+      ? await getKoreaderPassword()
+      : setupShortcut?.serverId
+        ? await getServerPassword(setupShortcut.serverId)
+        : null;
+  if (!password) return false;
+
+  await testKoreaderConnection(source.serverUrl, source.username, password);
+
+  if (source.kind === 'setup-shortcut') {
+    await saveDefaultSyncAccount(db, {
+      serverUrl: source.serverUrl,
+      username: source.username,
+      password,
+      documentIdMode: 'partial_md5',
+      enabled: true,
+    });
+  }
+  await setKoreaderSyncEnabled(db, true);
   return true;
 }

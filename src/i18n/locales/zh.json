@@ -202,7 +202,7 @@
   "sync": {
     "title": "KOReader 同步",
     "header": "同步服务器",
-    "footer": "Calibre-Web Automated 请使用书库主机加 /kosync（如 https://books.example.com/kosync）。部分 MD5 与 KOReader 及 Calibre 书库进度一致。",
+    "footer": "同步会应用到 {{appName}} 中所有已下载的 EPUB。Calibre-Web Automated 可用同一书库用户名和密码提供 /kosync 服务器；sync.koreader.rocks 使用你的 KOReader 账户密码（MD5 认证）。",
     "settingsFooter": "在 KOReader、Thorium 和本应用之间续读。",
     "settingsRowHint": "Calibre-Web /kosync — 与 KOReader 共享书库进度",
     "useLibraryServer": "使用书库服务器",

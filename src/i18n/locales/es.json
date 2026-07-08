@@ -206,7 +206,7 @@
   "sync": {
     "title": "Sincronización KOReader",
     "header": "Servidor de sincronización",
-    "footer": "En Calibre-Web Automated, usa tu host con /kosync (p. ej. https://libros.ejemplo.com/kosync). MD5 parcial alinea el progreso con KOReader y tu biblioteca Calibre.",
+    "footer": "La sincronización se aplica a todos los EPUB descargados en {{appName}}. Calibre-Web Automated puede ofrecer un servidor /kosync con el mismo usuario y contraseña de la biblioteca; sync.koreader.rocks usa la contraseña de tu cuenta KOReader (auth MD5).",
     "settingsFooter": "Continúa leyendo en KOReader, Thorium y esta app.",
     "settingsRowHint": "Calibre-Web /kosync — mismo progreso que KOReader en tu biblioteca",
     "useLibraryServer": "Usar servidor de biblioteca",

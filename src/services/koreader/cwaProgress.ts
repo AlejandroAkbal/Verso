@@ -1,13 +1,18 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-import { getBooksByServerId, getBookSyncState, upsertBookSyncState } from '@/db/queries';
+import {
+  getBooksByServerId,
+  getBookSyncState,
+  getSyncAccount,
+  upsertBookSyncState,
+} from '@/db/queries';
 import type { BookRow } from '@/db/schema';
 import { Md5Hasher } from '@/lib/md5';
 import { fetchRemoteProgress } from '@/services/koreader/client';
+import { getKoreaderPassword } from '@/services/koreader/credentials';
 import { partialMd5Offsets } from '@/services/koreader/documentId';
 import { applyRemotePercentage, isSyncActive } from '@/services/koreader/syncBook';
 import { authToHeaders, getServerAuth } from '@/services/opds/credentials';
-import { deriveKosyncUrlFromOpdsUrl } from '@/services/opds/url';
 
 import { isSameOriginUrl, resolveDownloadUrl } from './cwaProgressOrigin';
 
@@ -97,12 +102,15 @@ export async function syncCwaCatalogProgress(
     return { checked: 0, updated: 0, errors: 0 };
   }
 
-  const auth = await getServerAuth(server.id, server.auth_username);
-  if (!auth) {
+  const [auth, account, syncPassword] = await Promise.all([
+    getServerAuth(server.id, server.auth_username),
+    getSyncAccount(db),
+    getKoreaderPassword(),
+  ]);
+  if (!auth || !account?.server_url || !account.username || !syncPassword) {
     return { checked: 0, updated: 0, errors: 0 };
   }
 
-  const baseUrl = deriveKosyncUrlFromOpdsUrl(server.url);
   const headers = authToHeaders(auth);
   const rows = books ?? await getBooksByServerId(db, server.id);
   const candidates = rows.filter((book) => isCwaBook(book));
@@ -127,7 +135,12 @@ export async function syncCwaCatalogProgress(
         return;
       }
       const documentId = cached?.document_id || await partialMd5DocumentIdFromHttp(downloadUrl, headers);
-      const remote = await fetchRemoteProgress(baseUrl, auth.username, documentId, auth.password);
+      const remote = await fetchRemoteProgress(
+        account.server_url,
+        account.username,
+        documentId,
+        syncPassword,
+      );
       checked += 1;
       if (remote) {
         await upsertBookSyncState(db, {
@@ -141,7 +154,7 @@ export async function syncCwaCatalogProgress(
           remote_progress: remote.progress,
           last_error: '',
         });
-        if (remote.percentage > 0) {
+        if ((remote.percentage ?? 0) > 0) {
           await applyRemotePercentage(db, book.id, remote.percentage);
           updated += 1;
         }

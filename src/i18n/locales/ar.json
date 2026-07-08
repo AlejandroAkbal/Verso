@@ -222,7 +222,7 @@
   "sync": {
     "title": "مزامنة KOReader",
     "header": "خادم المزامنة",
-    "footer": "في Calibre-Web Automated استخدم مضيف مكتبتك مع /kosync (مثل https://books.example.com/kosync). MD5 الجزئي يوافق التقدّم مع KOReader ومكتبة Calibre.",
+    "footer": "تنطبق المزامنة على كل ملفات EPUB المنزّلة في {{appName}}. يمكن لـ Calibre-Web Automated توفير خادم /kosync باستخدام اسم مستخدم وكلمة مرور المكتبة نفسها؛ يستخدم sync.koreader.rocks كلمة مرور حساب KOReader (مصادقة MD5).",
     "settingsFooter": "تابع القراءة عبر KOReader وThorium وهذا التطبيق.",
     "settingsRowHint": "Calibre-Web /kosync — نفس تقدّم KOReader في مكتبتك",
     "useLibraryServer": "استخدام خادم المكتبة",

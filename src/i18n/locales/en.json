@@ -206,7 +206,7 @@
   "sync": {
     "title": "KOReader Sync",
     "header": "Sync server",
-    "footer": "For Calibre-Web Automated, use your library host (e.g. https://books.example.com) with the same username and password as OPDS — not /kosync in the URL. For sync.koreader.rocks, use your KOReader account password (MD5 auth).",
+    "footer": "Sync applies to every downloaded EPUB in {{appName}}. Calibre-Web Automated can provide a /kosync server using the same library username and password; sync.koreader.rocks uses your KOReader account password (MD5 auth).",
     "settingsFooter": "Resume reading across KOReader, Thorium, and this app.",
     "settingsRowHint": "Calibre-Web host or sync.koreader.rocks — same progress as KOReader",
     "useLibraryServer": "Use library server",

@@ -6,6 +6,13 @@ Living product and engineering backlog. Keep this file current when new durable 
 
 - [x] Onboarding KOReader enable button should health-check sync first: use saved profile if present, otherwise active Calibre-Web Automated library credentials; continue to Library on success, show KOReader settings only on failure.
 - [x] Reset All App Data must wipe everything from this device as if the app was uninstalled: servers, libraries, books, downloads/files, progress, sync state/accounts, preferences, cached query state, and saved secrets.
+- [x] Fix onboarding KOReader enable after Reset All App Data: after using a library server, enabling sync must pull existing remote book progress instead of only validating credentials.
+- [x] Investigate slow OPDS onboarding Connect My Library flow and remove avoidable waits without weakening connection validation.
+- [x] Move onboarding KOReader progress sync to background: Enable should validate/save fast, enter Library, then sync catalog/progress without blocking intro screen.
+- [x] Fix download completion KOReader sync crash: `finalizeAsync` must never insert null `reading_progress.progression`.
+- [x] Fix slow Read button flow: already-downloaded books should open without blocking on avoidable KOReader/network work.
+- [x] Redesign KOReader sync as global account first; active-library CWA detection only setup shortcut.
+- [x] Fix KOReader account-source selection: saved global account without password must block active-library CWA shortcut and return null.
 - [ ] Dogfood KOReader sync during real reading sessions (round-trip verified working; keep an eye on conflict UX across devices).
 
 ## Next

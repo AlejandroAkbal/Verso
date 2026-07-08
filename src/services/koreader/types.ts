@@ -6,7 +6,8 @@ export type KoreaderProgressPayload = {
   device: string;
 };
 
-export type KoreaderProgressResponse = KoreaderProgressPayload & {
+export type KoreaderProgressResponse = Omit<KoreaderProgressPayload, 'percentage'> & {
+  percentage: number | null;
   timestamp: number;
 };
 

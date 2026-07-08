@@ -27,6 +27,7 @@ import {
 } from './client';
 import { computeDocumentId } from './documentId';
 import { getOrCreateKoreaderDeviceId } from './deviceId';
+import { normalizeRemotePercentage } from './progress';
 import { resolveKosyncProfile } from './profile';
 import {
   CONFLICT_PROGRESS_DELTA,
@@ -159,12 +160,13 @@ export async function pullRemoteProgressForBook(
 export async function applyRemotePercentage(
   db: SQLiteDatabase,
   bookId: string,
-  percentage: number,
+  percentage: number | null | undefined,
 ): Promise<void> {
-  const locator = percentageToLocator(percentage);
+  const progression = normalizeRemotePercentage(percentage);
+  const locator = percentageToLocator(progression);
   await upsertReadingProgress(db, {
     book_id: bookId,
-    progression: percentage,
+    progression,
     locator_json: JSON.stringify(locator),
     updated_at: Date.now(),
   });

@@ -7,6 +7,7 @@ import {
   kosyncRequestHeaders,
 } from './credentials';
 import { kosyncEndpoint, resolveKosyncProfile } from './profile';
+import { normalizeRemotePercentage } from './progress';
 import type {
   KoreaderProgressPayload,
   KoreaderProgressResponse,
@@ -174,5 +175,5 @@ export function hasSyncConflict(
   if (remoteMs <= localUpdatedAt) {
     return false;
   }
-  return Math.abs(remote.percentage - localProgression) >= 0.02;
+  return Math.abs(normalizeRemotePercentage(remote.percentage) - localProgression) >= 0.02;
 }

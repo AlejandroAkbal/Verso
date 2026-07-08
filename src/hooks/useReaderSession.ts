@@ -24,8 +24,8 @@ function isEpubMime(mime: string): boolean {
 }
 
 /**
- * Loads a book for the reader: pulls remote KOReader progress (prompting on
- * conflict), resolves the local EPUB, and exposes the Readium file + progress.
+ * Loads a book for the reader, then checks remote KOReader progress without
+ * blocking the local EPUB open.
  */
 export function useReaderSession(id: string | undefined) {
   const db = useSQLiteContext();
@@ -77,22 +77,21 @@ export function useReaderSession(id: string | undefined) {
           await acknowledgeBook(db, id);
           await setLastOpenBookId(db, id);
 
-          const pull = await pullRemoteProgressForBook(db, id);
-
-          if (pull.hasConflict && pull.remote) {
-            promptSyncConflict(
-              t,
-              () => {
-                void applyRemotePercentage(db, id, pull.remote!.percentage).then(
-                  openWithLocalProgress,
-                );
-              },
-              openWithLocalProgress,
-            );
-            return;
-          }
-
           await openWithLocalProgress();
+
+          void pullRemoteProgressForBook(db, id).then((pull) => {
+            if (pull.hasConflict && pull.remote) {
+              promptSyncConflict(
+                t,
+                () => {
+                  void applyRemotePercentage(db, id, pull.remote!.percentage).then(
+                    openWithLocalProgress,
+                  );
+                },
+                () => undefined,
+              );
+            }
+          }).catch(() => undefined);
         } catch (err) {
           setError(err instanceof Error ? err.message : t('reader.loadFailed'));
           setLoading(false);

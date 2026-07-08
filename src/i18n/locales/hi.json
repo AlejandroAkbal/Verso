@@ -206,7 +206,7 @@
   "sync": {
     "title": "KOReader सिंक",
     "header": "सिंक सर्वर",
-    "footer": "Calibre-Web Automated के लिए अपने होस्ट पर /kosync उपयोग करें (जैसे https://books.example.com/kosync)। आंशिक MD5 KOReader और Calibre लाइब्रेरी के साथ प्रगति मिलाता है।",
+    "footer": "सिंक {{appName}} में डाउनलोड किए गए हर EPUB पर लागू होता है। Calibre-Web Automated उसी लाइब्रेरी उपयोगकर्ता नाम और पासवर्ड से /kosync सर्वर दे सकता है; sync.koreader.rocks आपके KOReader खाते का पासवर्ड (MD5 auth) उपयोग करता है।",
     "settingsFooter": "KOReader, Thorium और इस ऐप में पढ़ना जारी रखें।",
     "settingsRowHint": "Calibre-Web /kosync — आपकी लाइब्रेरी में KOReader जैसी प्रगति",
     "useLibraryServer": "लाइब्रेरी सर्वर उपयोग करें",

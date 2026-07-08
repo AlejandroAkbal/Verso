@@ -9,7 +9,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/ThemedText';
 import { Box, PressableBox } from '@/components/ui';
 import { useOnboarding } from '@/db/hooks/useOnboarding';
-import { verifyExistingOrActiveLibrarySync } from '@/services/koreader/onboarding';
+import {
+  syncActiveLibraryCatalogProgress,
+  verifyExistingOrActiveLibrarySync,
+} from '@/services/koreader/onboarding';
 import { useTheme } from '@/theme/ThemeProvider';
 
 export default function OnboardingSyncScreen() {
@@ -31,6 +34,9 @@ export default function OnboardingSyncScreen() {
     try {
       if (await verifyExistingOrActiveLibrarySync(db)) {
         await finish();
+        requestAnimationFrame(() => {
+          void syncActiveLibraryCatalogProgress(db).catch(() => undefined);
+        });
         return;
       }
     } catch {
