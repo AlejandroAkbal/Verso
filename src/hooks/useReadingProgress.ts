@@ -3,6 +3,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 
 import { getAllReadingProgress } from '@/db/queries';
 import type { ReadingProgressRow } from '@/db/schema';
+import { subscribeReadingProgressChanged } from '@/services/readingProgress/changes';
 
 export function useReadingProgressMap() {
   const db = useSQLiteContext();
@@ -26,10 +27,9 @@ export function useReadingProgressMap() {
     queueMicrotask(() => {
       void refresh();
     });
-    const interval = setInterval(() => {
+    return subscribeReadingProgressChanged(() => {
       void refresh();
-    }, 3000);
-    return () => clearInterval(interval);
+    });
   }, [refresh]);
 
   return { progressByBookId, loading, refresh };

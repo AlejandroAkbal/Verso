@@ -4,9 +4,12 @@ import { getBooksByServerId, getBookSyncState, upsertBookSyncState } from '@/db/
 import type { BookRow } from '@/db/schema';
 import { Md5Hasher } from '@/lib/md5';
 import { fetchRemoteProgress } from '@/services/koreader/client';
+import { partialMd5Offsets } from '@/services/koreader/documentId';
 import { applyRemotePercentage, isSyncActive } from '@/services/koreader/syncBook';
 import { authToHeaders, getServerAuth } from '@/services/opds/credentials';
 import { deriveKosyncUrlFromOpdsUrl } from '@/services/opds/url';
+
+import { isSameOriginUrl, resolveDownloadUrl } from './cwaProgressOrigin';
 
 const CWA_BOOK_ID_PATTERN = /\/opds\/download\/(\d+)\//;
 const MAX_CONCURRENT = 8;
@@ -58,8 +61,7 @@ async function partialMd5DocumentIdFromHttp(
 ): Promise<string> {
   const hasher = new Md5Hasher();
 
-  for (let i = -1; i <= 10; i += 1) {
-    const offset = CHUNK_SIZE << (2 * i);
+  for (const offset of partialMd5Offsets()) {
     const chunk = await fetchRangeChunk(url, headers, offset);
     if (!chunk) {
       break;
@@ -119,7 +121,12 @@ export async function syncCwaCatalogProgress(
       ) {
         return;
       }
-      const documentId = cached?.document_id || await partialMd5DocumentIdFromHttp(book.download_url, headers);
+      const downloadUrl = resolveDownloadUrl(book.download_url, server.url);
+      if (!downloadUrl || !isSameOriginUrl(downloadUrl, server.url)) {
+        errors += 1;
+        return;
+      }
+      const documentId = cached?.document_id || await partialMd5DocumentIdFromHttp(downloadUrl, headers);
       const remote = await fetchRemoteProgress(baseUrl, auth.username, documentId, auth.password);
       checked += 1;
       if (remote) {

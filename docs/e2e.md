@@ -11,11 +11,13 @@
 
 Maestro deep-links via `exp+opds-reader://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081`. If Metro is down, the dev client shows a red error screen — tap **Reload** after starting Metro.
 
-## Run all flows
+## Run checks
 
 ```bash
-pnpm start          # separate terminal
-pnpm e2e:ios        # runs every YAML in .maestro/
+pnpm verify:preflight  # typecheck + lint
+pnpm start             # separate terminal
+pnpm verify:e2e        # runs every YAML in .maestro/
+pnpm verify:ship       # preflight + E2E
 ```
 
 Run one flow:
@@ -40,12 +42,16 @@ maestro --device <UDID> test .maestro/
 
 | File | Covers |
 |------|--------|
-| `library-smoke.yaml` | Dev client → Library visible |
-| `settings-smoke.yaml` | Settings gear → OPDS Servers → KOReader row |
-| `koreader-settings.yaml` | KOReader sync form fields |
 | `book-detail.yaml` | Grid tap → book detail screen |
+| `complete-onboarding.yaml` | First-run onboarding completion |
 | `download-book.yaml` | Download from detail → Read button |
+| `filter-test.yaml` | Sort/filter sheet opens and closes |
+| `koreader-settings.yaml` | KOReader sync form fields |
+| `library-header-scroll-top.yaml` | Library title tap scrolls list to top |
+| `library-smoke.yaml` | Dev client → Library visible |
+| `library-switch.yaml` | Settings library switch updates active library |
 | `reader-open.yaml` | Download → Read → Readium reader open (`reader-screen`), then back |
+| `settings-smoke.yaml` | Settings gear → OPDS Servers → KOReader row |
 
 Add a new flow when shipping user-visible behavior. Prefer `testID` and accessibility labels over coordinate taps.
 
@@ -65,10 +71,9 @@ remote progress that conflicts with local. To exercise it end to end:
 - Use `testID` on interactive controls (see library settings gear, KOReader rows).
 - `extendedWaitUntil` with 60–90s timeout for cold Metro bundle.
 - Optional `tapOn: Reload` when the dev client may be stale.
-- **No Jest / Vitest / component tests** unless explicitly requested — extend Maestro instead.
+- Vitest is reserved for data-layer characterization tests; no component tests unless explicitly requested.
 
 ## Where tests run
 
 Local only, on our own simulators/emulators — there is no GitHub Actions pipeline. Run
-`pnpm typecheck` + `pnpm lint` and the Maestro flows on a booted device before shipping
-user-visible changes.
+`pnpm verify:preflight` for type/lint checks and `pnpm verify:e2e` on a booted device before shipping user-visible changes. `pnpm verify:ship` runs both.

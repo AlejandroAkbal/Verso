@@ -85,6 +85,7 @@ export function BookDetailQuickActions({
           paddingVertical="sm"
           backgroundColor="secondary"
           onPress={onRemoveDownload}
+          testID="book-detail-remove-download"
         >
           <SymbolView name="trash" size={18} tintColor={theme.colors.error} />
           <ThemedText variant="caption" color={theme.colors.error}>

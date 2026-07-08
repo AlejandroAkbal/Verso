@@ -204,22 +204,25 @@ Single sync account for v1 (`id = 'default'`). Multi-account later.
 
 ---
 
-## Module layout (planned)
+## Module layout
 
 ```text
 src/services/koreader/
-  auth.ts           # MD5 password, headers, testConnection
+  client.ts         # GET/PUT progress + connection test
+  credentials.ts    # password storage, MD5 auth key, headers
+  cwaProgress.ts    # CWA catalog progress restore via range partial-MD5
+  deviceId.ts       # stable device_id generation
   documentId.ts     # partialMd5 + filename mode
-  client.ts         # GET/PUT progress
-  mapProgress.ts    # Readium locator ↔ KOReader payload
+  fileName.ts       # filename extraction for filename document IDs
+  profile.ts        # KOSync profile/auth-mode resolution
   syncBook.ts       # pull/push orchestration per book
-  deviceId.ts       # stable device_id generation (AsyncStorage)
+  types.ts          # KOSync payload/response types
 ```
 
 Hooks:
 
-- `useKoreaderSync()` — settings + enabled state
-- `useSyncOnForeground()` — AppState listener in `_layout.tsx`
+- Reader/open hooks call `pullRemoteProgressForBook()` before opening local books.
+- Library refresh calls CWA catalog progress sync for compatible servers.
 
 ---
 

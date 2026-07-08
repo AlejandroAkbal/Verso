@@ -61,12 +61,9 @@ export function useReaderProgress(
       saveTimer.current = setTimeout(() => {
         saveTimer.current = null;
         void flushProgress();
-        void pushLocalProgressForBook(db, id, {
-          positionCount: positionCountRef.current,
-        });
       }, PROGRESS_SAVE_MS);
     },
-    [db, flushProgress, id, onProgression],
+    [flushProgress, id, onProgression],
   );
 
   useEffect(() => {

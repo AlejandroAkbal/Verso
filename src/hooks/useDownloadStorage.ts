@@ -20,18 +20,10 @@ export function useDownloadStorageStats() {
     queueMicrotask(() => {
       void refresh();
     });
-    const interval = setInterval(() => {
-      void refresh();
-    }, 3000);
 
-    const unsubscribe = subscribeDownloadsChanged(() => {
+    return subscribeDownloadsChanged(() => {
       void refresh();
     });
-
-    return () => {
-      clearInterval(interval);
-      unsubscribe();
-    };
   }, [refresh]);
 
   return { stats, refresh };

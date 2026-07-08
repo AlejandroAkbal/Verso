@@ -1,5 +1,7 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
+import { notifyReadingProgressChanged } from '@/services/readingProgress/changes';
+
 import type {
   BookRow,
   BookSyncStateRow,
@@ -320,6 +322,7 @@ export async function upsertReadingProgress(
       progress.updated_at,
     ],
   );
+  notifyReadingProgressChanged(progress.book_id);
 }
 
 export async function getReadingProgress(

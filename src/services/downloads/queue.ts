@@ -191,9 +191,18 @@ async function downloadBook(db: SQLiteDatabase, bookId: string): Promise<void> {
 
     if (!downloadResult) {
       if (cancelledTasks.delete(bookId)) {
+        await deleteDownload(db, bookId);
+        notifyDownloadsChanged();
         return;
       }
       throw new Error('Download cancelled');
+    }
+
+    if (cancelledTasks.delete(bookId)) {
+      await removeExistingFile(downloadResult.uri);
+      await deleteDownload(db, bookId);
+      notifyDownloadsChanged();
+      return;
     }
 
     const size = await fileSize(downloadResult.uri);
@@ -216,6 +225,7 @@ async function downloadBook(db: SQLiteDatabase, bookId: string): Promise<void> {
   } catch (error) {
     activeTasks.delete(bookId);
     if (cancelledTasks.delete(bookId)) {
+      await deleteDownload(db, bookId);
       notifyDownloadsChanged();
       return;
     }
@@ -233,7 +243,8 @@ export async function cancelDownload(
   if (task) {
     cancelledTasks.add(bookId);
     task.cancel();
-    activeTasks.delete(bookId);
+    notifyDownloadsChanged();
+    return;
   }
   await deleteDownload(db, bookId);
   notifyDownloadsChanged();

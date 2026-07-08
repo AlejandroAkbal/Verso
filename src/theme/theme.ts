@@ -120,27 +120,6 @@ const rawTheme = {
       flexShrink: 1,
     },
   },
-  typography: {
-    fontFamily: {
-      regular: 'System',
-      medium: 'System',
-      bold: 'System',
-    },
-    sizes: {
-      xs: 11,
-      sm: 13,
-      md: 15,
-      lg: 17,
-      xl: 22,
-      xxl: 28,
-      display: 34,
-    },
-    lineHeights: {
-      tight: 1.2,
-      normal: 1.5,
-      relaxed: 1.75,
-    },
-  },
   cover: {
     aspectRatio: 2 / 3,
     /** Physical books — square corners on grid jackets. */

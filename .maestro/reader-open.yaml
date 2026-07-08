@@ -10,8 +10,20 @@ appId: dev.akbal.opdsreader
 - extendedWaitUntil:
     visible: "Search your library"
     timeout: 30000
-# Deep-link to a stable catalog book (same seed as download-book.yaml).
-- openLink: opds-reader://book/af521524347c2af8cf57c1147ae6645d
+- tapOn:
+    id: "library-settings"
+- extendedWaitUntil:
+    visible: "OPDS Servers"
+    timeout: 15000
+- tapOn: "Calibre-Web Automated,.*"
+- tapOn:
+    text: "Done"
+    optional: true
+- extendedWaitUntil:
+    visible: "Calibre-Web Automated"
+    timeout: 30000
+# Deep-link to a stable CWA EPUB book (same seed as download-book.yaml).
+- openLink: opds-reader://book/a1cc9f5fe4ade588ea3181f7efedd184
 # Download first when the book is not already on device.
 - runFlow:
     when:

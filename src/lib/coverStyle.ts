@@ -19,14 +19,3 @@ export const coverShadowStyle = {
   shadowRadius: 20,
   elevation: 14,
 } as const;
-
-/** Soft, book-colored depth glow for grid covers (shadow only — no blur layer). */
-export function coverGlowStyle(glow: string) {
-  return {
-    shadowColor: glow,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.45,
-    shadowRadius: 14,
-    elevation: 8,
-  } as const;
-}

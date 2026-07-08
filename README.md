@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="./assets/images/icon.png" alt="Reader" width="96" height="96" />
+  <img src="./assets/images/icon.png" alt="Verso" width="96" height="96" />
 </p>
 
-<h1 align="center">OPDS Reader</h1>
+<h1 align="center">Verso</h1>
 
 <p align="center">
   <strong>A premium, local-first, OPDS-first e-book reader for iOS & Android.</strong><br />

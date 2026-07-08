@@ -1,7 +1,7 @@
 import * as LegacyFS from 'expo-file-system/legacy';
 
-import { md5Hex, Md5Hasher } from '@/lib/md5';
-import type { DocumentIdMode } from '@/db/schema';
+import { md5Hex, Md5Hasher } from '../../lib/md5';
+import type { DocumentIdMode } from '../../db/schema';
 
 import { fileNameFromUri } from './fileName';
 
@@ -14,13 +14,20 @@ function base64ToBytes(base64: string): Uint8Array {
   return bytes;
 }
 
+export function partialMd5Offsets(): number[] {
+  const step = 1024;
+  const offsets: number[] = [];
+  for (let i = -1; i <= 10; i += 1) {
+    offsets.push(step << (2 * i));
+  }
+  return offsets;
+}
+
 export async function partialMd5DocumentId(localUri: string): Promise<string> {
   const hasher = new Md5Hasher();
-  const step = 1024;
   const size = 1024;
 
-  for (let i = -1; i <= 10; i += 1) {
-    const offset = step << (2 * i);
+  for (const offset of partialMd5Offsets()) {
     const base64 = await LegacyFS.readAsStringAsync(localUri, {
       encoding: LegacyFS.EncodingType.Base64,
       position: offset,

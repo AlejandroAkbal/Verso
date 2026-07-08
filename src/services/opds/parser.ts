@@ -1,6 +1,4 @@
-import { authToHeaders } from './credentials';
 import { XMLParser } from 'fast-xml-parser';
-import * as Crypto from 'expo-crypto';
 
 import type { BookRow } from '@/db/schema';
 import type { OPDSEntry, OPDSFeed, OPDSNavigationEntry, OpdsAuth } from './types';
@@ -9,6 +7,9 @@ type XmlPrimitive = string | number | boolean;
 interface XmlNode {
   [key: string]: XmlPrimitive | XmlNode | XmlNode[] | undefined;
 }
+
+const OPDS_FETCH_TIMEOUT_MS = 30_000;
+const OPDS_PAGINATION_TIMEOUT_MS = 120_000;
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -324,14 +325,34 @@ export function parseOPDSFeed(xml: string, feedUrl: string): OPDSFeed {
   };
 }
 
+function createTimeoutSignal(ms: number): AbortSignal {
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), ms);
+  return controller.signal;
+}
+
+function isAbortError(error: unknown): boolean {
+  return error instanceof Error && error.name === 'AbortError';
+}
+
 export async function fetchOPDSFeed(url: string, auth: OpdsAuth | null = null): Promise<OPDSFeed> {
-  const response = await fetch(url, {
-    headers: {
-      Accept: 'application/atom+xml, application/xml, text/xml, */*',
-      ...authToHeaders(auth),
-    },
-    redirect: 'follow',
-  });
+  const { authToHeaders } = await import('./credentials');
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      headers: {
+        Accept: 'application/atom+xml, application/xml, text/xml, */*',
+        ...authToHeaders(auth),
+      },
+      redirect: 'follow',
+      signal: createTimeoutSignal(OPDS_FETCH_TIMEOUT_MS),
+    });
+  } catch (error) {
+    if (isAbortError(error)) {
+      throw new Error('OPDS request timed out');
+    }
+    throw error;
+  }
 
   if (!response.ok) {
     throw new Error(`OPDS fetch failed: ${response.status} ${response.statusText}`);
@@ -357,8 +378,12 @@ export async function fetchAllOPDSEntries(
   let searchUrl: string | null = null;
   let currentUrl: string | null = startUrl;
   let page = 0;
+  const deadline = Date.now() + OPDS_PAGINATION_TIMEOUT_MS;
 
   while (currentUrl && page < maxPages) {
+    if (Date.now() > deadline) {
+      throw new Error('OPDS pagination timed out');
+    }
     const feed = await fetchOPDSFeed(currentUrl, auth);
     if (!searchUrl && feed.searchUrl) {
       searchUrl = feed.searchUrl;
@@ -399,6 +424,7 @@ export async function searchOPDSEntries(
 }
 
 export async function createBookId(serverId: string, opdsId: string): Promise<string> {
+  const Crypto = await import('expo-crypto');
   const digest = await Crypto.digestStringAsync(
     Crypto.CryptoDigestAlgorithm.SHA256,
     `${serverId}:${opdsId}`,

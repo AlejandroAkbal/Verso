@@ -20,25 +20,42 @@ export async function migrateDatabase(db: SQLiteDatabase): Promise<void> {
   }
 }
 
-async function ensureLibraryPreferenceColumns(db: SQLiteDatabase): Promise<void> {
-  const columns = await db.getAllAsync<{ name: string }>('PRAGMA table_info(user_preferences)');
-  const names = new Set(columns.map((column) => column.name));
+async function tableColumnNames(db: SQLiteDatabase, table: string): Promise<Set<string>> {
+  const columns = await db.getAllAsync<{ name: string }>(`PRAGMA table_info(${table})`);
+  return new Set(columns.map((column) => column.name));
+}
 
-  if (!names.has('library_sort')) {
-    await db.runAsync(
-      `ALTER TABLE user_preferences ADD COLUMN library_sort TEXT NOT NULL DEFAULT 'recent'`,
-    );
+async function addColumnIfMissing(
+  db: SQLiteDatabase,
+  table: string,
+  column: string,
+  definition: string,
+): Promise<void> {
+  const names = await tableColumnNames(db, table);
+  if (!names.has(column)) {
+    await db.runAsync(`ALTER TABLE ${table} ADD COLUMN ${definition}`);
   }
-  if (!names.has('library_filter')) {
-    await db.runAsync(
-      `ALTER TABLE user_preferences ADD COLUMN library_filter TEXT NOT NULL DEFAULT 'all'`,
-    );
-  }
-  if (!names.has('library_category_filter')) {
-    await db.runAsync(
-      `ALTER TABLE user_preferences ADD COLUMN library_category_filter TEXT NOT NULL DEFAULT ''`,
-    );
-  }
+}
+
+async function ensureLibraryPreferenceColumns(db: SQLiteDatabase): Promise<void> {
+  await addColumnIfMissing(
+    db,
+    'user_preferences',
+    'library_sort',
+    `library_sort TEXT NOT NULL DEFAULT 'recent'`,
+  );
+  await addColumnIfMissing(
+    db,
+    'user_preferences',
+    'library_filter',
+    `library_filter TEXT NOT NULL DEFAULT 'all'`,
+  );
+  await addColumnIfMissing(
+    db,
+    'user_preferences',
+    'library_category_filter',
+    `library_category_filter TEXT NOT NULL DEFAULT ''`,
+  );
 }
 
 async function runMigrations(db: SQLiteDatabase): Promise<void> {
@@ -87,13 +104,12 @@ async function runMigrations(db: SQLiteDatabase): Promise<void> {
     }
 
     if (versionRow.version < 4) {
-      try {
-        await db.runAsync(
-          `ALTER TABLE servers ADD COLUMN auth_username TEXT NOT NULL DEFAULT ''`,
-        );
-      } catch {
-        // Column may already exist on fresh installs.
-      }
+      await addColumnIfMissing(
+        db,
+        'servers',
+        'auth_username',
+        `auth_username TEXT NOT NULL DEFAULT ''`,
+      );
 
       await db.execAsync(`
         CREATE TABLE IF NOT EXISTS user_preferences (
@@ -108,13 +124,12 @@ async function runMigrations(db: SQLiteDatabase): Promise<void> {
     }
 
     if (versionRow.version < 5) {
-      try {
-        await db.runAsync(
-          `ALTER TABLE books ADD COLUMN categories TEXT NOT NULL DEFAULT '[]'`,
-        );
-      } catch {
-        // Column may already exist on fresh installs.
-      }
+      await addColumnIfMissing(
+        db,
+        'books',
+        'categories',
+        `categories TEXT NOT NULL DEFAULT '[]'`,
+      );
     }
 
     if (versionRow.version < 6) {
@@ -123,13 +138,12 @@ async function runMigrations(db: SQLiteDatabase): Promise<void> {
     }
 
     if (versionRow.version < 7) {
-      try {
-        await db.runAsync(
-          `ALTER TABLE user_preferences ADD COLUMN active_server_id TEXT NOT NULL DEFAULT ''`,
-        );
-      } catch {
-        // Column may already exist on fresh installs.
-      }
+      await addColumnIfMissing(
+        db,
+        'user_preferences',
+        'active_server_id',
+        `active_server_id TEXT NOT NULL DEFAULT ''`,
+      );
     }
 
     if (versionRow.version < 8) {
@@ -151,27 +165,24 @@ async function runMigrations(db: SQLiteDatabase): Promise<void> {
     }
 
     if (versionRow.version < 10) {
-      try {
-        await db.runAsync(
-          `ALTER TABLE user_preferences ADD COLUMN koreader_sync_enabled INTEGER NOT NULL DEFAULT 0`,
-        );
-      } catch {
-        // Column may already exist on fresh installs.
-      }
-      try {
-        await db.runAsync(
-          `ALTER TABLE user_preferences ADD COLUMN resume_last_book INTEGER NOT NULL DEFAULT 0`,
-        );
-      } catch {
-        // Column may already exist on fresh installs.
-      }
-      try {
-        await db.runAsync(
-          `ALTER TABLE user_preferences ADD COLUMN last_open_book_id TEXT NOT NULL DEFAULT ''`,
-        );
-      } catch {
-        // Column may already exist on fresh installs.
-      }
+      await addColumnIfMissing(
+        db,
+        'user_preferences',
+        'koreader_sync_enabled',
+        `koreader_sync_enabled INTEGER NOT NULL DEFAULT 0`,
+      );
+      await addColumnIfMissing(
+        db,
+        'user_preferences',
+        'resume_last_book',
+        `resume_last_book INTEGER NOT NULL DEFAULT 0`,
+      );
+      await addColumnIfMissing(
+        db,
+        'user_preferences',
+        'last_open_book_id',
+        `last_open_book_id TEXT NOT NULL DEFAULT ''`,
+      );
 
       await db.execAsync(`
         CREATE TABLE IF NOT EXISTS sync_accounts (

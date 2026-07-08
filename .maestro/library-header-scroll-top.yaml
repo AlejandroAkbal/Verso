@@ -21,9 +21,11 @@ appId: dev.akbal.opdsreader
     visible: "OPDS Servers"
     timeout: 15000
 - tapOn: "Calibre-Web Automated,.*"
+- tapOn:
+    text: "Done"
+    optional: true
 - extendedWaitUntil:
-    visible:
-      id: "library-refresh"
+    visible: "Calibre-Web Automated"
     timeout: 30000
 # Wait for books to load
 - extendedWaitUntil:
