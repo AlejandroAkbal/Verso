@@ -1,6 +1,6 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-import { getBooksByServerId, upsertBookSyncState } from '@/db/queries';
+import { getBooksByServerId, getBookSyncState, upsertBookSyncState } from '@/db/queries';
 import type { BookRow } from '@/db/schema';
 import { Md5Hasher } from '@/lib/md5';
 import { fetchRemoteProgress } from '@/services/koreader/client';
@@ -110,23 +110,38 @@ export async function syncCwaCatalogProgress(
 
   await runPool(candidates, async (book) => {
     try {
-      const documentId = await partialMd5DocumentIdFromHttp(book.download_url, headers);
+      const cached = await getBookSyncState(db, book.id);
+      const documentId = cached?.document_id || await partialMd5DocumentIdFromHttp(book.download_url, headers);
       const remote = await fetchRemoteProgress(baseUrl, auth.username, documentId, auth.password);
       checked += 1;
-      if (remote && remote.percentage > 0) {
-        await applyRemotePercentage(db, book.id, remote.percentage);
+      if (remote) {
         await upsertBookSyncState(db, {
           book_id: book.id,
           document_id: documentId,
           document_id_mode: 'partial_md5',
-          last_pushed_at: 0,
+          last_pushed_at: cached?.last_pushed_at ?? 0,
           last_pulled_at: Date.now(),
           remote_timestamp: remote.timestamp,
           remote_percentage: remote.percentage,
           remote_progress: remote.progress,
           last_error: '',
         });
-        updated += 1;
+        if (remote.percentage > 0) {
+          await applyRemotePercentage(db, book.id, remote.percentage);
+          updated += 1;
+        }
+      } else if (!cached?.document_id) {
+        await upsertBookSyncState(db, {
+          book_id: book.id,
+          document_id: documentId,
+          document_id_mode: 'partial_md5',
+          last_pushed_at: 0,
+          last_pulled_at: Date.now(),
+          remote_timestamp: 0,
+          remote_percentage: null,
+          remote_progress: '',
+          last_error: '',
+        });
       }
     } catch {
       errors += 1;
