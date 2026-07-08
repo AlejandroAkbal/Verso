@@ -10,6 +10,18 @@ import { useTheme } from '@/theme/ThemeProvider';
 import type { LibrarySort } from '@/hooks/useLibraryFilters';
 import { useLibraryFilterContext } from '@/context/LibraryFilterContext';
 
+function closeFilter(router: ReturnType<typeof useRouter>) {
+  if (router.canDismiss()) {
+    router.dismiss();
+    return;
+  }
+  if (router.canGoBack()) {
+    router.back();
+    return;
+  }
+  router.replace('/(tabs)');
+}
+
 export default function LibraryFilterScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -29,7 +41,7 @@ export default function LibraryFilterScreen() {
         options={{
           title: t('library.sortAndFilter', 'Sort & Filter'),
           headerRight: () => (
-            <Pressable onPress={() => router.back()} hitSlop={12}>
+            <Pressable onPress={() => closeFilter(router)} hitSlop={12}>
               <ThemedText style={{ color: theme.colors.interactive, fontSize: 17, fontWeight: '600' }}>
                 {t('common.done')}
               </ThemedText>

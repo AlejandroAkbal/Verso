@@ -4,6 +4,18 @@ import { ToastProvider } from '@/components/toast/ToastProvider';
 import { PressableBox, Text } from '@/components/ui';
 import { theme } from '@/theme/theme';
 
+function closeSettings(router: ReturnType<typeof useRouter>) {
+  if (router.canDismiss()) {
+    router.dismiss();
+    return;
+  }
+  if (router.canGoBack()) {
+    router.back();
+    return;
+  }
+  router.replace('/(tabs)');
+}
+
 export default function SettingsLayout() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -26,7 +38,7 @@ export default function SettingsLayout() {
           title: t('settings.title'),
           headerLargeTitle: false,
           headerRight: () => (
-            <PressableBox onPress={() => router.back()} hitSlop={12}>
+            <PressableBox onPress={() => closeSettings(router)} hitSlop={12}>
               <Text style={{ color: theme.colors.interactive, fontSize: 17, fontWeight: '600' }}>{t('common.done')}</Text>
             </PressableBox>
           ),
@@ -52,7 +64,7 @@ export default function SettingsLayout() {
           title: t('sync.title'),
           presentation: 'card',
           headerRight: () => (
-            <PressableBox onPress={() => router.back()} hitSlop={12}>
+            <PressableBox onPress={() => closeSettings(router)} hitSlop={12}>
               <Text style={{ color: theme.colors.interactive, fontSize: 17, fontWeight: '600' }}>{t('common.done')}</Text>
             </PressableBox>
           ),
