@@ -6,6 +6,14 @@ import { useServers } from '@/db/hooks/useServers';
 import { queryClient } from '@/lib/queryClient';
 import type { ServerRow } from '@/db/schema';
 
+type ActiveServerListener = (serverId: string) => void;
+
+const activeServerListeners = new Set<ActiveServerListener>();
+
+function broadcastActiveServer(serverId: string) {
+  activeServerListeners.forEach((listener) => listener(serverId));
+}
+
 export function useActiveServer() {
   const db = useSQLiteContext();
   const { servers, loading: serversLoading } = useServers();
@@ -19,15 +27,20 @@ export function useActiveServer() {
   }, [db]);
 
   useEffect(() => {
+    activeServerListeners.add(setActiveServerIdState);
     queueMicrotask(() => {
       void refresh();
     });
+
+    return () => {
+      activeServerListeners.delete(setActiveServerIdState);
+    };
   }, [refresh]);
 
   const setActive = useCallback(
     async (serverId: string) => {
       await setActiveServerId(db, serverId);
-      setActiveServerIdState(serverId);
+      broadcastActiveServer(serverId);
       await queryClient.invalidateQueries({ queryKey: ['opds-catalog'] });
     },
     [db],

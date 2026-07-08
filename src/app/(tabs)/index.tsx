@@ -1,6 +1,6 @@
-import { FlashList } from '@shopify/flash-list';
+import { FlashList, type FlashListRef } from '@shopify/flash-list';
 import { useRouter, useFocusEffect } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, RefreshControl, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +31,7 @@ export default function LibraryScreen() {
   const { width } = useWindowDimensions();
   const { servers, loading: serversLoading } = useServers();
   const { activeServer, loading: activeServerLoading } = useActiveServer();
+  const listRef = useRef<FlashListRef<BookRow>>(null);
   const { downloads, refresh: refreshDownloads } = useDownloads();
   const { progressByBookId, refresh: refreshProgress, loading: progressLoading } = useReadingProgressMap();
   const [searchQuery, setSearchQuery] = useState('');
@@ -62,6 +63,10 @@ export default function LibraryScreen() {
   }, [refreshLibrary]);
 
   const isLibraryRefreshing = isRefreshing || isRefetching;
+
+  const scrollToTop = useCallback(() => {
+    listRef.current?.scrollToOffset({ offset: 0, animated: true });
+  }, []);
 
   const remoteSearch = useOPDSSearch(
     activeServer?.id,
@@ -267,6 +272,7 @@ export default function LibraryScreen() {
         isRefreshing={isLibraryRefreshing}
         onRefresh={() => void refreshLibrary()}
         onOpenSettings={() => router.push('/settings')}
+        onPressTitle={scrollToTop}
         topInset={insets.top}
       />
 
@@ -276,6 +282,7 @@ export default function LibraryScreen() {
         </Box>
       ) : (
         <FlashList
+          ref={listRef}
           data={visibleBooks}
           extraData={downloads}
           renderItem={renderItem}

@@ -20,6 +20,20 @@ import {
 } from '@/services/downloads/manage';
 import { useTheme } from '@/theme/ThemeProvider';
 
+function closeSettings(router: ReturnType<typeof useRouter>) {
+  if (router.canDismiss()) {
+    router.dismiss();
+    return;
+  }
+
+  if (router.canGoBack()) {
+    router.back();
+    return;
+  }
+
+  router.replace('/(tabs)');
+}
+
 function leaveSettingsFor(router: ReturnType<typeof useRouter>, href: '/' | '/(onboarding)') {
   if (router.canDismiss()) {
     router.dismiss();
@@ -117,8 +131,11 @@ export default function SettingsIndexScreen() {
             }
             selected={server.id === activeServerId}
             onPress={() => {
-              if (server.id === activeServerId) return;
-              void setActive(server.id).then(() => router.back());
+              if (server.id === activeServerId) {
+                closeSettings(router);
+                return;
+              }
+              void setActive(server.id).then(() => closeSettings(router));
             }}
             accessoryOnPress={() => router.push(`/settings/${server.id}`)}
           />

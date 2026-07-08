@@ -12,6 +12,7 @@ type LibraryHeaderProps = {
   isRefreshing: boolean;
   onRefresh: () => void;
   onOpenSettings: () => void;
+  onPressTitle: () => void;
   topInset: number;
 };
 
@@ -20,6 +21,7 @@ export function LibraryHeader({
   isRefreshing,
   onRefresh,
   onOpenSettings,
+  onPressTitle,
   topInset,
 }: LibraryHeaderProps) {
   const theme = useTheme();
@@ -50,11 +52,19 @@ export function LibraryHeader({
       >
         <Box flexDirection="row" alignItems="flex-start" justifyContent="space-between">
           <Box flex={1} gap="xs" style={{ paddingRight: 12 }}>
-            <ThemedText
-              style={{ fontSize: 34, fontWeight: '700', letterSpacing: -0.4, lineHeight: 40 }}
+            <PressableBox
+              onPress={onPressTitle}
+              accessibilityRole="button"
+              accessibilityLabel={t('library.title')}
+              hitSlop={8}
+              alignSelf="flex-start"
             >
-              {t('library.title')}
-            </ThemedText>
+              <ThemedText
+                style={{ fontSize: 34, fontWeight: '700', letterSpacing: -0.4, lineHeight: 40 }}
+              >
+                {t('library.title')}
+              </ThemedText>
+            </PressableBox>
             <ThemedText variant="caption" color={theme.colors.textMuted}>
               {subtitle}
             </ThemedText>

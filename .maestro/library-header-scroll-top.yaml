@@ -1,0 +1,43 @@
+appId: dev.akbal.opdsreader
+---
+- openLink: exp+opds-reader://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081
+- tapOn:
+    text: "Open"
+    optional: true
+- tapOn:
+    text: "Reload"
+    optional: true
+- tapOn:
+    text: "Done"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "library-settings"
+    timeout: 90000
+# Switch to CWA which has books
+- tapOn:
+    id: "library-settings"
+- extendedWaitUntil:
+    visible: "OPDS Servers"
+    timeout: 15000
+- tapOn: "Calibre-Web Automated,.*"
+- extendedWaitUntil:
+    visible:
+      id: "library-refresh"
+    timeout: 30000
+# Wait for books to load
+- extendedWaitUntil:
+    visible:
+      id: "library-filter"
+    timeout: 30000
+# Scroll down so search is hidden
+- scroll
+- scroll
+- assertNotVisible:
+    id: "library-filter"
+# Tap the Library title to scroll to top
+- tapOn: "Library"
+- extendedWaitUntil:
+    visible:
+      id: "library-filter"
+    timeout: 5000

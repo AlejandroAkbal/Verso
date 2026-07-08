@@ -21,10 +21,11 @@ Read https://docs.expo.dev/versions/v57.0.0/ before changing Expo APIs. **Expo G
 | Pod issues | `pnpm pod-install` |
 | Lint / types | `pnpm lint` / `pnpm typecheck` |
 | E2E (Maestro) | `pnpm e2e:ios` — see `docs/e2e.md` |
+| Ship check | `pnpm verify:ship` |
 
 `pnpm` only. iOS + Android only — no web. Config is `app.config.ts` (not `app.json`).
 
-**Testing:** E2E only (Maestro). No unit/component tests unless explicitly requested.
+**Testing:** E2E only (Maestro). No unit/component tests unless explicitly requested. Before pushing or marking a UI/data-flow change complete, run relevant Maestro coverage (`pnpm e2e:ios` or a targeted flow) and record the exact command; if skipped, state why.
 
 ---
 
