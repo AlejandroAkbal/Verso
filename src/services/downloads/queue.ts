@@ -4,6 +4,7 @@ import type { SQLiteDatabase } from 'expo-sqlite';
 
 import {
   acknowledgeBook,
+  deleteDownload,
   getActiveDownloads,
   getBookById,
   getDownloadByBookId,
@@ -27,6 +28,7 @@ const PROGRESS_WRITE_MS = 400;
 
 // Track active Expo File download tasks so we can cancel them mid-flight
 const activeTasks = new Map<string, ReturnType<typeof File.createDownloadTask>>();
+const cancelledTasks = new Set<string>();
 
 function getExtensionFromMime(mime: string, url: string): string {
   if (mime.includes('epub') || url.endsWith('.epub')) return '.epub';
@@ -185,6 +187,9 @@ async function downloadBook(db: SQLiteDatabase, bookId: string): Promise<void> {
     activeTasks.delete(bookId);
 
     if (!downloadResult) {
+      if (cancelledTasks.delete(bookId)) {
+        return;
+      }
       throw new Error('Download cancelled');
     }
 
@@ -206,6 +211,10 @@ async function downloadBook(db: SQLiteDatabase, bookId: string): Promise<void> {
     notifyDownloadsChanged();
   } catch (error) {
     activeTasks.delete(bookId);
+    if (cancelledTasks.delete(bookId)) {
+      notifyDownloadsChanged();
+      return;
+    }
     const message = error instanceof Error ? error.message : 'Download failed';
     await updateDownloadStatus(db, bookId, 'failed', { error: message });
     notifyDownloadsChanged();
@@ -218,9 +227,10 @@ export async function cancelDownload(
 ): Promise<void> {
   const task = activeTasks.get(bookId);
   if (task) {
+    cancelledTasks.add(bookId);
     task.cancel();
     activeTasks.delete(bookId);
   }
-  await updateDownloadStatus(db, bookId, 'cancelled');
+  await deleteDownload(db, bookId);
   notifyDownloadsChanged();
 }

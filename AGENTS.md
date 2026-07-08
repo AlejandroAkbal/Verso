@@ -71,7 +71,7 @@ Minimal diff · `@/` imports · Restyle primitives from `src/components/ui.tsx` 
 </PressableBox>
 ```
 
-Track durable product/engineering backlog in `TODO.md`.
+Track durable product/engineering backlog in `TODO.md`. When changing a feature, mention nearby UX/architecture improvements worth considering; do not implement them unless asked.
 
 ---
 

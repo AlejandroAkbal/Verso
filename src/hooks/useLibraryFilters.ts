@@ -20,6 +20,11 @@ function matchesSearch(book: BookRow, query: string): boolean {
   );
 }
 
+function bookDate(book: BookRow): number {
+  const parsed = book.updated_at ? Date.parse(book.updated_at) : NaN;
+  return Number.isNaN(parsed) ? (book.cached_at ?? 0) : parsed;
+}
+
 type UseLibraryFiltersArgs = {
   books: BookRow[];
   /** Remote OPDS search hits, when a query is active. */
@@ -120,13 +125,23 @@ export function useLibraryFilters({
         }
       }
       
-      const timeA = a.cached_at ?? 0;
-      const timeB = b.cached_at ?? 0;
+      if (sort === 'recent') {
+        const timeA = bookDate(a);
+        const timeB = bookDate(b);
+        
+        if (timeA === timeB) return a.id.localeCompare(b.id);
+        return timeB - timeA;
+      }
+      
+      const timeA = bookDate(a);
+      const timeB = bookDate(b);
       
       if (sort === 'oldest') {
+        if (timeA === timeB) return a.id.localeCompare(b.id);
         return timeA - timeB;
       }
       
+      if (timeA === timeB) return a.id.localeCompare(b.id);
       return timeB - timeA;
     });
 

@@ -34,6 +34,7 @@ export default function LibraryScreen() {
   const { downloads, refresh: refreshDownloads } = useDownloads();
   const { progressByBookId, refresh: refreshProgress, loading: progressLoading } = useReadingProgressMap();
   const [searchQuery, setSearchQuery] = useState('');
+  const [isPullRefreshing, setIsPullRefreshing] = useState(false);
 
   const {
     books,
@@ -50,6 +51,15 @@ export default function LibraryScreen() {
     refreshCatalog: refresh,
     refreshProgress,
   });
+
+  const onPullRefresh = useCallback(async () => {
+    setIsPullRefreshing(true);
+    try {
+      await refreshLibrary();
+    } finally {
+      setIsPullRefreshing(false);
+    }
+  }, [refreshLibrary]);
 
   const isLibraryRefreshing = isRefreshing || isRefetching;
 
@@ -274,8 +284,8 @@ export default function LibraryScreen() {
           style={{ flex: 1, backgroundColor: 'transparent' }}
           refreshControl={
             <RefreshControl
-              refreshing={isLibraryRefreshing}
-              onRefresh={() => void refreshLibrary()}
+              refreshing={isPullRefreshing}
+              onRefresh={onPullRefresh}
               tintColor={theme.colors.textSecondary}
               progressViewOffset={insets.top + 78}
             />
