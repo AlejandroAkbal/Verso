@@ -4,6 +4,7 @@ Living product and engineering backlog. Keep this file current when new durable 
 
 ## Now
 
+- [x] Autonomous one-hour improvement pass: pay safe tech debt, prefer small verified reliability/test/docs improvements, avoid risky scope changes.
 - [x] Onboarding KOReader enable button should health-check sync first: use saved profile if present, otherwise active Calibre-Web Automated library credentials; continue to Library on success, show KOReader settings only on failure.
 - [x] Reset All App Data must wipe everything from this device as if the app was uninstalled: servers, libraries, books, downloads/files, progress, sync state/accounts, preferences, cached query state, and saved secrets.
 - [x] Fix onboarding KOReader enable after Reset All App Data: after using a library server, enabling sync must pull existing remote book progress instead of only validating credentials.

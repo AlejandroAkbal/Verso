@@ -1,5 +1,5 @@
 import { getLocales } from 'expo-localization';
-import i18n from 'i18next';
+import { createInstance } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { I18nManager } from 'react-native';
 
@@ -46,6 +46,7 @@ function applyRtl(locale: SupportedLocale): void {
   }
 }
 
+const i18n = createInstance();
 const deviceLocale = resolveDeviceLocale();
 applyRtl(deviceLocale);
 
