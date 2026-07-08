@@ -9,8 +9,9 @@ import { authToHeaders, getServerAuth } from '@/services/opds/credentials';
 import { deriveKosyncUrlFromOpdsUrl } from '@/services/opds/url';
 
 const CWA_BOOK_ID_PATTERN = /\/opds\/download\/(\d+)\//;
-const MAX_CONCURRENT = 3;
+const MAX_CONCURRENT = 8;
 const CHUNK_SIZE = 1024;
+const EMPTY_PROGRESS_RECHECK_MS = 10 * 60 * 1000;
 
 type CwaSyncServer = {
   id: string;
@@ -111,6 +112,13 @@ export async function syncCwaCatalogProgress(
   await runPool(candidates, async (book) => {
     try {
       const cached = await getBookSyncState(db, book.id);
+      if (
+        cached?.document_id &&
+        cached.remote_timestamp === 0 &&
+        Date.now() - cached.last_pulled_at < EMPTY_PROGRESS_RECHECK_MS
+      ) {
+        return;
+      }
       const documentId = cached?.document_id || await partialMd5DocumentIdFromHttp(book.download_url, headers);
       const remote = await fetchRemoteProgress(baseUrl, auth.username, documentId, auth.password);
       checked += 1;
