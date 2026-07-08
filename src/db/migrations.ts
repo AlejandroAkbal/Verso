@@ -20,6 +20,27 @@ export async function migrateDatabase(db: SQLiteDatabase): Promise<void> {
   }
 }
 
+async function ensureLibraryPreferenceColumns(db: SQLiteDatabase): Promise<void> {
+  const columns = await db.getAllAsync<{ name: string }>('PRAGMA table_info(user_preferences)');
+  const names = new Set(columns.map((column) => column.name));
+
+  if (!names.has('library_sort')) {
+    await db.runAsync(
+      `ALTER TABLE user_preferences ADD COLUMN library_sort TEXT NOT NULL DEFAULT 'recent'`,
+    );
+  }
+  if (!names.has('library_filter')) {
+    await db.runAsync(
+      `ALTER TABLE user_preferences ADD COLUMN library_filter TEXT NOT NULL DEFAULT 'all'`,
+    );
+  }
+  if (!names.has('library_category_filter')) {
+    await db.runAsync(
+      `ALTER TABLE user_preferences ADD COLUMN library_category_filter TEXT NOT NULL DEFAULT ''`,
+    );
+  }
+}
+
 async function runMigrations(db: SQLiteDatabase): Promise<void> {
   await db.execAsync('PRAGMA busy_timeout = 5000');
   await db.execAsync(CREATE_TABLES_SQL);
@@ -179,31 +200,13 @@ async function runMigrations(db: SQLiteDatabase): Promise<void> {
     }
 
     if (versionRow.version < 11) {
-      try {
-        await db.runAsync(
-          `ALTER TABLE user_preferences ADD COLUMN library_sort TEXT NOT NULL DEFAULT 'recent'`,
-        );
-      } catch {
-        // Column may already exist on fresh installs.
-      }
-      try {
-        await db.runAsync(
-          `ALTER TABLE user_preferences ADD COLUMN library_filter TEXT NOT NULL DEFAULT 'all'`,
-        );
-      } catch {
-        // Column may already exist on fresh installs.
-      }
-      try {
-        await db.runAsync(
-          `ALTER TABLE user_preferences ADD COLUMN library_category_filter TEXT NOT NULL DEFAULT ''`,
-        );
-      } catch {
-        // Column may already exist on fresh installs.
-      }
+      await ensureLibraryPreferenceColumns(db);
     }
 
     await db.runAsync('UPDATE schema_version SET version = ?', [SCHEMA_VERSION]);
   }
+
+  await ensureLibraryPreferenceColumns(db);
 
   await db.runAsync(
     'INSERT OR IGNORE INTO user_preferences (id, onboarding_completed) VALUES (1, 0)',
