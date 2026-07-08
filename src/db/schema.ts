@@ -13,6 +13,9 @@ export type UserPreferencesRow = {
   koreader_sync_enabled: number;
   resume_last_book: number;
   last_open_book_id: string;
+  library_sort: string;
+  library_filter: string;
+  library_category_filter: string;
 };
 
 export type DocumentIdMode = 'partial_md5' | 'filename';
@@ -80,7 +83,7 @@ export type ReadingProgressRow = {
   updated_at: number;
 };
 
-export const SCHEMA_VERSION = 10;
+export const SCHEMA_VERSION = 11;
 
 export const CREATE_TABLES_SQL = `
   PRAGMA journal_mode = WAL;
@@ -96,7 +99,10 @@ export const CREATE_TABLES_SQL = `
     active_server_id TEXT NOT NULL DEFAULT '',
     koreader_sync_enabled INTEGER NOT NULL DEFAULT 0,
     resume_last_book INTEGER NOT NULL DEFAULT 0,
-    last_open_book_id TEXT NOT NULL DEFAULT ''
+    last_open_book_id TEXT NOT NULL DEFAULT '',
+    library_sort TEXT NOT NULL DEFAULT 'recent',
+    library_filter TEXT NOT NULL DEFAULT 'all',
+    library_category_filter TEXT NOT NULL DEFAULT ''
   );
 
   CREATE TABLE IF NOT EXISTS servers (

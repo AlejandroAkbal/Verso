@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useLibraryFilterContext } from '@/context/LibraryFilterContext';
 
 import type { BookRow, ReadingProgressRow } from '@/db/schema';
@@ -53,8 +53,7 @@ export function useLibraryFilters({
   searchQuery,
   progressByBookId = new Map(),
 }: UseLibraryFiltersArgs) {
-  const [filter, setFilter] = useState<LibraryFilter>('all');
-  const { sort, categoryFilter, setCategoryOptions } = useLibraryFilterContext();
+  const { filter, setFilter, sort, categoryFilter, setCategoryOptions } = useLibraryFilterContext();
 
   const categoryOptionsLocal = useMemo(() => {
     const counts = new Map<string, number>();

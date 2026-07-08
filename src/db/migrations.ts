@@ -178,6 +178,30 @@ async function runMigrations(db: SQLiteDatabase): Promise<void> {
       `);
     }
 
+    if (versionRow.version < 11) {
+      try {
+        await db.runAsync(
+          `ALTER TABLE user_preferences ADD COLUMN library_sort TEXT NOT NULL DEFAULT 'recent'`,
+        );
+      } catch {
+        // Column may already exist on fresh installs.
+      }
+      try {
+        await db.runAsync(
+          `ALTER TABLE user_preferences ADD COLUMN library_filter TEXT NOT NULL DEFAULT 'all'`,
+        );
+      } catch {
+        // Column may already exist on fresh installs.
+      }
+      try {
+        await db.runAsync(
+          `ALTER TABLE user_preferences ADD COLUMN library_category_filter TEXT NOT NULL DEFAULT ''`,
+        );
+      } catch {
+        // Column may already exist on fresh installs.
+      }
+    }
+
     await db.runAsync('UPDATE schema_version SET version = ?', [SCHEMA_VERSION]);
   }
 

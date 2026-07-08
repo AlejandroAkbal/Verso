@@ -65,7 +65,8 @@ export async function getUserPreferences(
 ): Promise<UserPreferencesRow> {
   const row = await db.getFirstAsync<UserPreferencesRow>(
     `SELECT id, onboarding_completed, active_server_id, koreader_sync_enabled,
-      resume_last_book, last_open_book_id
+      resume_last_book, last_open_book_id, library_sort, library_filter,
+      library_category_filter
      FROM user_preferences WHERE id = 1`,
   );
 
@@ -77,6 +78,9 @@ export async function getUserPreferences(
       koreader_sync_enabled: 0,
       resume_last_book: 0,
       last_open_book_id: '',
+      library_sort: 'recent',
+      library_filter: 'all',
+      library_category_filter: '',
     }
   );
 }
@@ -325,6 +329,23 @@ export async function getReadingProgress(
   return db.getFirstAsync<ReadingProgressRow>(
     'SELECT book_id, progression, locator_json, updated_at FROM reading_progress WHERE book_id = ?',
     [bookId],
+  );
+}
+
+export async function setLibraryFilterPreferences(
+  db: SQLiteDatabase,
+  sort: string,
+  filter: string,
+  categoryFilter: string,
+): Promise<void> {
+  await db.runAsync(
+    `INSERT OR IGNORE INTO user_preferences (id, onboarding_completed) VALUES (1, 0)`,
+  );
+  await db.runAsync(
+    `UPDATE user_preferences
+     SET library_sort = ?, library_filter = ?, library_category_filter = ?
+     WHERE id = 1`,
+    [sort, filter, categoryFilter],
   );
 }
 
