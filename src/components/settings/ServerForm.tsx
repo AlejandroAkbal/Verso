@@ -50,6 +50,12 @@ export function ServerForm({
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loadingPassword, setLoadingPassword] = useState(Boolean(serverId && !initial?.password));
+  const submitLabel = submitLabelKey
+    ? t(submitLabelKey)
+    : serverId
+      ? t('settings.updateButton')
+      : t('settings.addButton');
+  const showPrimarySubmit = submitLabelKey === 'serverForm.saveAndOpen';
 
   useEffect(() => {
     if (!serverId) return;
@@ -265,22 +271,38 @@ export function ServerForm({
         />
       </SettingsGroup>
 
-      <SettingsGroup footer={t('settings.serverFooter')}>
-        <SettingsRow
-          title={
-            submitLabelKey
-              ? t(submitLabelKey)
-              : serverId
-                ? t('settings.updateButton')
-                : t('settings.addButton')
-          }
+      {showPrimarySubmit ? (
+        <PressableBox
           onPress={() => void handleSubmit()}
           disabled={testing || saving || loadingPassword}
-          rightElement={
-            saving ? <ActivityIndicator color={theme.colors.text} size="small" /> : null
-          }
-        />
-      </SettingsGroup>
+          opacity={testing || saving || loadingPassword ? 0.6 : 1}
+          minHeight={56}
+          borderRadius="xl"
+          backgroundColor="interactive"
+          alignItems="center"
+          justifyContent="center"
+          marginBottom="md"
+        >
+          {saving ? (
+            <ActivityIndicator color={theme.colors.background} size="small" />
+          ) : (
+            <ThemedText style={{ color: theme.colors.background, fontSize: 17, fontWeight: '700' }}>
+              {submitLabel}
+            </ThemedText>
+          )}
+        </PressableBox>
+      ) : (
+        <SettingsGroup footer={t('settings.serverFooter')}>
+          <SettingsRow
+            title={submitLabel}
+            onPress={() => void handleSubmit()}
+            disabled={testing || saving || loadingPassword}
+            rightElement={
+              saving ? <ActivityIndicator color={theme.colors.text} size="small" /> : null
+            }
+          />
+        </SettingsGroup>
+      )}
 
       {trailingContent}
       </ScrollBox>

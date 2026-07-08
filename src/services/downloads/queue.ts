@@ -20,7 +20,10 @@ import {
   resolveAcquisitionFromDetail,
 } from '@/services/opds/parser';
 import { notifyDownloadsChanged } from '@/services/downloads/changes';
-import { ensureBookDocumentId } from '@/services/koreader/syncBook';
+import {
+  ensureBookDocumentId,
+  pullRemoteProgressForBook,
+} from '@/services/koreader/syncBook';
 import { ensureDownloadsDirectory, getDownloadsDirectory } from './paths';
 
 const MAX_CONCURRENT = 2;
@@ -205,6 +208,7 @@ async function downloadBook(db: SQLiteDatabase, bookId: string): Promise<void> {
 
     try {
       await ensureBookDocumentId(db, bookId);
+      await pullRemoteProgressForBook(db, bookId);
     } catch {
       // KOReader document ID is best-effort; never fail a completed download for sync setup.
     }

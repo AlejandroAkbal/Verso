@@ -51,6 +51,11 @@ export default function SettingsLayout() {
         options={{
           title: t('sync.title'),
           presentation: 'card',
+          headerRight: () => (
+            <PressableBox onPress={() => router.back()} hitSlop={12}>
+              <Text style={{ color: theme.colors.interactive, fontSize: 17, fontWeight: '600' }}>{t('common.done')}</Text>
+            </PressableBox>
+          ),
         }}
       />
       <Stack.Screen

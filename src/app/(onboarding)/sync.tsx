@@ -36,7 +36,10 @@ export default function OnboardingSyncScreen() {
     >
       <Box alignItems="center" gap="md">
         <SymbolView name="arrow.triangle.2.circlepath" size={56} tintColor={theme.colors.text} />
-        <ThemedText variant="title" style={{ fontSize: 32, marginTop: 8, textAlign: 'center' }}>
+        <ThemedText
+          variant="title"
+          style={{ fontSize: 32, lineHeight: 38, marginTop: 8, textAlign: 'center' }}
+        >
           {t('onboarding.syncTitle')}
         </ThemedText>
         <ThemedText

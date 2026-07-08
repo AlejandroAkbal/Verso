@@ -123,7 +123,11 @@ export async function pullRemoteProgressForBook(
     const localProgression = local?.progression ?? 0;
     const localUpdatedAt = local?.updated_at ?? 0;
 
-    const hasConflict = remote
+    if (remote && !local) {
+      await applyRemotePercentage(db, bookId, remote.percentage);
+    }
+
+    const hasConflict = remote && local
       ? hasSyncConflict(localUpdatedAt, localProgression, remote)
       : false;
 

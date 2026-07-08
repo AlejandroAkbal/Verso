@@ -6,6 +6,7 @@ import { getBookCountByServerId, getBooksByServerId, upsertBooks } from '@/db/qu
 import { useBooksCache } from '@/db/hooks/useBooksCache';
 import type { BookRow } from '@/db/schema';
 import { queryClient } from '@/lib/queryClient';
+import { syncCwaCatalogProgress } from '@/services/koreader/cwaProgress';
 import { getServerAuth } from '@/services/opds/credentials';
 import { resolveBookListingUrl } from '@/services/opds/catalog';
 import {
@@ -43,7 +44,13 @@ async function fetchAndCacheCatalog(
     : rows;
   await upsertBooks(db, normalizedRows);
   const cachedRows = await getBooksByServerId(db, serverId);
-  return { books: cachedRows, searchUrl };
+  await syncCwaCatalogProgress(
+    db,
+    { id: serverId, url: serverUrl, auth_username: authUsername },
+    cachedRows,
+  );
+  const syncedRows = await getBooksByServerId(db, serverId);
+  return { books: syncedRows, searchUrl };
 }
 
 export function useOPDSCatalog(

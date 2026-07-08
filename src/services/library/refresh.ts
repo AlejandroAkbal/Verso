@@ -1,6 +1,7 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-import { getAllDownloads } from '@/db/queries';
+import { getAllDownloads, getServerById, getUserPreferences } from '@/db/queries';
+import { syncCwaCatalogProgress } from '@/services/koreader/cwaProgress';
 import {
   applyRemotePercentage,
   isSyncActive,
@@ -13,7 +14,6 @@ export type LibrarySyncRefreshResult = {
   errors: number;
 };
 
-/** Pull KOReader/CWA progress for every downloaded book (manual refresh). */
 export async function syncDownloadedBooksProgress(
   db: SQLiteDatabase,
 ): Promise<LibrarySyncRefreshResult> {
@@ -22,12 +22,24 @@ export async function syncDownloadedBooksProgress(
     return { pulled: 0, updated: 0, errors: 0 };
   }
 
-  const downloads = await getAllDownloads(db);
-  const completed = downloads.filter((row) => row.status === 'completed');
-
   let pulled = 0;
   let updated = 0;
   let errors = 0;
+
+  const prefs = await getUserPreferences(db);
+  const server = prefs.active_server_id
+    ? await getServerById(db, prefs.active_server_id)
+    : null;
+
+  if (server) {
+    const cwa = await syncCwaCatalogProgress(db, server);
+    pulled += cwa.checked;
+    updated += cwa.updated;
+    errors += cwa.errors;
+  }
+
+  const downloads = await getAllDownloads(db);
+  const completed = downloads.filter((row) => row.status === 'completed');
 
   for (const download of completed) {
     try {
