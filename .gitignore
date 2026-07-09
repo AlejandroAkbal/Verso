@@ -30,6 +30,9 @@ yarn-error.*
 .DS_Store
 *.pem
 
+# opencode CLI session state (goals, etc.)
+.opencode/
+
 # local env files
 .env*.local
 src/config/dev-secrets.ts
